@@ -1,0 +1,9 @@
+# Cloudflare Pages redirect rules.
+# Your article generator template links to /privacy, /about, /contact
+# (no .html). These rules map those clean URLs to the real files so you
+# never have to edit the generator template.
+/privacy      /privacy.html      200
+/about        /about.html        200
+/contact      /contact.html      200
+/terms        /terms.html        200
+/disclaimer   /disclaimer.html   200

@@ -1,0 +1,10 @@
+{
+  "name": "ai-news-factory",
+  "private": true,
+  "version": "1.0.0",
+  "description": "AI News Factory — static news site auto-built from HTML articles in /articles",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-index.mjs"
+  }
+}
