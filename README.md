@@ -44,20 +44,25 @@ git push -u origin main
 2. Select this repo.
 3. Build settings:
    - **Build command:** `npm run build`
-   - **Build output directory:** `public` ⚠️ **not** the project root
-4. Deploy. You'll get a free `*.pages.dev` URL immediately.
+   - **Build output directory:** `public`
+4. Deploy.
 
-> **Why `public` and not `/`:** Cloudflare's build step installs `wrangler`
-> itself into `node_modules` before your build runs (you'll see this in the
-> build log), and that includes a ~120 MB binary called `workerd` — well
-> over the 25 MB per-file limit for deployed assets. If the output
-> directory is set to the project root, that folder gets swept up and the
-> deploy fails with `Asset too large`. `scripts/build-index.mjs` now
-> assembles everything that actually needs to be served into a clean
-> `/public` folder on every build (copying the HTML/CSS/JS files and
-> `/articles`, then writing `articles.json` + `sitemap.xml` there) — so as
-> long as the output directory is set to `public`, `node_modules` is never
-> part of what gets deployed.
+> **Two separate problems, two separate fixes.** Cloudflare's newer unified
+> project type runs `npm run build` (which now correctly writes everything
+> into `/public`), then runs a *second*, independent step — `npx wrangler
+> deploy` — to actually upload the site. That deploy step does **not** read
+> the dashboard's "Build output directory" setting; instead it looks for a
+> `wrangler.jsonc` file in your repo, and auto-creates one pointed at the
+> project root (`.`) if it doesn't find one. That root folder includes
+> `node_modules` (which the build process installs to get `wrangler`
+> itself, including a ~120 MB `workerd` binary) — over Cloudflare's 25 MB
+> per-file limit, so the deploy fails.
+>
+> The fix is `wrangler.jsonc` in this repo, which explicitly sets
+> `"assets": { "directory": "public" }`. As long as that file is committed,
+> wrangler uses it instead of auto-generating its own — don't delete it,
+> and keep the dashboard's output directory set to `public` too (both need
+> to agree).
 
 > Why not GitHub Pages? GitHub Pages' hosting is meant for docs/portfolio
 > sites and isn't the right fit for an ad-monetized production site.
@@ -136,6 +141,7 @@ ai-news-factory/
 ├── robots.txt
 ├── _redirects               ← maps /privacy → /privacy.html etc for Cloudflare
 ├── package.json
+├── wrangler.jsonc            ← tells Cloudflare's deploy step to use /public, not project root
 ├── .gitignore                ← excludes node_modules/ and public/ from git
 └── public/                   ← GENERATED on every build — this is what gets
                                  deployed. Don't edit files here directly;
