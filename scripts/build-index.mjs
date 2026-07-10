@@ -19,7 +19,16 @@
  * daily scheduled trigger to your host's deploy hook — see README.md.
  */
 
-import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import {
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+  copyFileSync,
+  rmSync,
+  statSync,
+} from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -27,6 +36,54 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const ARTICLES_DIR = path.join(ROOT, "articles");
 const SITE_URL = process.env.SITE_URL || "https://example.com"; // overridden in README setup
+
+// Everything actually served lives in /public. Keeping the deploy output in
+// its own folder (instead of the repo root) means node_modules — which
+// Cloudflare's build step creates to install wrangler itself — never gets
+// swept up into the deployed assets. Set "Build output directory" to
+// "public" in your Cloudflare project settings.
+const PUBLIC_DIR = path.join(ROOT, "public");
+
+const STATIC_FILES = [
+  "index.html",
+  "about.html",
+  "contact.html",
+  "privacy.html",
+  "terms.html",
+  "disclaimer.html",
+  "style.css",
+  "script.js",
+  "ads.txt",
+  "robots.txt",
+  "_redirects",
+];
+
+function copyDir(src, dest) {
+  mkdirSync(dest, { recursive: true });
+  for (const entry of readdirSync(src)) {
+    const srcPath = path.join(src, entry);
+    const destPath = path.join(dest, entry);
+    if (statSync(srcPath).isDirectory()) {
+      copyDir(srcPath, destPath);
+    } else {
+      copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+function resetPublicDir() {
+  rmSync(PUBLIC_DIR, { recursive: true, force: true });
+  mkdirSync(PUBLIC_DIR, { recursive: true });
+
+  for (const file of STATIC_FILES) {
+    const srcPath = path.join(ROOT, file);
+    if (existsSync(srcPath)) {
+      copyFileSync(srcPath, path.join(PUBLIC_DIR, file));
+    }
+  }
+
+  copyDir(ARTICLES_DIR, path.join(PUBLIC_DIR, "articles"));
+}
 
 function extract(html, regex, fallback = "") {
   const m = html.match(regex);
@@ -100,8 +157,11 @@ function main() {
   const published = all.filter((a) => !a.scheduled);
   const scheduledCount = all.length - published.length;
 
+  // Assemble the deployable /public folder fresh on every build.
+  resetPublicDir();
+
   writeFileSync(
-    path.join(ROOT, "articles.json"),
+    path.join(PUBLIC_DIR, "articles.json"),
     JSON.stringify({ generatedAt: new Date().toISOString(), articles: published }, null, 2)
   );
 
@@ -114,10 +174,11 @@ function main() {
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
     .map((u) => `  <url><loc>${u}</loc></url>`)
     .join("\n")}\n</urlset>\n`;
-  writeFileSync(path.join(ROOT, "sitemap.xml"), sitemap);
+  writeFileSync(path.join(PUBLIC_DIR, "sitemap.xml"), sitemap);
 
-  console.log(`Built articles.json: ${published.length} published, ${scheduledCount} scheduled for the future.`);
-  console.log(`Built sitemap.xml with ${urls.length} URLs.`);
+  console.log(`Copied static files + ${files.length} article(s) into /public`);
+  console.log(`Built public/articles.json: ${published.length} published, ${scheduledCount} scheduled for the future.`);
+  console.log(`Built public/sitemap.xml with ${urls.length} URLs.`);
 }
 
 main();

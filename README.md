@@ -44,8 +44,20 @@ git push -u origin main
 2. Select this repo.
 3. Build settings:
    - **Build command:** `npm run build`
-   - **Build output directory:** `/` (leave as project root)
+   - **Build output directory:** `public` ⚠️ **not** the project root
 4. Deploy. You'll get a free `*.pages.dev` URL immediately.
+
+> **Why `public` and not `/`:** Cloudflare's build step installs `wrangler`
+> itself into `node_modules` before your build runs (you'll see this in the
+> build log), and that includes a ~120 MB binary called `workerd` — well
+> over the 25 MB per-file limit for deployed assets. If the output
+> directory is set to the project root, that folder gets swept up and the
+> deploy fails with `Asset too large`. `scripts/build-index.mjs` now
+> assembles everything that actually needs to be served into a clean
+> `/public` folder on every build (copying the HTML/CSS/JS files and
+> `/articles`, then writing `articles.json` + `sitemap.xml` there) — so as
+> long as the output directory is set to `public`, `node_modules` is never
+> part of what gets deployed.
 
 > Why not GitHub Pages? GitHub Pages' hosting is meant for docs/portfolio
 > sites and isn't the right fit for an ad-monetized production site.
@@ -113,15 +125,23 @@ which covers most workflows.
 
 ```
 ai-news-factory/
-├── articles/              ← drop new article .html files here
+├── articles/              ← drop new article .html files here (source of truth)
 ├── scripts/
-│   └── build-index.mjs    ← parses /articles, writes articles.json + sitemap.xml
-├── index.html              ← homepage (feed, search, category filters)
+│   └── build-index.mjs    ← builds /public from source files on every deploy
+├── index.html              ← homepage source (feed, search, category filters)
 ├── script.js               ← homepage feed logic
 ├── style.css                ← shared design tokens (matches article template)
 ├── about.html / contact.html / privacy.html / terms.html / disclaimer.html
 ├── ads.txt
 ├── robots.txt
 ├── _redirects               ← maps /privacy → /privacy.html etc for Cloudflare
-└── package.json
+├── package.json
+├── .gitignore                ← excludes node_modules/ and public/ from git
+└── public/                   ← GENERATED on every build — this is what gets
+                                 deployed. Don't edit files here directly;
+                                 edit the source files above instead.
 ```
+
+You never need to touch `/public` by hand — it's regenerated from scratch
+every time `npm run build` runs, which Cloudflare does automatically on
+every push.
