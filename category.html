@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Archive — AI News Factory</title>
-<meta name="description" content="Browse every AI News Factory story by month — nothing is ever deleted.">
+<title id="pageTitle">Category — AI News Factory</title>
+<meta id="pageDescription" name="description" content="Browse the latest news in this category on AI News Factory.">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -16,24 +16,27 @@
 </header>
 <nav class="site-nav">
   <a href="/">Home</a>
-  <a href="/archive.html" class="active">Archive</a>
+  <a href="/archive.html">Archive</a>
 </nav>
 
 <div class="container">
-  <h1 class="page-title">Archive</h1>
-  <p class="page-sub">Every story we've published, organized by month. The homepage only shows the last 30 days — everything else lives here, permanently.</p>
+  <div class="breadcrumb"><a href="/">Home</a> › <span id="breadcrumbCat">Category</span></div>
+  <h1 class="page-title" id="categoryTitle">Category</h1>
+  <p class="page-sub" id="categorySub">Latest stories in this category.</p>
 
   <div class="controls">
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Search the archive…" aria-label="Search">
+      <input type="text" id="searchInput" placeholder="Search this category…" aria-label="Search">
     </div>
   </div>
 
-  <div class="chips month-picker" id="monthPicker"></div>
-
   <div class="grid" id="articleGrid" aria-live="polite"></div>
-  <p class="empty-state" id="emptyState" hidden>No articles found.</p>
+  <p class="empty-state" id="emptyState" hidden>No articles found in this category yet.</p>
   <button class="load-more" id="loadMoreBtn" hidden>Load more</button>
+
+  <div class="ad-slot">
+    <ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot=""></ins>
+  </div>
 </div>
 
 <footer class="site-footer">
@@ -51,6 +54,9 @@
   <div>© <span id="year"></span> AI News Factory. All rights reserved.</div>
   <div class="disclaimer">Content on this site is AI-assisted / AI-generated for informational purposes. Always verify with original sources.</div>
 </footer>
-<script src="/archive.js"></script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+<script src="/category.js"></script>
 </body>
 </html>

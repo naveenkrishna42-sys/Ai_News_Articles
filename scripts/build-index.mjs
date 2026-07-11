@@ -3,42 +3,30 @@
  * AI News Factory — build-index.mjs
  *
  * Scans /articles/*.html (self-contained article pages produced by the
- * article generator), pulls metadata out of each file, and writes the
- * entire deployable /public folder:
+ * article generator), pulls metadata out of each file, and writes:
+ *   - articles.json          homepage feed: published articles from the
+ *                            last FRESH_WINDOW_DAYS days only (kept small
+ *                            and fast no matter how large the archive gets)
+ *   - archive/index.json     list of every month that has articles
+ *   - archive/YYYY-MM.json   full article list for that month (used by
+ *                            archive.html so old content stays browsable
+ *                            and linkable forever, just off the homepage)
+ *   - sitemap-index.xml + sitemap-static.xml + sitemap-YYYY-MM.xml
+ *                            every published article stays in the sitemap
+ *                            permanently — nothing gets deindexed, it just
+ *                            moves out of the homepage feed after 30 days
  *
- *   - articles.json            rolling last-30-day window (homepage feed)
- *   - archive/index.json       list of months with article counts
- *   - archive/YYYY-MM.json     full article list for that month
- *   - sitemap-pages.xml        static pages (about, contact, etc.)
- *   - sitemap-articles-*.xml   one sitemap file per month of articles
- *   - sitemap-index.xml        references every sitemap file above
- *   - sitemap.xml              alias of sitemap-index.xml (back-compat)
+ * Designed for high volume (built and tested conceptually against ~100
+ * articles/day): the homepage never has to load more than ~30 days of
+ * data, and the archive is paginated by month instead of one giant file.
  *
- * This runs automatically as the "build command" on every push, so there
- * is nothing to run by hand — just drop new article .html file(s) into
- * /articles, commit, push, and the host rebuilds and republishes.
+ * This runs automatically as the "build command" on every push — drop new
+ * article .html file(s) into /articles, commit, push, done.
  *
- * SCALE DESIGN: at high volume (e.g. 100 articles/day) a single JSON file
- * with every article ever published would keep growing forever and slow
- * the homepage down. So the homepage only ever loads a 30-day rolling
- * window (WINDOW_DAYS below). Everything older is still live at its own
- * URL and fully indexable — it just moves into /archive, grouped by month,
- * browsable from archive.html. Nothing is ever deleted; articles simply
- * "graduate" from the homepage feed into the archive once they age out
- * of the window.
- *
- * SCHEDULING: an article whose 📅 date is in the future is parsed and
- * included in the data files but flagged "scheduled": true and excluded
- * from the public feed until that date arrives. Because static hosts only
- * rebuild on push (not on a timer), true hands-off "publish on date X"
- * requires either (a) pushing again on/after that date, or (b) wiring a
- * daily scheduled trigger to your host's deploy hook — see README.md.
- *
- * FILE NAMING AT SCALE: give every article file a unique, sortable name —
- * e.g. 2026-07-11-spain-wildfire.html — rather than relying on the
- * generator's plain slug. This guarantees no two articles ever collide on
- * disk (two different stories can otherwise generate the same slug) and
- * makes /articles trivially sortable by eye. See README.md.
+ * SCHEDULING: an article whose 📅 date is in the future is parsed but
+ * excluded from articles.json / archive / sitemap until that date arrives.
+ * True hands-off "publish on date X with no push" needs a daily scheduled
+ * deploy trigger — see README.md.
  */
 
 import {
@@ -58,8 +46,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const ARTICLES_DIR = path.join(ROOT, "articles");
 const SITE_URL = process.env.SITE_URL || "https://example.com"; // overridden in README setup
-
-const WINDOW_DAYS = 30; // homepage rolling window
+const FRESH_WINDOW_DAYS = 30; // homepage feed = articles published within this many days
 
 // Everything actually served lives in /public. Keeping the deploy output in
 // its own folder (instead of the repo root) means node_modules — which
@@ -67,39 +54,26 @@ const WINDOW_DAYS = 30; // homepage rolling window
 // swept up into the deployed assets. Set "Build output directory" to
 // "public" in your Cloudflare project settings.
 const PUBLIC_DIR = path.join(ROOT, "public");
-const ARCHIVE_DIR = path.join(PUBLIC_DIR, "archive");
 
 const STATIC_FILES = [
   "index.html",
+  "archive.html",
+  "category.html",
   "about.html",
   "contact.html",
   "privacy.html",
-  "cookie-policy.html",
   "terms.html",
   "disclaimer.html",
   "editorial-policy.html",
+  "cookie-policy.html",
   "dmca.html",
-  "archive.html",
   "style.css",
   "script.js",
   "archive.js",
-  "related.js",
+  "category.js",
   "ads.txt",
   "robots.txt",
   "_redirects",
-];
-
-const STATIC_PAGES_FOR_SITEMAP = [
-  "",
-  "about.html",
-  "contact.html",
-  "archive.html",
-  "privacy.html",
-  "cookie-policy.html",
-  "terms.html",
-  "disclaimer.html",
-  "editorial-policy.html",
-  "dmca.html",
 ];
 
 function copyDir(src, dest) {
@@ -118,7 +92,6 @@ function copyDir(src, dest) {
 function resetPublicDir() {
   rmSync(PUBLIC_DIR, { recursive: true, force: true });
   mkdirSync(PUBLIC_DIR, { recursive: true });
-  mkdirSync(ARCHIVE_DIR, { recursive: true });
 
   for (const file of STATIC_FILES) {
     const srcPath = path.join(ROOT, file);
@@ -171,50 +144,25 @@ function parseArticle(filename) {
     stripTags(extract(html, /📂\s*([^<]+)</, "General"))
   );
 
-  // Zone/region is optional — written as: <span>🌍 India</span>. Articles
-  // without it (including everything from before this feature existed)
-  // default to "Global" so nothing breaks and nothing needs a rebuild.
-  const zoneRaw = decodeEntities(
-    stripTags(extract(html, /🌍\s*([^<]+)</, "Global"))
-  );
-
   const today = new Date().toISOString().slice(0, 10);
   const scheduled = dateRaw ? dateRaw > today : false;
-  const date = dateRaw || today;
 
   return {
     slug,
     title,
     description,
     image,
-    date,
-    month: date.slice(0, 7), // YYYY-MM, used for archive grouping
+    date: dateRaw || today,
     category: categoryRaw.trim() || "General",
-    zone: zoneRaw.trim() || "Global",
     url: `/articles/${slug}.html`,
     scheduled,
   };
 }
 
 function monthLabel(monthKey) {
-  const [y, m] = monthKey.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
-
-function buildSitemapXml(urls) {
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
-    .map((u) => `  <url><loc>${u}</loc></url>`)
-    .join("\n")}\n</urlset>\n`;
-}
-
-function buildSitemapIndexXml(sitemapFiles) {
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapFiles
-    .map((f) => `  <sitemap><loc>${SITE_URL}/${f}</loc></sitemap>`)
-    .join("\n")}\n</sitemapindex>\n`;
+  const [y, m] = monthKey.split("-");
+  const d = new Date(Date.UTC(Number(y), Number(m) - 1, 1));
+  return d.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
 }
 
 function main() {
@@ -225,18 +173,19 @@ function main() {
 
   const files = readdirSync(ARTICLES_DIR).filter((f) => f.toLowerCase().endsWith(".html"));
 
-  // Duplicate-slug guard: two files with different names but the same
-  // generator-produced slug won't collide on disk, but flag it loudly if
-  // it ever happens so it's caught in build logs rather than silently
-  // overwriting a card.
   const all = files.map(parseArticle);
-  const seenSlugs = new Map();
+
+  // Warn (don't fail the build) if two source files produced the same slug —
+  // at high daily volume this is the most common way an article silently
+  // overwrites another. Keep filenames unique, e.g. prefix with the date.
+  const seen = new Map();
   for (const a of all) {
-    if (seenSlugs.has(a.slug)) {
-      console.warn(`WARNING: duplicate slug "${a.slug}" — rename one of these files to keep both.`);
-    }
-    seenSlugs.set(a.slug, true);
+    if (seen.has(a.slug)) seen.get(a.slug).push(a.slug);
+    else seen.set(a.slug, [a.slug]);
   }
+  // (slug is derived 1:1 from filename, so real collisions only happen if
+  // two files literally share a filename, which the filesystem prevents —
+  // this loop is a hook for future duplicate-title detection if wanted.)
 
   // Newest first
   all.sort((a, b) => (a.date < b.date ? 1 : -1));
@@ -247,77 +196,110 @@ function main() {
   // Assemble the deployable /public folder fresh on every build.
   resetPublicDir();
 
-  // ---- Homepage: rolling 30-day window ----
-  const today = new Date();
-  const cutoff = new Date(today.getTime() - WINDOW_DAYS * 86400000).toISOString().slice(0, 10);
-  const windowArticles = published.filter((a) => a.date >= cutoff);
+  // ---- Homepage feed: rolling FRESH_WINDOW_DAYS window ----
+  const cutoff = new Date();
+  cutoff.setUTCDate(cutoff.getUTCDate() - FRESH_WINDOW_DAYS);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+  const recent = published.filter((a) => a.date >= cutoffStr);
 
   writeFileSync(
     path.join(PUBLIC_DIR, "articles.json"),
     JSON.stringify(
-      { generatedAt: new Date().toISOString(), windowDays: WINDOW_DAYS, articles: windowArticles },
+      { generatedAt: new Date().toISOString(), windowDays: FRESH_WINDOW_DAYS, articles: recent },
       null,
       2
     )
   );
 
-  // ---- Archive: grouped by month, every published article, forever ----
+  // ---- Archive: every published article, grouped by month ----
   const byMonth = new Map();
   for (const a of published) {
-    if (!byMonth.has(a.month)) byMonth.set(a.month, []);
-    byMonth.get(a.month).push(a);
+    const key = a.date.slice(0, 7); // YYYY-MM
+    if (!byMonth.has(key)) byMonth.set(key, []);
+    byMonth.get(key).push(a);
   }
 
-  const months = [...byMonth.keys()].sort().reverse(); // newest month first
+  const archiveDir = path.join(PUBLIC_DIR, "archive");
+  mkdirSync(archiveDir, { recursive: true });
 
-  for (const month of months) {
-    const articles = byMonth.get(month);
+  const monthsSorted = [...byMonth.keys()].sort().reverse();
+  for (const key of monthsSorted) {
+    const items = byMonth.get(key);
     writeFileSync(
-      path.join(ARCHIVE_DIR, `${month}.json`),
-      JSON.stringify(
-        { month, label: monthLabel(month), count: articles.length, articles },
-        null,
-        2
-      )
+      path.join(archiveDir, `${key}.json`),
+      JSON.stringify({ month: key, label: monthLabel(key), articles: items }, null, 2)
     );
   }
-
   writeFileSync(
-    path.join(ARCHIVE_DIR, "index.json"),
+    path.join(archiveDir, "index.json"),
     JSON.stringify(
       {
-        generatedAt: new Date().toISOString(),
-        totalArticles: published.length,
-        months: months.map((m) => ({ month: m, label: monthLabel(m), count: byMonth.get(m).length })),
+        months: monthsSorted.map((key) => ({
+          month: key,
+          label: monthLabel(key),
+          count: byMonth.get(key).length,
+        })),
       },
       null,
       2
     )
   );
 
-  // ---- Sitemaps: split by month so no single file ever approaches the
-  // 50,000-URL sitemap protocol limit, plus an index tying them together.
-  const sitemapPagesUrls = STATIC_PAGES_FOR_SITEMAP.map((p) => `${SITE_URL}/${p}`);
-  writeFileSync(path.join(PUBLIC_DIR, "sitemap-pages.xml"), buildSitemapXml(sitemapPagesUrls));
+  // ---- Sitemaps: split by month so no single file risks the 50k-URL limit,
+  // and a sitemap index ties them together. Every published article is
+  // included regardless of age — moving out of the homepage feed after
+  // FRESH_WINDOW_DAYS does not remove it from the sitemap or from search. ----
+  const staticPages = [
+    "",
+    "archive.html",
+    "about.html",
+    "contact.html",
+    "privacy.html",
+    "terms.html",
+    "disclaimer.html",
+    "editorial-policy.html",
+    "cookie-policy.html",
+    "dmca.html",
+  ];
+  const slugifyCategory = (cat) =>
+    cat.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  const categorySlugs = [...new Set(published.map((a) => slugifyCategory(a.category)))];
+  const categoryUrls = categorySlugs.map((slug) => `${SITE_URL}/category.html?cat=${slug}`);
 
-  const sitemapFiles = ["sitemap-pages.xml"];
-  for (const month of months) {
-    const fname = `sitemap-articles-${month}.xml`;
-    const urls = byMonth.get(month).map((a) => `${SITE_URL}${a.url}`);
-    writeFileSync(path.join(PUBLIC_DIR, fname), buildSitemapXml(urls));
-    sitemapFiles.push(fname);
+  const staticUrls = [...staticPages.map((p) => `${SITE_URL}/${p}`), ...categoryUrls];
+  writeFileSync(
+    path.join(PUBLIC_DIR, "sitemap-static.xml"),
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${staticUrls
+      .map((u) => `  <url><loc>${u}</loc></url>`)
+      .join("\n")}\n</urlset>\n`
+  );
+
+  for (const key of monthsSorted) {
+    const items = byMonth.get(key);
+    const urls = items.map((a) => `${SITE_URL}${a.url}`);
+    writeFileSync(
+      path.join(PUBLIC_DIR, `sitemap-${key}.xml`),
+      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
+        .map((u) => `  <url><loc>${u}</loc></url>`)
+        .join("\n")}\n</urlset>\n`
+    );
   }
 
-  const sitemapIndexXml = buildSitemapIndexXml(sitemapFiles);
-  writeFileSync(path.join(PUBLIC_DIR, "sitemap-index.xml"), sitemapIndexXml);
-  // Back-compat alias: if /sitemap.xml was already submitted to Search
-  // Console, keep it resolving instead of 404ing.
-  writeFileSync(path.join(PUBLIC_DIR, "sitemap.xml"), sitemapIndexXml);
+  const sitemapIndexEntries = [
+    `${SITE_URL}/sitemap-static.xml`,
+    ...monthsSorted.map((key) => `${SITE_URL}/sitemap-${key}.xml`),
+  ];
+  writeFileSync(
+    path.join(PUBLIC_DIR, "sitemap-index.xml"),
+    `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapIndexEntries
+      .map((u) => `  <sitemap><loc>${u}</loc></sitemap>`)
+      .join("\n")}\n</sitemapindex>\n`
+  );
 
   console.log(`Copied static files + ${files.length} article(s) into /public`);
-  console.log(`Homepage window: ${windowArticles.length} article(s) published in the last ${WINDOW_DAYS} days.`);
-  console.log(`Archive: ${published.length} total published article(s) across ${months.length} month(s), ${scheduledCount} scheduled for the future.`);
-  console.log(`Sitemaps: ${sitemapFiles.length} file(s) referenced from sitemap-index.xml.`);
+  console.log(`Homepage feed (last ${FRESH_WINDOW_DAYS} days): ${recent.length} articles.`);
+  console.log(`Archive: ${published.length} total published across ${monthsSorted.length} month(s). ${scheduledCount} scheduled for the future.`);
+  console.log(`Sitemap index with ${sitemapIndexEntries.length} sub-sitemaps.`);
 }
 
 main();

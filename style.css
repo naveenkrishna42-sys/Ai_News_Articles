@@ -24,8 +24,8 @@ header.site-header .tagline{color:#94a3b8;font-size:0.78rem;display:block;font-w
 header.site-header a.back{color:#94a3b8;text-decoration:none;font-size:0.9rem}
 header.site-header a.back:hover{color:#fff}
 
-nav.site-nav{background:var(--ink-soft);padding:10px 24px;display:flex;gap:20px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
-nav.site-nav a{color:#94a3b8;text-decoration:none;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap}
+nav.site-nav{background:var(--ink-soft);padding:10px 24px;display:flex;gap:20px;flex-wrap:wrap}
+nav.site-nav a{color:#94a3b8;text-decoration:none;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px}
 nav.site-nav a:hover,nav.site-nav a.active{color:var(--accent)}
 
 .container{max-width:1080px;margin:32px auto;padding:0 20px}
@@ -39,7 +39,6 @@ h1.page-title{font-size:2rem;font-weight:800;color:var(--ink);margin-bottom:8px;
 
 /* Controls: search + category chips */
 .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:28px}
-.controls-label{font-size:0.8rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
 .search-box{flex:1;min-width:220px}
 .search-box input{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.95rem;background:#fff;color:var(--ink-soft)}
 .search-box input:focus{outline:2px solid var(--accent);outline-offset:1px}
@@ -86,3 +85,34 @@ footer.site-footer .disclaimer{margin-top:6px;font-size:0.75rem}
   h1.page-title{font-size:1.5rem}
   .card img{height:140px}
 }
+
+/* Category carousels (homepage) */
+.category-section{margin-bottom:36px}
+.category-section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.category-section-head h2{font-size:1.25rem;font-weight:800;color:var(--ink)}
+.category-section-head a{font-size:0.85rem;color:var(--link);text-decoration:none;white-space:nowrap}
+.carousel-track{display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;padding-bottom:6px;scrollbar-width:thin}
+.carousel-track::-webkit-scrollbar{height:6px}
+.carousel-track::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.carousel-card{flex:0 0 240px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column}
+.carousel-card img{width:100%;height:130px;object-fit:cover;background:var(--border)}
+.carousel-card .cc-body{padding:12px}
+.carousel-card h3{font-size:0.92rem;line-height:1.35;color:var(--ink);margin-bottom:6px}
+.carousel-card .cc-meta{font-size:0.72rem;color:var(--text-muted)}
+.carousel-card:hover h3{color:var(--link)}
+
+/* Contact form */
+.contact-form{display:flex;flex-direction:column;gap:14px;max-width:520px;margin-top:8px}
+.contact-form label{font-size:0.85rem;font-weight:600;color:var(--ink);margin-bottom:4px;display:block}
+.contact-form input,.contact-form textarea{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.95rem;font-family:inherit;background:#fff;color:var(--ink-soft)}
+.contact-form textarea{min-height:120px;resize:vertical}
+.contact-form input:focus,.contact-form textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.contact-form button{align-self:flex-start;padding:11px 26px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer}
+.contact-form button:hover{background:var(--ink-soft)}
+.contact-form button:disabled{opacity:0.6;cursor:not-allowed}
+.form-status{font-size:0.88rem;padding:10px 14px;border-radius:8px;display:none}
+.form-status.success{display:block;background:var(--good-bg);color:var(--good-text);border:1px solid var(--good-border)}
+.form-status.error{display:block;background:#fef2f2;color:#991b1b;border:1px solid #fca5a5}
+
+/* Category / archive month chips reuse .chip / .chips from controls */
+.month-picker{margin-bottom:24px}

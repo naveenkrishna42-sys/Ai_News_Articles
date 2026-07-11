@@ -19,11 +19,13 @@
 </header>
 <nav class="site-nav" id="categoryNav">
   <a href="/" data-cat="all" class="active">Home</a>
+  <a href="/archive.html">Archive</a>
   <!-- category links are injected by script.js based on what's actually in articles.json -->
-  <a href="/archive.html" style="margin-left:auto">Archive</a>
 </nav>
 
 <div class="container">
+  <div id="categoryCarousels"><!-- populated by script.js: one sliding row per category --></div>
+
   <h1 class="page-title">Latest News</h1>
   <p class="page-sub">Updated automatically as new stories are published.</p>
 
@@ -32,10 +34,6 @@
       <input type="text" id="searchInput" placeholder="Search articles…" aria-label="Search articles">
     </div>
     <div class="chips" id="chipRow"></div>
-  </div>
-  <div class="controls" id="zoneControls" hidden>
-    <span class="controls-label">Region:</span>
-    <div class="chips" id="zoneChipRow"></div>
   </div>
 
   <div class="grid" id="articleGrid" aria-live="polite"></div>
@@ -52,14 +50,13 @@
   <div style="margin-bottom:10px;">
     <a href="/about.html">About Us</a>
     <a href="/contact.html">Contact</a>
-    <a href="/archive.html">Archive</a>
     <a href="/privacy.html">Privacy Policy</a>
-    <a href="/cookie-policy.html">Cookie Policy</a>
     <a href="/terms.html">Terms</a>
     <a href="/disclaimer.html">Disclaimer</a>
     <a href="/editorial-policy.html">Editorial Policy</a>
-    <a href="/dmca.html">DMCA</a>
-    <a href="/sitemap-index.xml">Sitemap</a>
+    <a href="/cookie-policy.html">Cookie Policy</a>
+    <a href="/dmca.html">Copyright / DMCA</a>
+    <a href="/sitemap.xml">Sitemap</a>
   </div>
   <div>© <span id="year"></span> AI News Factory. All rights reserved.</div>
   <div class="disclaimer">Content on this site is AI-assisted / AI-generated for informational purposes. Always verify with original sources. See our <a href="/disclaimer.html">Disclaimer</a>.</div>

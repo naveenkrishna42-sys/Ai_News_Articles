@@ -14,7 +14,6 @@
 </header>
 <nav class="site-nav">
   <a href="/">Home</a>
-  <a href="/archive.html">Archive</a>
   <a href="/about.html">About</a>
   <a href="/contact.html" class="active">Contact</a>
   <a href="/disclaimer.html">Disclaimer</a>
@@ -24,32 +23,96 @@
   <div class="breadcrumb"><a href="/">Home</a> › Contact</div>
   <h1 class="page-title">Contact Us</h1>
   <div class="prose">
-    <p>Have a correction, takedown request, or general inquiry? We'd like to hear from you.</p>
-    <h2>Email</h2>
-    <!-- TODO: replace with your real contact email before launch -->
-    <p><a href="mailto:contact@yourdomain.com">contact@yourdomain.com</a></p>
-    <h2>Corrections &amp; takedown requests</h2>
-    <p>If you believe an article contains a factual error, or you are a rights holder requesting removal of content, please email us with the article URL and a description of the issue. We aim to respond within 5 business days.</p>
-    <h2>Advertising</h2>
-    <p>For advertising inquiries, please use the email above with the subject line "Advertising."</p>
+    <p>Have a correction, takedown request, advertising inquiry, or general question? Send us a message below and we'll get back to you.</p>
   </div>
+
+  <form class="contact-form" id="contactForm">
+    <!-- TODO: replace YOUR_WEB3FORMS_ACCESS_KEY below — see README "Contact form setup" -->
+    <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY">
+    <input type="hidden" name="subject" value="New message from AI News Factory contact form">
+    <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+
+    <div>
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+    <div>
+      <label for="email">Your email</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+    <div>
+      <label for="reason">Reason</label>
+      <select id="reason" name="reason" style="padding:11px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.95rem;font-family:inherit;background:#fff;">
+        <option>General question</option>
+        <option>Correction request</option>
+        <option>Copyright / DMCA takedown</option>
+        <option>Advertising inquiry</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div>
+      <label for="message">Message</label>
+      <textarea id="message" name="message" required></textarea>
+    </div>
+
+    <button type="submit" id="submitBtn">Send message</button>
+    <div class="form-status" id="formStatus"></div>
+  </form>
 </div>
 
 <footer class="site-footer">
   <div style="margin-bottom:10px;">
     <a href="/about.html">About Us</a>
     <a href="/contact.html">Contact</a>
-    <a href="/archive.html">Archive</a>
     <a href="/privacy.html">Privacy Policy</a>
-    <a href="/cookie-policy.html">Cookie Policy</a>
     <a href="/terms.html">Terms</a>
     <a href="/disclaimer.html">Disclaimer</a>
     <a href="/editorial-policy.html">Editorial Policy</a>
-    <a href="/dmca.html">DMCA</a>
+    <a href="/cookie-policy.html">Cookie Policy</a>
+    <a href="/dmca.html">Copyright / DMCA</a>
     <a href="/sitemap-index.xml">Sitemap</a>
   </div>
   <div>© 2026 AI News Factory. All rights reserved.</div>
   <div class="disclaimer">Content on this site is AI-assisted / AI-generated for informational purposes. Always verify with original sources.</div>
 </footer>
+
+<script>
+  const form = document.getElementById("contactForm");
+  const statusEl = document.getElementById("formStatus");
+  const submitBtn = document.getElementById("submitBtn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending…";
+    statusEl.className = "form-status";
+    statusEl.hidden = true;
+
+    try {
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
+      if (result.success) {
+        statusEl.textContent = "Message sent — thanks, we'll get back to you soon.";
+        statusEl.className = "form-status success";
+        form.reset();
+      } else {
+        throw new Error(result.message || "Unknown error");
+      }
+    } catch (err) {
+      statusEl.textContent = "Something went wrong sending your message. Please try again in a moment.";
+      statusEl.className = "form-status error";
+    } finally {
+      statusEl.hidden = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Send message";
+    }
+  });
+</script>
 </body>
 </html>
