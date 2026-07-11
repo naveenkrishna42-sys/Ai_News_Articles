@@ -99,6 +99,7 @@ function buildCategoryCarousels(all) {
 }
 
 
+function applyFilters() {
   const q = state.query.trim().toLowerCase();
   state.filtered = state.all.filter((a) => {
     const matchesCat = state.category === "all" || a.category.toLowerCase() === state.category;

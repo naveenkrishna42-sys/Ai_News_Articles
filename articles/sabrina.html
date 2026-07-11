@@ -32,15 +32,12 @@
 </head>
 <body>
 <header>
-  <a href="/" style="font-weight:700;font-size:1.1rem;color:#fff;">AIWebFactory News</a>
+  <a href="/" style="font-weight:700;font-size:1.1rem;color:#fff;">AI News Factory</a>
   <a href="/">← Back to Home</a>
 </header>
 <nav>
   <a href="/">Home</a>
-  <a href="/?cat=tech">Tech</a>
-  <a href="/?cat=business">Business</a>
-  <a href="/?cat=sports">Sports</a>
-  <a href="/?cat=health">Health</a>
+  <a href="/archive.html">Archive</a>
 </nav>
 <div class="container">
   <div class="breadcrumb"><a href="/">Home</a> › <a href="/?cat=science">Science</a> › Article</div>
@@ -78,10 +75,8 @@
             title="Related video"></iframe>
     </div>
 
-    <div class="also-read-box" style="margin-top: 40px; padding: 24px; border-top: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px;">
-        <h4 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Also Read in Science</h4>
-        <ul style="list-style-type: square; padding-left: 20px; margin: 0;"><li style="margin-bottom: 8px;"><a href="/article/3e836042-6051-4822-ad5b-7c0705b29c4b" style="color: #3b82f6; text-decoration: none; font-weight: 500;">Moon Astronauts</a></li></ul>
-    </div>
+    <div id="relatedArticles"></div>
+    <script src="/related.js" data-category="Science" data-slug="sabrina" data-limit="3"></script>
   </div>
   <div class="source-link">
     Source: <a href="https://news.google.com/rss/articles/CBMipAJBVV95cUxQSXI4c1p3TlpJamhKU3M1QzJYNWVuaTNTRUduZHpnVG5iZGNQanJUS25tUWF0alU4aEVPLU1XRmhRRWdRSEVDYng1aUEwMTN1azA5SkU0eWhEd3dTSWRZZnZ4dnlZLTZGT05MNS1Va3BNUUdra0NnODQyc0dpTjdkSndoYUtKeW5IS0dQRF9RVG1qS19SNTJ5X3lGQlZoQTVjQUEza3VqdEk3Zk5aLVA5U3RlaUJURk4yQXRodGIwU25kamhKa1hOTlE4LXpLTjRkTWtyRHI1MDRKSjNjUXMyUE1vVkJLZHpqREVPTmJQMllYM1JIbHZsU0gtbUNPUThEM0Z6S1RBSXVZLVk1TS1QTG5vQmhDMFpzbllrV084WEV0ZU5y0gGqAkFVX3lxTE80N180WXJ0UEFZQ1pmRVdWeENFTXRzNmN0MElCa2t6bFd5UTFzTGYwSlI1OXU4dnNZbWJMNGlTajBRN00wWXIxTVVDVGR3X1Y1WVA4c19XdEFUdFBQdlZMS3lQZFNWT1dZRExFS0JKWFoxSWYyakJRdnhidDZWSW1vekMwLUJOeVBfTGhIQVBHejlCeGFPVlJuZGcwelJ1NmVfY0Vyc1dwNE02NXFYbHdEd2ZRRXNrOV91MERnQWVUZjRzZEFvbk5GUUtlRU1zekdDTmN3REEyMmpRYVMxeHFlY1U0QUxTMnhCOHpNYXRHQzgzZWIyeFRxN0JwQW1FUjRiUVpXRDd6c0FtbW9SM1doeG1zMFRvMmRYMW04Ul84WFlWOEFOaEhSTUE?oc=5" target="_blank" rel="noopener noreferrer">https://news.google.com/rss/articles/CBMipAJBVV95cUxQSXI4c1p3TlpJamhKU3M1QzJYNWVuaTNTRUduZHpnVG5iZGNQanJUS25tUWF0alU4aEVPLU1XRmhRRWdRSEVDYng1aUEwMTN1azA5SkU0eWhEd3dTSWRZZnZ4dnlZLTZGT05MNS1Va3BNUUdra0NnODQyc0dpTjdkSndoYUtKeW5IS0dQRF9RVG1qS19SNTJ5X3lGQlZoQTVjQUEza3VqdEk3Zk5aLVA5U3RlaUJURk4yQXRodGIwU25kamhKa1hOTlE4LXpLTjRkTWtyRHI1MDRKSjNjUXMyUE1vVkJLZHpqREVPTmJQMllYM1JIbHZsU0gtbUNPUThEM0Z6S1RBSXVZLVk1TS1QTG5vQmhDMFpzbllrV084WEV0ZU5y0gGqAkFVX3lxTE80N180WXJ0UEFZQ1pmRVdWeENFTXRzNmN0MElCa2t6bFd5UTFzTGYwSlI1OXU4dnNZbWJMNGlTajBRN00wWXIxTVVDVGR3X1Y1WVA4c19XdEFUdFBQdlZMS3lQZFNWT1dZRExFS0JKWFoxSWYyakJRdnhidDZWSW1vekMwLUJOeVBfTGhIQVBHejlCeGFPVlJuZGcwelJ1NmVfY0Vyc1dwNE02NXFYbHdEd2ZRRXNrOV91MERnQWVUZjRzZEFvbk5GUUtlRU1zekdDTmN3REEyMmpRYVMxeHFlY1U0QUxTMnhCOHpNYXRHQzgzZWIyeFRxN0JwQW1FUjRiUVpXRDd6c0FtbW9SM1doeG1zMFRvMmRYMW04Ul84WFlWOEFOaEhSTUE?oc=5</a>
@@ -89,13 +84,18 @@
 </div>
 <footer>
   <div style="margin-bottom:10px;">
-    <a href="/privacy">Privacy Policy</a>
-    <a href="/about">About Us</a>
-    <a href="/contact">Contact</a>
-    <a href="/sitemap.xml">Sitemap</a>
+    <a href="/about.html">About Us</a>
+    <a href="/contact.html">Contact</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="/disclaimer.html">Disclaimer</a>
+    <a href="/editorial-policy.html">Editorial Policy</a>
+    <a href="/cookie-policy.html">Cookie Policy</a>
+    <a href="/dmca.html">Copyright / DMCA</a>
+    <a href="/sitemap-index.xml">Sitemap</a>
   </div>
-  <div>© 2026 AIWebFactory News. All rights reserved.</div>
-  <div style="margin-top:6px;font-size:0.75rem;">Content is AI-generated for informational purposes. Always verify with original sources.</div>
+  <div>© 2026 AI News Factory. All rights reserved.</div>
+  <div style="margin-top:6px;font-size:0.75rem;">Content is AI-assisted / AI-generated for informational purposes. Always verify with original sources. See our <a href="/disclaimer.html">Disclaimer</a>.</div>
 </footer>
 </body>
 </html>

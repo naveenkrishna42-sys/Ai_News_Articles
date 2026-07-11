@@ -33,19 +33,18 @@ import path from "node:path";
 
 const STANDARD_FOOTER = `<footer>
   <div style="margin-bottom:10px;">
-    <a href="/about">About Us</a>
-    <a href="/contact">Contact</a>
-    <a href="/archive.html">Archive</a>
-    <a href="/privacy">Privacy Policy</a>
-    <a href="/cookie-policy.html">Cookie Policy</a>
-    <a href="/terms">Terms</a>
-    <a href="/disclaimer">Disclaimer</a>
+    <a href="/about.html">About Us</a>
+    <a href="/contact.html">Contact</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="/disclaimer.html">Disclaimer</a>
     <a href="/editorial-policy.html">Editorial Policy</a>
-    <a href="/dmca.html">DMCA</a>
+    <a href="/cookie-policy.html">Cookie Policy</a>
+    <a href="/dmca.html">Copyright / DMCA</a>
     <a href="/sitemap-index.xml">Sitemap</a>
   </div>
   <div>© 2026 AI News Factory. All rights reserved.</div>
-  <div style="margin-top:6px;font-size:0.75rem;">Content is AI-generated for informational purposes. Always verify with original sources.</div>
+  <div style="margin-top:6px;font-size:0.75rem;">Content is AI-assisted / AI-generated for informational purposes. Always verify with original sources. See our <a href="/disclaimer.html">Disclaimer</a>.</div>
 </footer>`;
 
 const STANDARD_NAV = `<nav>
