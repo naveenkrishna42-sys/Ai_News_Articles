@@ -30,12 +30,12 @@ GitHub Action that pings Cloudflare Pages' deploy hook once a day (see
 
 ### 1. Push this folder to GitHub
 ```
-cd ai-news-factory
+cd ainewsss
 git init
 git add .
 git commit -m "Initial commit"
 git branch -M main
-git remote add origin https://github.com/<your-username>/ai-news-factory.git
+git remote add origin https://github.com/<your-username>/ainewsss.git
 git push -u origin main
 ```
 
@@ -97,7 +97,7 @@ and `sitemap.xml` you don't need — this repo already has its own). Instead
 of renaming each one by hand:
 
 1. Download articles as usual — each is a zip with `index.html` inside.
-2. Extract every zip into `ai-news-factory/incoming/` — one subfolder per
+2. Extract every zip into `ainewsss/incoming/` — one subfolder per
    download is completely fine, you don't need to flatten anything.
 3. Run:
    ```
@@ -242,7 +242,7 @@ landing page, etc.):
 ## File structure
 
 ```
-ai-news-factory/
+ainewsss/
 ├── articles/              ← drop new article .html files here (source of truth)
 ├── scripts/
 │   └── build-index.mjs    ← builds /public from source files on every deploy

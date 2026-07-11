@@ -14,7 +14,7 @@
  * WORKFLOW:
  *   1. Download articles from your generator as usual (each is a zip
  *      containing index.html + robots.txt + sitemap.xml).
- *   2. Extract ALL of today's zips into ai-news-factory/incoming/
+ *   2. Extract ALL of today's zips into ainewsss/incoming/
  *      (each one in its own subfolder is fine — this script looks
  *      recursively, you don't need to flatten anything).
  *   3. Run:  node scripts/import-articles.mjs   (or  npm run import)
