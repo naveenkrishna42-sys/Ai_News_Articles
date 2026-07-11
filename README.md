@@ -90,6 +90,41 @@ Registrar) — that's the one real cost in this whole stack.
   domain, e.g. `https://ainewsfactory.com`, so `sitemap.xml` has correct
   absolute URLs.
 
+## Publishing articles without manually renaming anything
+
+Your generator always names its export `index.html` (plus a `robots.txt`
+and `sitemap.xml` you don't need — this repo already has its own). Instead
+of renaming each one by hand:
+
+1. Download articles as usual — each is a zip with `index.html` inside.
+2. Extract every zip into `ai-news-factory/incoming/` — one subfolder per
+   download is completely fine, you don't need to flatten anything.
+3. Run:
+   ```
+   npm run import
+   ```
+4. It scans `/incoming` recursively, reads each file's `<title>` and `📅`
+   date, and copies it into `/articles` as e.g.
+   `2026-07-11-jayden-adams-dies.html` — automatically, no manual renaming.
+5. `git add articles/ && git commit -m "New articles" && git push`
+
+Nothing under `/incoming` is deleted by the script — delete it yourself
+once you've confirmed the import worked. `/incoming` is git-ignored, so it
+never gets pushed.
+
+## The "Also Read" box and dead `/article/<id>` links
+
+Every article your generator exports currently has an "Also Read" box at
+the bottom linking to `/article/<uuid>` — a URL pattern this static site
+never had, so those links 404 on every single article. **This isn't
+something fixable in the website repo** — it's baked into the generator's
+own export template, in a different codebase (the desktop app), not here.
+To remove it, that template needs to stop emitting the "Also Read" block
+entirely — worth asking whoever maintains that generator's code (or your
+coding agent) to delete that block from the export, since a live,
+self-updating "related articles" feature would need to be added here on
+the website side as a separate, deliberate feature instead.
+
 ## Daily use: publishing an article
 
 1. Generate the article `.html` file as you already do.

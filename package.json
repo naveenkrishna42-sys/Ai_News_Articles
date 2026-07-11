@@ -5,6 +5,7 @@
   "description": "AI News Factory — static news site auto-built from HTML articles in /articles",
   "type": "module",
   "scripts": {
-    "build": "node scripts/build-index.mjs"
+    "build": "node scripts/build-index.mjs",
+    "import": "node scripts/import-articles.mjs"
   }
 }
