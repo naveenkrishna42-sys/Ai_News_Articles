@@ -49,7 +49,6 @@ const STANDARD_FOOTER = `<footer>
 
 const STANDARD_NAV = `<nav>
   <a href="/">Home</a>
-  <a href="/archive.html">Archive</a>
 </nav>`;
 
 function extract(html, regex, fallback = "") {
@@ -65,8 +64,8 @@ function fixFile(filePath) {
   // 1. Nav — replace any <nav>...</nav> that still contains a "?cat="
   // link (the old dead-link pattern) with the simplified working nav.
   html = html.replace(/<nav>[\s\S]*?<\/nav>/, (block) => {
-    if (block.includes("?cat=")) {
-      changes.push("nav (removed dead ?cat= links)");
+    if (block.includes("?cat=") || block.includes("archive.html")) {
+      changes.push("nav (removed archive/dead links)");
       return STANDARD_NAV;
     }
     return block;

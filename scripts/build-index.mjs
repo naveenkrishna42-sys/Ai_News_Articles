@@ -46,7 +46,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const ARTICLES_DIR = path.join(ROOT, "articles");
 const SITE_URL = process.env.SITE_URL || "https://example.com"; // overridden in README setup
-const FRESH_WINDOW_DAYS = 30; // homepage feed = articles published within this many days
 
 // Everything actually served lives in /public. Keeping the deploy output in
 // its own folder (instead of the repo root) means node_modules — which
@@ -57,7 +56,6 @@ const PUBLIC_DIR = path.join(ROOT, "public");
 
 const STATIC_FILES = [
   "index.html",
-  "archive.html",
   "category.html",
   "about.html",
   "contact.html",
@@ -69,7 +67,6 @@ const STATIC_FILES = [
   "dmca.html",
   "style.css",
   "script.js",
-  "archive.js",
   "category.js",
   "ads.txt",
   "robots.txt",
@@ -196,22 +193,17 @@ function main() {
   // Assemble the deployable /public folder fresh on every build.
   resetPublicDir();
 
-  // ---- Homepage feed: rolling FRESH_WINDOW_DAYS window ----
-  const cutoff = new Date();
-  cutoff.setUTCDate(cutoff.getUTCDate() - FRESH_WINDOW_DAYS);
-  const cutoffStr = cutoff.toISOString().slice(0, 10);
-  const recent = published.filter((a) => a.date >= cutoffStr);
-
+  // ---- Homepage feed: all published articles ----
   writeFileSync(
     path.join(PUBLIC_DIR, "articles.json"),
     JSON.stringify(
-      { generatedAt: new Date().toISOString(), windowDays: FRESH_WINDOW_DAYS, articles: recent },
+      { generatedAt: new Date().toISOString(), articles: published },
       null,
       2
     )
   );
 
-  // ---- Archive: every published article, grouped by month ----
+  // ---- Group by month (used for sitemaps) ----
   const byMonth = new Map();
   for (const a of published) {
     const key = a.date.slice(0, 7); // YYYY-MM
@@ -219,31 +211,7 @@ function main() {
     byMonth.get(key).push(a);
   }
 
-  const archiveDir = path.join(PUBLIC_DIR, "archive");
-  mkdirSync(archiveDir, { recursive: true });
-
   const monthsSorted = [...byMonth.keys()].sort().reverse();
-  for (const key of monthsSorted) {
-    const items = byMonth.get(key);
-    writeFileSync(
-      path.join(archiveDir, `${key}.json`),
-      JSON.stringify({ month: key, label: monthLabel(key), articles: items }, null, 2)
-    );
-  }
-  writeFileSync(
-    path.join(archiveDir, "index.json"),
-    JSON.stringify(
-      {
-        months: monthsSorted.map((key) => ({
-          month: key,
-          label: monthLabel(key),
-          count: byMonth.get(key).length,
-        })),
-      },
-      null,
-      2
-    )
-  );
 
   // ---- Sitemaps: split by month so no single file risks the 50k-URL limit,
   // and a sitemap index ties them together. Every published article is
@@ -297,8 +265,7 @@ function main() {
   );
 
   console.log(`Copied static files + ${files.length} article(s) into /public`);
-  console.log(`Homepage feed (last ${FRESH_WINDOW_DAYS} days): ${recent.length} articles.`);
-  console.log(`Archive: ${published.length} total published across ${monthsSorted.length} month(s). ${scheduledCount} scheduled for the future.`);
+  console.log(`Homepage feed: ${published.length} articles. ${scheduledCount} scheduled for the future.`);
   console.log(`Sitemap index with ${sitemapIndexEntries.length} sub-sitemaps.`);
 }
 

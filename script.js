@@ -124,9 +124,8 @@ function buildCategoryUI(categories) {
   // Top nav (site-wide sections)
   categories.forEach((cat) => {
     const a = document.createElement("a");
-    a.href = "#";
+    a.href = "/category.html?cat=" + encodeURIComponent(slugifyCategory(cat));
     a.textContent = cat;
-    a.dataset.cat = cat.toLowerCase();
     categoryNav.appendChild(a);
   });
 
@@ -154,12 +153,6 @@ function buildCategoryUI(categories) {
 
   chipRow.addEventListener("click", (e) => {
     if (e.target.matches(".chip")) setCategory(e.target.dataset.cat, e.target);
-  });
-  categoryNav.addEventListener("click", (e) => {
-    if (e.target.matches("a[data-cat]")) {
-      e.preventDefault();
-      setCategory(e.target.dataset.cat, e.target);
-    }
   });
 }
 
