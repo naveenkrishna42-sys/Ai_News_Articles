@@ -161,6 +161,19 @@ Registrar) — that's the one real cost in this whole stack.
    for bulk" above), e.g. `2026-07-12-spain-wildfire-update.html` — the
    filename becomes the URL (`/articles/2026-07-12-spain-wildfire-update.html`).
 3. `git add articles/*.html && git commit -m "Articles for 2026-07-12" && git push`
+
+**If your generator hasn't been updated yet:** run the auto-fix script on
+new files before committing — it patches the known old-template issues
+(dead category nav, broken `/article/<uuid>` related-links, incomplete
+footer) without you touching the generator:
+```
+node scripts/fix-article-template.mjs articles/*.html
+```
+It's safe to run on every batch, every time — files that are already fixed
+are left untouched. This is a stopgap; updating the generator's template
+(see "Article template requirements" below) is the permanent fix so you
+don't need this step at all going forward.
+
 4. Cloudflare Pages rebuilds automatically (usually live within ~1 minute).
    The homepage feed, archive, category filters, and all sitemaps update on
    their own — nothing else to touch. New articles show on the homepage
