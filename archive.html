@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Article Archive — AI News Factory</title>
+<meta name="description" content="Browse every article ever published on AI News Factory, organized by month.">
+<link rel="stylesheet" href="/style.css">
+<link rel="canonical" href="/archive.html">
+</head>
+<body>
+<header class="site-header">
+  <div>
+    <a href="/" class="brand">AI News Factory</a>
+    <span class="tagline">Fast, AI-assisted news coverage</span>
+  </div>
+  <a href="/" class="back">← Back to Home</a>
+</header>
+<nav class="site-nav">
+  <a href="/">Home</a>
+  <a href="/archive.html" class="active">Archive</a>
+</nav>
+
+<div class="container">
+  <div class="breadcrumb"><a href="/">Home</a> › Archive</div>
+  <h1 class="page-title">Article Archive</h1>
+  <p class="page-sub">The homepage only shows the last 30 days. Everything ever published stays here, organized by month — nothing is deleted.</p>
+
+  <div class="controls">
+    <div class="chips" id="monthChips"></div>
+  </div>
+
+  <div class="grid" id="archiveGrid" aria-live="polite"></div>
+  <p class="empty-state" id="archiveEmpty" hidden>No articles found for this month.</p>
+
+  <button class="load-more" id="archiveLoadMore" hidden>Load more</button>
+</div>
+
+<footer class="site-footer">
+  <div style="margin-bottom:10px;">
+    <a href="/about.html">About Us</a>
+    <a href="/contact.html">Contact</a>
+    <a href="/archive.html">Archive</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/cookie-policy.html">Cookie Policy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="/disclaimer.html">Disclaimer</a>
+    <a href="/editorial-policy.html">Editorial Policy</a>
+    <a href="/dmca.html">DMCA</a>
+    <a href="/sitemap-index.xml">Sitemap</a>
+  </div>
+  <div>© <span id="year"></span> AI News Factory. All rights reserved.</div>
+  <div class="disclaimer">Content on this site is AI-assisted / AI-generated for informational purposes. Always verify with original sources. See our <a href="/disclaimer.html">Disclaimer</a>.</div>
+</footer>
+
+<script src="/archive.js"></script>
+</body>
+</html>

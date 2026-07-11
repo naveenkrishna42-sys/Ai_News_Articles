@@ -24,8 +24,8 @@ header.site-header .tagline{color:#94a3b8;font-size:0.78rem;display:block;font-w
 header.site-header a.back{color:#94a3b8;text-decoration:none;font-size:0.9rem}
 header.site-header a.back:hover{color:#fff}
 
-nav.site-nav{background:var(--ink-soft);padding:10px 24px;display:flex;gap:20px;flex-wrap:wrap}
-nav.site-nav a{color:#94a3b8;text-decoration:none;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px}
+nav.site-nav{background:var(--ink-soft);padding:10px 24px;display:flex;gap:20px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
+nav.site-nav a{color:#94a3b8;text-decoration:none;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap}
 nav.site-nav a:hover,nav.site-nav a.active{color:var(--accent)}
 
 .container{max-width:1080px;margin:32px auto;padding:0 20px}
@@ -39,6 +39,7 @@ h1.page-title{font-size:2rem;font-weight:800;color:var(--ink);margin-bottom:8px;
 
 /* Controls: search + category chips */
 .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:28px}
+.controls-label{font-size:0.8rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
 .search-box{flex:1;min-width:220px}
 .search-box input{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.95rem;background:#fff;color:var(--ink-soft)}
 .search-box input:focus{outline:2px solid var(--accent);outline-offset:1px}
