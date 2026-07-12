@@ -141,8 +141,11 @@ function parseArticle(filename) {
     stripTags(extract(html, /📂\s*([^<]+)</, "General"))
   );
 
-  const today = new Date().toISOString().slice(0, 10);
-  const scheduled = dateRaw ? dateRaw > today : false;
+  const dateObj = new Date();
+  const today = dateObj.toISOString().slice(0, 10);
+  dateObj.setUTCDate(dateObj.getUTCDate() + 1);
+  const tomorrow = dateObj.toISOString().slice(0, 10);
+  const scheduled = dateRaw ? dateRaw > tomorrow : false;
 
   return {
     slug,
