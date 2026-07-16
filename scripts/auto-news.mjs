@@ -188,6 +188,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 300, 
     slug: filename.replace(/\.html$/, ""),
     adsensePublisherId: ADSENSE_ID,
     adsenseAdSlot: ADSENSE_SLOT,
+    siteUrl: config.site.url || "",
   });
 
   writeFileSync(path.join(ARTICLES_DIR, filename), html);
@@ -247,6 +248,7 @@ if (!NO_SPECIALS && pool.providers.length > 0) {
           slug: filename.replace(/\.html$/, ""),
           adsensePublisherId: ADSENSE_ID,
           adsenseAdSlot: ADSENSE_SLOT,
+          siteUrl: config.site.url || "",
         });
         writeFileSync(path.join(ARTICLES_DIR, filename), html);
         results.written++;

@@ -36,11 +36,48 @@ export function renderArticlePage({
   slug,
   adsensePublisherId, // optional
   adsenseAdSlot,      // optional
+  siteUrl = "",       // absolute origin for canonical/OG/JSON-LD
 }) {
   const safeTitle = escapeHtml(title);
   const safeDesc = escapeHtml(description).slice(0, 300);
   const catSlug = slugify(category);
   const year = date.slice(0, 4);
+  const pageUrl = siteUrl ? `${siteUrl}/articles/${slug}.html` : "";
+
+  // NewsArticle structured data — what search engines and Google Discover
+  // read. Built with JSON.stringify so titles with quotes can't break it.
+  const jsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: title.slice(0, 110),
+    description,
+    image: heroImage ? [heroImage] : undefined,
+    datePublished: date,
+    dateModified: date,
+    articleSection: category,
+    author: { "@type": "Organization", name: "TIVRA News", url: siteUrl || undefined },
+    publisher: {
+      "@type": "Organization",
+      name: "TIVRA News",
+      logo: siteUrl ? { "@type": "ImageObject", url: `${siteUrl}/logo.svg` } : undefined,
+    },
+    mainEntityOfPage: pageUrl || undefined,
+  });
+
+  const socialMeta = `
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="TIVRA News">
+<meta property="og:title" content="${safeTitle}">
+<meta property="og:description" content="${safeDesc}">
+${heroImage ? `<meta property="og:image" content="${escapeHtml(heroImage)}">` : ""}
+${pageUrl ? `<meta property="og:url" content="${escapeHtml(pageUrl)}">\n<link rel="canonical" href="${escapeHtml(pageUrl)}">` : ""}
+<meta property="article:published_time" content="${date}">
+<meta property="article:section" content="${escapeHtml(category)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${safeTitle}">
+<meta name="twitter:description" content="${safeDesc}">
+${heroImage ? `<meta name="twitter:image" content="${escapeHtml(heroImage)}">` : ""}
+<script type="application/ld+json">${jsonLd}</script>`;
 
   const hasAds = adsensePublisherId && !adsensePublisherId.startsWith("ca-pub-000") && !adsensePublisherId.includes("X");
   const adsHead = hasAds
@@ -74,7 +111,7 @@ export function renderArticlePage({
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${safeTitle}</title>
 <meta name="description" content="${safeDesc}">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">${socialMeta}
 ${adsHead}
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
