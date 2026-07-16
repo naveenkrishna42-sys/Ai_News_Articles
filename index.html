@@ -3,34 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI News Factory — Latest World, Tech, Business, Sports & Health News</title>
-<meta name="description" content="AI News Factory delivers fast, AI-assisted news coverage across World, Tech, Business, Sports and Health.">
+<title>TIVRA News — Trusted Insights, Verified Reports & Alerts</title>
+<meta name="description" content="TIVRA News — fast, source-linked coverage of India and the world: breaking news, business, sports, entertainment, technology, health and your city, updated every few hours.">
 <link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/articles.json" as="fetch" crossorigin>
 <link rel="canonical" href="/">
-<!-- Replace ca-pub-XXXXXXXXXXXXXXXX with your real AdSense publisher ID once approved -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 </head>
 <body>
 <header class="site-header">
   <div>
-    <a href="/" class="brand">AI News Factory</a>
-    <span class="tagline">Fast, AI-assisted news coverage</span>
+    <a href="/" class="brand"><img src="/logo.svg" alt="TIVRA News" width="182" height="38"></a>
+    <span class="tagline">Trusted Insights, Verified Reports &amp; Alerts</span>
+  </div>
+  <div class="head-right">
+    <span class="live-dot">Live</span>
+    <span class="head-date" id="headDate"></span>
   </div>
 </header>
+
 <nav class="site-nav" id="categoryNav">
-  <a href="/" data-cat="all" class="active">Home</a>
-  <!-- category links are injected by script.js based on what's actually in articles.json -->
+  <a href="/" class="active">Home</a>
+  <!-- featured category links + "More" menu injected by script.js -->
 </nav>
 
-<div class="container">
-  <div id="categoryCarousels"><!-- populated by script.js: one sliding row per category --></div>
+<div class="ticker" id="ticker" hidden>
+  <span class="ticker-label">Breaking</span>
+  <div class="ticker-viewport"><div class="ticker-track" id="tickerTrack"></div></div>
+</div>
 
-  <h1 class="page-title">Latest News</h1>
-  <p class="page-sub">Updated automatically as new stories are published.</p>
+<div class="container">
+
+  <section class="hero" id="hero" hidden aria-label="Top stories">
+    <div class="hero-track" id="heroTrack"></div>
+    <button class="hero-arrow prev" id="heroPrev" aria-label="Previous story">‹</button>
+    <button class="hero-arrow next" id="heroNext" aria-label="Next story">›</button>
+    <div class="hero-dots" id="heroDots"></div>
+  </section>
+
+  <div id="categoryCarousels"><!-- one auto-scrolling rail per featured category --></div>
+
+  <div class="section-head">
+    <h2 id="latestTitle">Latest news</h2>
+  </div>
 
   <div class="controls">
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Search articles…" aria-label="Search articles">
+      <input type="text" id="searchInput" placeholder="Search all stories…" aria-label="Search articles">
     </div>
     <div class="chips" id="chipRow"></div>
   </div>
@@ -38,17 +57,14 @@
   <div class="grid" id="articleGrid" aria-live="polite"></div>
   <p class="empty-state" id="emptyState" hidden>No articles match your search.</p>
 
-  <button class="load-more" id="loadMoreBtn" hidden>Load more</button>
-
-  <div class="ad-slot" id="adSlotMid">
-    <ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot=""></ins>
-  </div>
+  <button class="load-more" id="loadMoreBtn" hidden>Load more stories</button>
 </div>
 
 <footer class="site-footer">
   <div style="margin-bottom:10px;">
     <a href="/about.html">About Us</a>
     <a href="/contact.html">Contact</a>
+    <a href="/archive.html">Archive</a>
     <a href="/privacy.html">Privacy Policy</a>
     <a href="/terms.html">Terms</a>
     <a href="/disclaimer.html">Disclaimer</a>
@@ -57,11 +73,10 @@
     <a href="/dmca.html">Copyright / DMCA</a>
     <a href="/sitemap-index.xml">Sitemap</a>
   </div>
-  <div>© <span id="year"></span> AI News Factory. All rights reserved.</div>
-  <div class="disclaimer">Content on this site is AI-assisted / AI-generated for informational purposes. Always verify with original sources. See our <a href="/disclaimer.html">Disclaimer</a>.</div>
+  <div>© <span id="year"></span> TIVRA News. All rights reserved.</div>
+  <div class="disclaimer">TIVRA News publishes AI-assisted coverage compiled from publicly available reporting. Every story links to its original source — please verify important details there. See our <a href="/disclaimer.html">Disclaimer</a> and <a href="/editorial-policy.html">Editorial Policy</a>.</div>
 </footer>
 
-<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-<script src="/script.js"></script>
+<script src="/script.js" defer></script>
 </body>
 </html>

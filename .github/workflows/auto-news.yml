@@ -1,0 +1,81 @@
+# TIVRA News — scheduled auto-publisher.
+# Runs in GitHub's cloud: your PC can be off. Every run generates fresh
+# articles, cleans up old ones, and pushes — Cloudflare then rebuilds the
+# live site automatically (~1 minute).
+#
+# CHANGE THE SCHEDULE: edit the cron line below. Examples:
+#   "0 */6 * * *"   every 6 hours (current)
+#   "0 */4 * * *"   every 4 hours
+#   "0 */12 * * *"  twice a day
+#   "30 2 * * *"    once a day at 08:00 IST (02:30 UTC)
+# Cron times are UTC (IST = UTC+5:30).
+#
+# RUN IT NOW (single click): GitHub → Actions → "TIVRA auto news" →
+# "Run workflow". Optionally set a per-category override for a small test.
+
+name: TIVRA auto news
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      per_category:
+        description: "Articles per category this run (blank = config default)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tivra-auto-news
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate articles + cleanup
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          ADSENSE_PUBLISHER_ID: ${{ secrets.ADSENSE_PUBLISHER_ID }}
+          ADSENSE_AD_SLOT: ${{ secrets.ADSENSE_AD_SLOT }}
+        run: |
+          EXTRA=""
+          if [ -n "${{ github.event.inputs.per_category }}" ]; then
+            EXTRA="--per-category ${{ github.event.inputs.per_category }}"
+          fi
+          node scripts/auto-news.mjs $EXTRA
+
+      - name: Sanity-check the site still builds
+        run: npm run build
+
+      - name: Commit and push
+        run: |
+          git config user.name "tivra-news-bot"
+          git config user.email "actions@github.com"
+          git add articles/ data/
+          if git diff --cached --quiet; then
+            echo "Nothing new this run."
+            exit 0
+          fi
+          COUNT=$(git diff --cached --numstat | wc -l)
+          git commit -m "TIVRA auto news: $(date -u +'%Y-%m-%d %H:%M UTC') ($COUNT file changes)"
+          # Retry once with a rebase in case another push landed mid-run.
+          git push || (git pull --rebase && git push)

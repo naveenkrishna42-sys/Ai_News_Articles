@@ -1,58 +1,56 @@
-// AI News Factory — related articles widget
-// Drop this into any article page like:
-//
-//   <div id="relatedArticles"></div>
-//   <script src="/related.js" data-category="World" data-slug="spain-wildfire" data-limit="3"></script>
-//
-// It fetches /articles.json (same rolling-30-day feed the homepage uses),
-// finds other articles in the same category, and renders real, working
-// links — instead of hardcoded article IDs that don't correspond to any
-// page on this site.
-//
-// If nothing matches (e.g. this is the only article in its category right
-// now, or the article itself has aged out of the 30-day window), the
-// widget hides itself rather than showing an empty box or a broken link.
+// TIVRA News — related stories box on article pages.
+// Finds #relatedArticles (with data-category / data-slug), pulls the live
+// feed, and renders up to 3 same-category stories. Works on both new TIVRA
+// articles (data attrs on the div) and the older generator's pages (data
+// attrs on the script tag). Styles are inline because article pages are
+// self-contained. Hides itself if nothing matches — never an empty box.
 
 (function () {
-  const thisScript = document.currentScript;
-  const category = (thisScript.dataset.category || "").toLowerCase();
-  const currentSlug = thisScript.dataset.slug || "";
-  const limit = parseInt(thisScript.dataset.limit || "3", 10);
+  const box = document.getElementById("relatedArticles");
+  if (!box) return;
 
-  let container = document.getElementById("relatedArticles");
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "relatedArticles";
-    thisScript.parentNode.insertBefore(container, thisScript);
-  }
+  const legacyScript = document.querySelector('script[src*="related.js"]');
+  const category = box.dataset.category || (legacyScript && legacyScript.dataset.category) || "";
+  const slug = box.dataset.slug || (legacyScript && legacyScript.dataset.slug) || "";
+  const limit = Number((legacyScript && legacyScript.dataset.limit) || 3) || 3;
 
-  function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, (c) => ({
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
     }[c]));
+  }
+  function slugifyCategory(cat) {
+    return cat.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   }
 
   fetch("/articles.json", { cache: "no-store" })
     .then((r) => r.json())
     .then((data) => {
-      const related = (data.articles || [])
-        .filter((a) => a.slug !== currentSlug && a.category.toLowerCase() === category)
-        .slice(0, limit);
-
-      if (related.length === 0) {
-        container.remove();
-        return;
+      const all = data.articles || [];
+      const catSlug = slugifyCategory(category);
+      let picks = all.filter(
+        (a) => slugifyCategory(a.category) === catSlug && !a.url.includes(slug)
+      );
+      if (picks.length < limit) {
+        const extra = all.filter((a) => !a.url.includes(slug) && picks.indexOf(a) === -1);
+        picks = picks.concat(extra);
       }
+      picks = picks.slice(0, limit);
+      if (!picks.length) { box.remove(); return; }
 
-      const items = related
-        .map((a) => `<li style="margin-bottom:8px;"><a href="${a.url}" style="color:#3b82f6;text-decoration:none;font-weight:500;">${escapeHtml(a.title)}</a></li>`)
-        .join("");
-
-      container.innerHTML = `
-        <div style="margin-top:40px;padding:24px;border-top:1px solid #e2e8f0;background:#f8fafc;border-radius:8px;">
-          <h4 style="font-size:1.15rem;font-weight:700;margin-bottom:16px;color:#0f172a;">Also Read in ${escapeHtml(related[0].category)}</h4>
-          <ul style="list-style-type:square;padding-left:20px;margin:0;">${items}</ul>
-        </div>`;
+      box.innerHTML =
+        '<div style="font-weight:800;color:#0b1220;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;border-left:4px solid #e11d48;padding-left:10px;">Also read</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;">' +
+        picks
+          .map(
+            (a) => `
+        <a href="${a.url}" style="display:flex;flex-direction:column;background:#fff;border:1px solid #e5e9f0;border-radius:12px;overflow:hidden;text-decoration:none;">
+          ${a.image ? `<img src="${esc(a.image)}" alt="${esc(a.title)}" loading="lazy" style="width:100%;height:110px;object-fit:cover;display:block;">` : ""}
+          <span style="padding:10px 12px;font-size:.86rem;font-weight:700;color:#0b1220;line-height:1.35;">${esc(a.title)}</span>
+        </a>`
+          )
+          .join("") +
+        "</div>";
     })
-    .catch(() => container.remove());
+    .catch(() => box.remove());
 })();

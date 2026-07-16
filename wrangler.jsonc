@@ -3,6 +3,7 @@
   "name": "ainewss",
   "compatibility_date": "2025-09-01",
   "assets": {
-    "directory": "public"
+    "directory": "public",
+    "not_found_handling": "404-page"
   }
 }

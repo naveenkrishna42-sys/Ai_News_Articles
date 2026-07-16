@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>News Archive — TIVRA News</title>
+<meta name="description" content="Browse every story published on TIVRA News, organised by month.">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="site-header">
+  <div>
+    <a href="/" class="brand"><img src="/logo.svg" alt="TIVRA News" width="158" height="33"></a>
+    <span class="tagline">Trusted Insights, Verified Reports &amp; Alerts</span>
+  </div>
+  <a href="/" class="back">← Back to Home</a>
+</header>
+<nav class="site-nav">
+  <a href="/">Home</a>
+  <a href="/archive.html" class="active">Archive</a>
+</nav>
+
+<div class="container">
+  <div class="breadcrumb"><a href="/">Home</a> › Archive</div>
+  <h1 class="page-title">News archive</h1>
+  <p class="page-sub" id="archiveSub">Every story we've published, organised by month.</p>
+
+  <div class="chips month-picker" id="monthPicker"></div>
+
+  <div class="controls">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search this month…" aria-label="Search archive">
+    </div>
+  </div>
+
+  <div class="grid" id="articleGrid" aria-live="polite"></div>
+  <p class="empty-state" id="emptyState" hidden>Nothing here yet.</p>
+  <button class="load-more" id="loadMoreBtn" hidden>Load more stories</button>
+</div>
+
+<footer class="site-footer">
+  <div style="margin-bottom:10px;">
+    <a href="/about.html">About Us</a>
+    <a href="/contact.html">Contact</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="/disclaimer.html">Disclaimer</a>
+    <a href="/editorial-policy.html">Editorial Policy</a>
+    <a href="/cookie-policy.html">Cookie Policy</a>
+    <a href="/dmca.html">Copyright / DMCA</a>
+    <a href="/sitemap-index.xml">Sitemap</a>
+  </div>
+  <div>© <span id="year"></span> TIVRA News. All rights reserved.</div>
+</footer>
+
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+const PAGE_SIZE = 18;
+const grid = document.getElementById("articleGrid");
+const emptyState = document.getElementById("emptyState");
+const loadMoreBtn = document.getElementById("loadMoreBtn");
+const monthPicker = document.getElementById("monthPicker");
+const searchInput = document.getElementById("searchInput");
+const state = { items: [], shown: 0, query: "" };
+
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+const FALLBACK_IMG = "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress&cs=tinysrgb&h=400&w=600";
+
+function cardHtml(a){
+  return `<article class="card">
+    <a href="${a.url}"><img src="${a.image||FALLBACK_IMG}" alt="${escapeHtml(a.title)}" loading="lazy"></a>
+    <div class="card-body">
+      <span class="cat-tag">${escapeHtml(a.category)}</span>
+      <h3><a href="${a.url}">${escapeHtml(a.title)}</a></h3>
+      <div class="card-meta"><span>${a.date}</span></div>
+    </div>
+  </article>`;
+}
+function render(reset){
+  if(reset){grid.innerHTML="";state.shown=0;}
+  const q=state.query.trim().toLowerCase();
+  const filtered=state.items.filter(a=>!q||a.title.toLowerCase().includes(q));
+  const next=filtered.slice(state.shown,state.shown+PAGE_SIZE);
+  grid.insertAdjacentHTML("beforeend",next.map(cardHtml).join(""));
+  state.shown+=next.length;
+  emptyState.hidden=filtered.length!==0;
+  loadMoreBtn.hidden=state.shown>=filtered.length;
+}
+function loadMonth(key,label){
+  [...monthPicker.children].forEach(c=>c.classList.toggle("active",c.dataset.m===key));
+  document.getElementById("archiveSub").textContent=`Stories from ${label}.`;
+  fetch(`/archive/${key}.json`,{cache:"no-store"}).then(r=>r.json()).then(d=>{
+    state.items=d.articles||[];
+    render(true);
+  }).catch(()=>{state.items=[];render(true);});
+}
+searchInput.addEventListener("input",e=>{state.query=e.target.value;render(true);});
+loadMoreBtn.addEventListener("click",()=>render(false));
+
+fetch("/archive/index.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{
+  const months=d.months||[];
+  if(!months.length){emptyState.hidden=false;return;}
+  monthPicker.innerHTML=months.map(m=>`<button class="chip" data-m="${m.key}">${m.label} (${m.count})</button>`).join("");
+  monthPicker.addEventListener("click",e=>{
+    if(e.target.dataset.m){const m=months.find(x=>x.key===e.target.dataset.m);loadMonth(m.key,m.label);}
+  });
+  loadMonth(months[0].key,months[0].label);
+}).catch(()=>{emptyState.hidden=false;});
+</script>
+</body>
+</html>

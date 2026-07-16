@@ -45,7 +45,14 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const ARTICLES_DIR = path.join(ROOT, "articles");
-const SITE_URL = process.env.SITE_URL || "https://example.com"; // overridden in README setup
+
+// Site config (name, featured category order, canonical URL) lives in
+// config/news-config.json — the same control panel auto-news.mjs uses.
+let CONFIG = { site: {}, featuredCategories: [] };
+try {
+  CONFIG = JSON.parse(readFileSync(path.join(ROOT, "config", "news-config.json"), "utf-8"));
+} catch { /* build still works without the config */ }
+const SITE_URL = process.env.SITE_URL || CONFIG.site.url || "https://example.com";
 
 // Everything actually served lives in /public. Keeping the deploy output in
 // its own folder (instead of the repo root) means node_modules — which
@@ -57,6 +64,8 @@ const PUBLIC_DIR = path.join(ROOT, "public");
 const STATIC_FILES = [
   "index.html",
   "category.html",
+  "archive.html",
+  "404.html",
   "about.html",
   "contact.html",
   "privacy.html",
@@ -68,6 +77,9 @@ const STATIC_FILES = [
   "style.css",
   "script.js",
   "category.js",
+  "related.js",
+  "logo.svg",
+  "favicon.svg",
   "ads.txt",
   "robots.txt",
   "_redirects",
@@ -200,13 +212,18 @@ function main() {
   writeFileSync(
     path.join(PUBLIC_DIR, "articles.json"),
     JSON.stringify(
-      { generatedAt: new Date().toISOString(), articles: published },
+      {
+        generatedAt: new Date().toISOString(),
+        site: CONFIG.site.name || "TIVRA News",
+        featuredCategories: CONFIG.featuredCategories || [],
+        articles: published,
+      },
       null,
       2
     )
   );
 
-  // ---- Group by month (used for sitemaps) ----
+  // ---- Group by month (archive JSONs + sitemaps) ----
   const byMonth = new Map();
   for (const a of published) {
     const key = a.date.slice(0, 7); // YYYY-MM
@@ -215,6 +232,26 @@ function main() {
   }
 
   const monthsSorted = [...byMonth.keys()].sort().reverse();
+
+  // ---- Archive: one JSON per month + an index (used by archive.html) ----
+  const archiveDir = path.join(PUBLIC_DIR, "archive");
+  mkdirSync(archiveDir, { recursive: true });
+  for (const key of monthsSorted) {
+    writeFileSync(
+      path.join(archiveDir, `${key}.json`),
+      JSON.stringify({ month: key, articles: byMonth.get(key) })
+    );
+  }
+  writeFileSync(
+    path.join(archiveDir, "index.json"),
+    JSON.stringify({
+      months: monthsSorted.map((key) => ({
+        key,
+        label: monthLabel(key),
+        count: byMonth.get(key).length,
+      })),
+    })
+  );
 
   // ---- Sitemaps: split by month so no single file risks the 50k-URL limit,
   // and a sitemap index ties them together. Every published article is
