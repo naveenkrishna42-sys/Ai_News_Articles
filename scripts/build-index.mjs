@@ -81,8 +81,6 @@ const STATIC_FILES = [
   "logo.svg",
   "favicon.svg",
   "ads.txt",
-  "robots.txt",
-  "_redirects",
 ];
 
 function copyDir(src, dest) {
@@ -297,11 +295,18 @@ function main() {
     `${SITE_URL}/sitemap-static.xml`,
     ...monthsSorted.map((key) => `${SITE_URL}/sitemap-${key}.xml`),
   ];
+  const sitemapIndexXml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapIndexEntries
+    .map((u) => `  <sitemap><loc>${u}</loc></sitemap>`)
+    .join("\n")}\n</sitemapindex>\n`;
+  writeFileSync(path.join(PUBLIC_DIR, "sitemap-index.xml"), sitemapIndexXml);
+  // Serve the same index at the conventional /sitemap.xml address too
+  // (Workers static assets don't support _redirects rewrites reliably).
+  writeFileSync(path.join(PUBLIC_DIR, "sitemap.xml"), sitemapIndexXml);
+
+  // robots.txt with an absolute sitemap URL (generated, not copied).
   writeFileSync(
-    path.join(PUBLIC_DIR, "sitemap-index.xml"),
-    `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapIndexEntries
-      .map((u) => `  <sitemap><loc>${u}</loc></sitemap>`)
-      .join("\n")}\n</sitemapindex>\n`
+    path.join(PUBLIC_DIR, "robots.txt"),
+    `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap-index.xml\n`
   );
 
   console.log(`Copied static files + ${files.length} article(s) into /public`);
