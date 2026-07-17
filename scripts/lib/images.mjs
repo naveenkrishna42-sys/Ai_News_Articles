@@ -34,7 +34,7 @@ function pick(arr) {
   return arr.length ? arr[Math.floor(Math.random() * arr.length)] : null;
 }
 
-async function searchPexels(query) {
+export async function searchPexels(query) {
   const key = process.env.PEXELS_API_KEY;
   if (!key) return null;
   try {
@@ -53,7 +53,7 @@ async function searchPexels(query) {
   }
 }
 
-async function searchPixabay(query) {
+export async function searchPixabay(query) {
   const key = process.env.PIXABAY_API_KEY;
   if (!key) return null;
   try {
