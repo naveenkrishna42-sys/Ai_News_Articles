@@ -30,17 +30,23 @@ async function timedFetch(url, headers = {}) {
   }
 }
 
+function pick(arr) {
+  return arr.length ? arr[Math.floor(Math.random() * arr.length)] : null;
+}
+
 async function searchPexels(query) {
   const key = process.env.PEXELS_API_KEY;
   if (!key) return null;
   try {
     const res = await timedFetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=3&orientation=landscape`,
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=5&orientation=landscape`,
       { Authorization: key }
     );
     if (!res.ok) return null;
     const data = await res.json();
-    const photo = data?.photos?.[0];
+    // Random pick among top matches so same-category stories don't all
+    // land on an identical photo.
+    const photo = pick(data?.photos || []);
     return photo ? `${photo.src.landscape}` : null;
   } catch {
     return null;
@@ -52,15 +58,44 @@ async function searchPixabay(query) {
   if (!key) return null;
   try {
     const res = await timedFetch(
-      `https://pixabay.com/api/?key=${key}&q=${encodeURIComponent(query)}&image_type=photo&orientation=horizontal&per_page=3&safesearch=true`
+      `https://pixabay.com/api/?key=${key}&q=${encodeURIComponent(query)}&image_type=photo&orientation=horizontal&per_page=5&safesearch=true`
     );
     if (!res.ok) return null;
     const data = await res.json();
-    const hit = data?.hits?.[0];
+    const hit = pick(data?.hits || []);
     return hit ? hit.webformatURL : null;
   } catch {
     return null;
   }
+}
+
+// Run-start diagnostics: one test call per image provider so the Actions
+// log states plainly whether each key works — no more silent fallbacks.
+export async function mediaPreflight() {
+  const report = [];
+  if (!process.env.PEXELS_API_KEY) {
+    report.push("Pexels: NO KEY (secret PEXELS_API_KEY missing)");
+  } else {
+    try {
+      const r = await timedFetch("https://api.pexels.com/v1/search?query=news&per_page=1", {
+        Authorization: process.env.PEXELS_API_KEY,
+      });
+      report.push(r.ok ? "Pexels: OK ✅" : `Pexels: FAILED (HTTP ${r.status}) — check the PEXELS_API_KEY secret value (should be ~56 letters/numbers, NO dash, from pexels.com/api)`);
+    } catch (e) {
+      report.push(`Pexels: FAILED (${e.message})`);
+    }
+  }
+  if (!process.env.PIXABAY_API_KEY) {
+    report.push("Pixabay: NO KEY (secret PIXABAY_API_KEY missing)");
+  } else {
+    try {
+      const r = await timedFetch(`https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=news&per_page=3`);
+      report.push(r.ok ? "Pixabay: OK ✅" : `Pixabay: FAILED (HTTP ${r.status}) — check the PIXABAY_API_KEY secret value (format 12345678-abc… WITH a dash, from pixabay.com/api/docs)`);
+    } catch (e) {
+      report.push(`Pixabay: FAILED (${e.message})`);
+    }
+  }
+  return report;
 }
 
 export async function findImage(title, category, fallbackImages) {

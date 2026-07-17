@@ -31,7 +31,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { ProviderPool, extractJson } from "./lib/providers.mjs";
 import { fetchAllFeeds, storyKey, significantWords, titlesOverlap } from "./lib/feeds.mjs";
-import { findImage, findYouTubeVideo } from "./lib/images.mjs";
+import { findImage, findYouTubeVideo, mediaPreflight } from "./lib/images.mjs";
 import { renderArticlePage, slugify } from "./lib/template.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -83,6 +83,10 @@ console.log(`Published today so far: ${todayCount}. Budget this run: ${budget}. 
 if (pool.providers.length === 0 && !DRY_RUN) {
   console.error("No AI provider API keys found in environment — nothing to do. Add GitHub Secrets (see README).");
   process.exit(0); // exit clean: a keyless scheduled run should not mark the workflow red forever
+}
+
+if (!DRY_RUN) {
+  for (const line of await mediaPreflight()) console.log(`Image providers — ${line}`);
 }
 
 // ---------- Story selection ----------
