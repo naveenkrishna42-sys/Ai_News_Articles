@@ -31,7 +31,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { ProviderPool, extractJson } from "./lib/providers.mjs";
 import { fetchAllFeeds, storyKey, significantWords, titlesOverlap } from "./lib/feeds.mjs";
-import { findImage, findYouTubeVideo, mediaPreflight } from "./lib/images.mjs";
+import { findImage, findYouTubeVideo, mediaPreflight, findWikipediaPortrait } from "./lib/images.mjs";
 import { renderArticlePage, slugify } from "./lib/template.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -148,7 +148,7 @@ Non-negotiable rules:
 - End with one short forward-looking paragraph (what happens next / what to watch).
 
 Output STRICT JSON only, no markdown fences, exactly this shape:
-{"title":"SEO headline under 70 chars, no clickbait","description":"news summary, 140-160 chars","key_points":["point 1","point 2","point 3"],"content":"article body HTML using only <h2>,<h3>,<p>,<ul>,<li> tags"}`;
+{"title":"SEO headline under 70 chars, no clickbait","description":"news summary, 140-160 chars","key_points":["point 1","point 2","point 3"],"content":"article body HTML using only <h2>,<h3>,<p>,<ul>,<li> tags","image_person":"Full name of the single famous person this story is centrally about (e.g. \\"Aamir Khan\\"), or \\"\\" if the story is not about one specific famous person","image_query":"2-4 word LITERAL visual scene for a stock-photo search, describing objects/places only, never a person's name (e.g. \\"cricket stadium floodlights\\", \\"courtroom gavel\\", \\"smartphone factory line\\")"}`;
 
 function countWords(html) {
   return html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
@@ -165,10 +165,24 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 300, 
   const bodyHtml = parsed.content || "";
   if (countWords(bodyHtml) < minWords) throw new Error(`too short (${countWords(bodyHtml)} words)`);
 
-  const [heroImage, youtubeId] = await Promise.all([
-    findImage(title, item.category, config.fallbackImages),
-    findYouTubeVideo(item.title),
-  ]);
+  // Image strategy: real Wikipedia portrait when the story is about one
+  // famous person (never for crime/war stories — wrong-face risk), else a
+  // Pexels photo of the AI-chosen scene, else category fallback.
+  const NO_PERSON_CATEGORIES = new Set(["Crime & Law", "Wars & Conflicts"]);
+  let heroImage = "";
+  let heroCredit = "";
+  if (parsed.image_person && !NO_PERSON_CATEGORIES.has(item.category)) {
+    const portrait = await findWikipediaPortrait(parsed.image_person);
+    if (portrait) {
+      heroImage = portrait.url;
+      heroCredit = portrait.credit;
+    }
+  }
+  if (!heroImage) {
+    heroImage = await findImage(parsed.image_query || title, item.category, config.fallbackImages);
+    heroCredit = heroImage.includes("pexels.com") ? "Pexels" : "";
+  }
+  const youtubeId = await findYouTubeVideo(item.title);
 
   let slug = slugify(title) || slugify(item.title) || `story-${Date.now()}`;
   let filename = `${today}-${slug}.html`;
@@ -183,7 +197,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 300, 
     category: item.category,
     date: today,
     heroImage,
-    heroCredit: heroImage.includes("pexels.com") ? "Pexels" : heroImage.includes("pixabay.com") ? "Pixabay" : "",
+    heroCredit,
     keyPoints: parsed.key_points || [],
     bodyHtml,
     sourceName: item.sourceName,

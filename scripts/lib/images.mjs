@@ -98,10 +98,12 @@ export async function mediaPreflight() {
   return report;
 }
 
-export async function findImage(title, category, fallbackImages) {
-  const query = imageQueryFromTitle(title, category);
+// NOTE: Pixabay is deliberately NOT in this chain. Its API image URLs are
+// temporary and expire ("This URL is invalid or has expired") — hotlinking
+// them puts dead images on the site. Pexels CDN URLs are permanent.
+export async function findImage(titleOrQuery, category, fallbackImages) {
+  const query = imageQueryFromTitle(titleOrQuery, category);
   let url = await searchPexels(query);
-  if (!url) url = await searchPixabay(query);
   if (!url && query !== category) {
     url = await searchPexels(category);
   }
@@ -110,6 +112,75 @@ export async function findImage(title, category, fallbackImages) {
     url = pool[Math.floor(Math.random() * pool.length)] || "";
   }
   return url;
+}
+
+// ---- Wikipedia/Wikimedia portraits for famous people ----
+// The only legal FREE source of real photos of specific actors, players and
+// politicians. Wikimedia allows hotlinking; images of living people on
+// Wikipedia are free-licensed (we verify via Commons and skip anything
+// marked non-free/fair-use). Returns { url, credit } or null.
+
+const PERSON_DESC = /actor|actress|singer|politician|minister|cricketer|footballer|athlete|player|director|producer|musician|composer|author|writer|business|executive|entrepreneur|scientist|astronaut|coach|captain|president|economist|judge|advocate|comedian|anchor|journalist|youtuber|rapper|dancer|model|chess|celebrity|filmmaker|host|founder/i;
+
+export async function findWikipediaPortrait(name) {
+  if (!name || name.trim().split(/\s+/).length < 2) return null; // full names only
+  try {
+    const sum = await timedFetch(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name.trim())}`,
+      { "User-Agent": "TIVRA-News/1.0 (image lookup)" }
+    );
+    if (!sum.ok) return null;
+    const s = await sum.json();
+    if (s.type !== "standard" || !PERSON_DESC.test(s.description || "")) return null;
+
+    // High-res lead image + the underlying file name for the license check.
+    const q = await timedFetch(
+      `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(s.title)}&prop=pageimages&piprop=thumbnail%7Cname&pithumbsize=1200&format=json&origin=*`,
+      { "User-Agent": "TIVRA-News/1.0 (image lookup)" }
+    );
+    if (!q.ok) return null;
+    const pages = (await q.json())?.query?.pages || {};
+    const page = Object.values(pages)[0];
+    const thumb = page?.thumbnail?.source;
+    const fileName = page?.pageimage;
+    if (!thumb || !fileName) return null;
+
+    // License check on Commons — reject non-free/fair-use (also rejects
+    // files that exist only on en.wikipedia, which are usually non-free).
+    const li = await timedFetch(
+      `https://commons.wikimedia.org/w/api.php?action=query&titles=File:${encodeURIComponent(fileName)}&prop=imageinfo&iiprop=extmetadata&format=json&origin=*`,
+      { "User-Agent": "TIVRA-News/1.0 (license check)" }
+    );
+    if (!li.ok) return null;
+    const fpages = (await li.json())?.query?.pages || {};
+    const fpage = Object.values(fpages)[0];
+    const meta = fpage?.imageinfo?.[0]?.extmetadata;
+    if (!meta) return null;
+    const license = meta.LicenseShortName?.value || "";
+    if (!license || /non-free|fair/i.test(license)) return null;
+    const artist = (meta.Artist?.value || "").replace(/<[^>]+>/g, "").trim().slice(0, 60);
+
+    return {
+      url: thumb,
+      credit: `Wikimedia Commons${artist ? ` / ${artist}` : ""} · ${license}`,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// Capitalized-name candidates from a headline (for repairing old articles
+// where no AI call is available): "Aamir Khan Confirms..." -> ["Aamir Khan"].
+export function personCandidatesFromTitle(title) {
+  const clean = title.replace(/[^A-Za-z\s.'-]/g, " ");
+  const matches = clean.match(/(?:[A-Z][a-z'.-]+\s+){1,2}[A-Z][a-z'.-]+/g) || [];
+  const out = [];
+  for (const m of matches.map((s) => s.trim())) {
+    const words = m.split(/\s+/);
+    if (words.length >= 2) out.push(words.slice(0, 2).join(" ")); // "Aamir Khan Confirms" -> "Aamir Khan"
+    if (words.length === 3) out.push(m);
+  }
+  return [...new Set(out)].slice(0, 3);
 }
 
 // Optional: a related YouTube video (needs YOUTUBE_API_KEY; silently skipped

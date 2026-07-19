@@ -100,9 +100,11 @@ ${heroImage ? `<meta name="twitter:image" content="${escapeHtml(heroImage)}">` :
 
   const ytSearch = `https://www.youtube.com/results?search_query=${encodeURIComponent(title)}`;
   const gnSearch = `https://news.google.com/search?q=${encodeURIComponent(title)}`;
-  const credit = heroCredit
-    ? `<figcaption>Representative image · ${escapeHtml(heroCredit)} (free license)</figcaption>`
-    : `<figcaption>Representative image</figcaption>`;
+  const credit = heroCredit.startsWith("Wikimedia")
+    ? `<figcaption>Photo: ${escapeHtml(heroCredit)}</figcaption>`
+    : heroCredit
+      ? `<figcaption>Representative image · ${escapeHtml(heroCredit)} (free license)</figcaption>`
+      : `<figcaption>Representative image</figcaption>`;
 
   return `<!DOCTYPE html>
 <html lang="en">

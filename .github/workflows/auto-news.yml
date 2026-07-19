@@ -63,6 +63,11 @@ jobs:
           fi
           node scripts/auto-news.mjs $EXTRA
 
+      - name: Self-heal broken or generic images
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: node scripts/reimage.mjs --budget 60
+
       - name: Sanity-check the site still builds
         run: npm run build
 
