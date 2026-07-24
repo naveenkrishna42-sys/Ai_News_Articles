@@ -17,7 +17,7 @@ name: TIVRA auto news
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 */2 * * *"
   workflow_dispatch:
     inputs:
       per_category:
@@ -63,6 +63,11 @@ jobs:
           fi
           node scripts/auto-news.mjs $EXTRA
 
+      - name: Publish incoming uploads with TIVRA branding
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: node scripts/rebrand.mjs
+
       - name: Self-heal broken or generic images
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
@@ -75,7 +80,7 @@ jobs:
         run: |
           git config user.name "tivra-news-bot"
           git config user.email "actions@github.com"
-          git add articles/ data/
+          git add articles/ data/ incoming/
           if git diff --cached --quiet; then
             echo "Nothing new this run."
             exit 0
