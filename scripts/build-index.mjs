@@ -70,6 +70,7 @@ const STATIC_FILES = [
   "contact.html",
   "privacy.html",
   "terms.html",
+  "affiliate-disclosure.html",
   "disclaimer.html",
   "editorial-policy.html",
   "cookie-policy.html",
