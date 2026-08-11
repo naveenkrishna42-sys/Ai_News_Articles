@@ -1,6 +1,8 @@
 // Unsplash API. Commercial use permitted, high quality. Needs UNSPLASH_ACCESS_KEY.
 // Returns {url,width,height,license,author,sourceUrl,provider} or null.
 
+import { matchesQuery } from "./relevance.mjs";
+
 const TIMEOUT_MS = 10_000;
 
 async function timedFetch(url, headers = {}) {
@@ -31,8 +33,16 @@ export async function search(query) {
     const data = await res.json();
     const results = data?.results || [];
 
+    // Unsplash is a stock library, so a device search returns *some* phone
+    // rather than *the* phone. Only accept a result that actually names the
+    // device — otherwise return null and let the caller fall through to a
+    // generic image that is honestly captioned "Representative image".
+    const relevant = results.filter((p) =>
+      matchesQuery(`${p.description || ""} ${p.alt_description || ""}`, query)
+    );
+
     // Pick randomly among top 5 to vary articles by topic.
-    const photo = pick(results.slice(0, 5));
+    const photo = pick(relevant.slice(0, 5));
     if (!photo) return null;
 
     return {

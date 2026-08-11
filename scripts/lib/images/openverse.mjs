@@ -1,6 +1,8 @@
 // Openverse (CC-licensed, ~800M items). No API key needed for anonymous use.
 // Returns {url,width,height,license,author,sourceUrl,provider} or null.
 
+import { matchesQuery } from "./relevance.mjs";
+
 const TIMEOUT_MS = 10_000;
 
 async function timedFetch(url, headers = {}) {
@@ -28,6 +30,9 @@ export async function search(query) {
     for (const item of results) {
       const width = item.width || 0;
       if (width < 800) continue;
+
+      // Must actually depict what was searched for.
+      if (!matchesQuery(`${item.title || ""} ${(item.tags || []).map((t) => t.name).join(" ")}`, query)) continue;
 
       // license_type=commercial filter already ensures commercial use. Map
       // Openverse license codes to proper CC license names.
