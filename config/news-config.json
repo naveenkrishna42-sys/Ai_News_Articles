@@ -56,7 +56,6 @@
     "Technology",
     "Health",
     "Gadget Comparisons",
-    "Sacred Places",
     "AI Tips & Tools"
   ],
   "specials": {
@@ -65,8 +64,7 @@
     "weeklyLongform": 2
   },
   "newCategoryVolume": {
-    "Gadget Comparisons": 3,
-    "Sacred Places": 3,
+    "Gadget Comparisons": 9,
     "AI Tips & Tools": 3
   },
   "feeds": [
@@ -188,16 +186,24 @@
       "url": "https://news.google.com/rss/headlines/section/geo/Delhi?hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
-      "category": "Gadget Comparisons",
-      "url": "https://news.google.com/rss/search?q=smartphone+launch+review+specifications&hl=en-IN&gl=IN&ceid=IN:en"
-    },
-    {
-      "category": "Sacred Places",
-      "url": "https://news.google.com/rss/search?q=temple+heritage+pilgrimage+sacred+site&hl=en-IN&gl=IN&ceid=IN:en"
-    },
-    {
       "category": "AI Tips & Tools",
       "url": "https://news.google.com/rss/search?q=AI+tool+launch+chatgpt+gemini+claude+prompt&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Gadget Comparisons",
+      "url": "https://news.google.com/rss/search?q=smartphone%20launch%20review%20specifications&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Gadget Comparisons",
+      "url": "https://news.google.com/rss/search?q=smartwatch%20launch%20review%20specifications&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Gadget Comparisons",
+      "url": "https://news.google.com/rss/search?q=earbuds%20TWS%20launch%20review%20specifications&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Gadget Comparisons",
+      "url": "https://news.google.com/rss/search?q=laptop%20computer%20hardware%20launch%20review%20specifications&hl=en-IN&gl=IN&ceid=IN:en"
     }
   ],
   "categoryPriority": [
@@ -231,7 +237,6 @@
     "Religion",
     "Inventions",
     "Gadget Comparisons",
-    "Sacred Places",
     "AI Tips & Tools"
   ],
   "fallbackImages": {
@@ -309,9 +314,6 @@
     ],
     "Gadget Comparisons": [
       "https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
-    ],
-    "Sacred Places": [
-      "https://images.pexels.com/photos/2161467/pexels-photo-2161467.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
     ],
     "AI Tips & Tools": [
       "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"

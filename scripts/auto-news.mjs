@@ -35,7 +35,7 @@ import { findImage, findYouTubeVideo, mediaPreflight, findWikipediaPortrait } fr
 import { findDeviceImage } from "./lib/images/index.mjs";
 import { renderArticlePage, renderComparisonTable, slugify, escapeHtml } from "./lib/template.mjs";
 import { renderBuyBox } from "./lib/affiliate.mjs";
-import { buildComparisonSystemPrompt, buildRankingSystemPrompt, buildNichePrompt } from "./lib/gadget-prompts.mjs";
+import { buildComparisonSystemPrompt, buildRankingSystemPrompt, buildReviewSystemPrompt, buildNichePrompt } from "./lib/gadget-prompts.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -119,7 +119,7 @@ console.log(`Fetched ${fetchedTotal} raw stories across ${byCategory.size} categ
 const priority = config.categoryPriority.filter((c) => byCategory.has(c));
 for (const c of byCategory.keys()) if (!priority.includes(c)) priority.push(c);
 
-// Gadget Comparisons / Sacred Places / AI Tips & Tools are capped at
+// Gadget Comparisons / AI Tips & Tools are capped at
 // newCategoryVolume[category] PUBLISHED PER DAY (across all runs), not per
 // run like every other category's PER_CATEGORY. We enforce that by reusing
 // the existing registry bookkeeping (registry[key].d === today, .c ===
@@ -128,7 +128,7 @@ for (const c of byCategory.keys()) if (!priority.includes(c)) priority.push(c);
 // value is missing or 0 for one of these three categories, the computed
 // budget is 0 and the category silently produces nothing that day — no
 // crash, no special-cased error path, config-only toggle.
-const NICHE_DAILY_CATEGORIES = new Set(["Gadget Comparisons", "Sacred Places", "AI Tips & Tools"]);
+const NICHE_DAILY_CATEGORIES = new Set(["Gadget Comparisons", "AI Tips & Tools"]);
 function categoryPublishedToday(category) {
   return Object.values(registry).filter((r) => r.d === today && r.c === category).length;
 }
@@ -254,6 +254,78 @@ function buildProductJsonLd(name, imageUrl) {
     image: imageUrl ? [imageUrl] : undefined,
     brand: { "@type": "Brand", name: (name.split(/\s+/)[0] || name) },
   };
+}
+
+// writeReviewStory — Gadget Comparisons. Single-product spotlight: specs,
+// qualitative reception (never a fabricated star rating — see the prompt),
+// pros/cons, verdict, buy link. Same shape and same honesty rules as
+// writeComparisonStory below, just one device instead of two.
+async function writeReviewStory(item) {
+  const userPrompt = `Headline: ${item.title}\nCategory: ${item.category}\nOriginal reporting by: ${item.sourceName}\nPublished: ${item.pubDate || today}\nSource snippet: ${item.summary || "(headline only)"}`;
+
+  const { text } = await pool.chat({ system: buildReviewSystemPrompt(), user: userPrompt, maxTokens: 3400 });
+  const parsed = extractJson(text);
+
+  const title = (parsed.title || item.title).slice(0, 110);
+  const deviceName = parsed.deviceName || item.title;
+  const specRows = Array.isArray(parsed.specRows) ? parsed.specRows : [];
+  const pros = (Array.isArray(parsed.pros) ? parsed.pros : []).filter(Boolean);
+  const cons = (Array.isArray(parsed.cons) ? parsed.cons : []).filter(Boolean);
+
+  const whyNowHtml = parsed.whyNow ? `<p>${escapeHtml(parsed.whyNow)}</p>` : "";
+  const tableHtml = renderComparisonTable(specRows, deviceName || "Spec");
+  const receptionHtml = parsed.reception ? `<p><strong>What reviewers generally say:</strong> ${escapeHtml(parsed.reception)}</p>` : "";
+  const prosConsHtml = pros.length || cons.length
+    ? `<div style="display:flex;gap:20px;flex-wrap:wrap;margin:20px 0;">
+${pros.length ? `<div style="flex:1;min-width:220px;"><strong style="color:#15803d;">Pros</strong><ul>${pros.map((p) => `<li>${escapeHtml(p)}</li>`).join("")}</ul></div>` : ""}
+${cons.length ? `<div style="flex:1;min-width:220px;"><strong style="color:#be123c;">Cons</strong><ul>${cons.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul></div>` : ""}
+</div>`
+    : "";
+  const verdictHtml = parsed.verdict || "";
+  const buyBoxHtml = renderBuyBox([deviceName], config);
+  const bodyHtml = `${whyNowHtml}\n${tableHtml}\n${receptionHtml}\n${prosConsHtml}\n${verdictHtml}\n${buyBoxHtml}`;
+
+  const articleWords = countWords(`${whyNowHtml}\n${receptionHtml}\n${prosConsHtml}\n${verdictHtml}`);
+  if (articleWords < 120) throw new Error(`review too short (${articleWords} words)`);
+
+  const deviceSlug = slugify(deviceName);
+  const img = await findDeviceImage({ deviceName, deviceSlug, category: item.category, fallbackImages: config.fallbackImages });
+  const heroImage = img ? img.url : (config.fallbackImages["Gadget Comparisons"] || config.fallbackImages._default)[0];
+  const heroCredit = img
+    ? { provider: img.provider, author: img.author, license: img.license, sourceUrl: img.sourceUrl }
+    : "Pexels";
+
+  let slug = slugify(title) || deviceSlug || `review-${Date.now()}`;
+  let filename = `${today}-${slug}.html`;
+  let n = 2;
+  while (existsSync(path.join(ARTICLES_DIR, filename))) {
+    filename = `${today}-${slug}-${n++}.html`;
+  }
+
+  const html = renderArticlePage({
+    title,
+    description: parsed.description || parsed.seoDescription || title,
+    category: "Gadget Comparisons",
+    date: today,
+    heroImage,
+    heroCredit,
+    keyPoints: parsed.keyPoints || [],
+    bodyHtml,
+    sourceName: item.sourceName,
+    sourceUrl: item.sourceUrl,
+    youtubeId: "",
+    slug: filename.replace(/\.html$/, ""),
+    adsensePublisherId: ADSENSE_ID,
+    adsenseAdSlot: ADSENSE_SLOT,
+    siteUrl: config.site.url || "",
+    extraJsonLd: [buildProductJsonLd(deviceName, img ? img.url : "")],
+  });
+
+  writeFileSync(path.join(ARTICLES_DIR, filename), html);
+  results.written++;
+  results.files.push(filename);
+  if (results.written % 20 === 0) saveRegistry();
+  console.log(`  ✔ [Gadget Comparisons] ${title} (review)`);
 }
 
 // writeComparisonStory — Gadget Comparisons. Derives a two-device head-to-
@@ -454,15 +526,23 @@ async function runQueue(items, worker) {
 // three new niche categories are routed differently:
 //   - Gadget Comparisons needs a whole different two-device shape, so it
 //     gets its own writer.
-//   - Sacred Places / AI Tips & Tools reuse writeStory() completely
-//     unchanged, just with a different systemPrompt — the same override
-//     mechanism ANALYSIS_SYSTEM/FEATURE_SYSTEM already use below.
+//   - AI Tips & Tools reuses writeStory() completely unchanged, just with a
+//     different systemPrompt — the same override mechanism
+//     ANALYSIS_SYSTEM/FEATURE_SYSTEM already use below.
 const NICHE_SYSTEM_PROMPTS = {
-  "Sacred Places": buildNichePrompt("temple", SYSTEM_PROMPT),
   "AI Tips & Tools": buildNichePrompt("ai-tips", SYSTEM_PROMPT),
 };
+// Gadget Comparisons format mix: mostly single-product reviews (matches
+// what was actually asked for — "product review, ratings, specifications,
+// verdict, pros and cons" — for whatever device is in the news right now),
+// with a head-to-head comparison every 3rd item for variety. Deterministic
+// on today's published-so-far count rather than random, so the mix is
+// predictable and testable rather than a coin flip per run.
 function dispatchWrite(item) {
-  if (item.category === "Gadget Comparisons") return writeComparisonStory(item);
+  if (item.category === "Gadget Comparisons") {
+    const doneToday = categoryPublishedToday("Gadget Comparisons");
+    return doneToday % 3 === 2 ? writeComparisonStory(item) : writeReviewStory(item);
+  }
   const nicheSystem = NICHE_SYSTEM_PROMPTS[item.category];
   if (nicheSystem) return writeStory(item, { systemPrompt: nicheSystem });
   return writeStory(item);
