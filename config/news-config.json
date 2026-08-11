@@ -343,5 +343,12 @@
     "_default": [
       "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
     ]
+  },
+  "affiliate": {
+    "enabled": true,
+    "network": "Amazon Associates",
+    "marketplace": "amazon.in",
+    "amazonTag": "sirmohana-21",
+    "products": {}
   }
 }

@@ -314,7 +314,7 @@ ${bodyHtml}
 </div>
 <footer class="site">
   <div style="margin-bottom:8px;">
-    <a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/archive.html">Archive</a><a href="/privacy.html">Privacy</a><a href="/cookie-policy.html">Cookies</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/editorial-policy.html">Editorial Policy</a><a href="/dmca.html">DMCA</a><a href="/sitemap-index.xml">Sitemap</a>
+    <a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/archive.html">Archive</a><a href="/privacy.html">Privacy</a><a href="/cookie-policy.html">Cookies</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/editorial-policy.html">Editorial Policy</a><a href="/dmca.html">DMCA</a><a href="/affiliate-disclosure.html">Affiliate Disclosure</a><a href="/sitemap-index.xml">Sitemap</a>
   </div>
   <div>© ${year} TIVRA News — Trusted Insights, Verified Reports &amp; Alerts.</div>
 </footer>

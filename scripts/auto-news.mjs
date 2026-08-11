@@ -34,6 +34,7 @@ import { fetchAllFeeds, storyKey, significantWords, titlesOverlap } from "./lib/
 import { findImage, findYouTubeVideo, mediaPreflight, findWikipediaPortrait } from "./lib/images.mjs";
 import { findDeviceImage } from "./lib/images/index.mjs";
 import { renderArticlePage, renderComparisonTable, slugify, escapeHtml } from "./lib/template.mjs";
+import { renderBuyBox } from "./lib/affiliate.mjs";
 import { buildComparisonSystemPrompt, buildRankingSystemPrompt, buildNichePrompt } from "./lib/gadget-prompts.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -274,9 +275,13 @@ async function writeComparisonStory(item) {
   const tableHtml = renderComparisonTable(specRows, deviceA || "Device A", deviceB || "Device B");
   const summaryHtml = parsed.summary ? `<p>${escapeHtml(parsed.summary)}</p>` : "";
   const verdictHtml = parsed.verdict || "";
-  const bodyHtml = `${introHtml}\n${tableHtml}\n${summaryHtml}\n${verdictHtml}`;
+  const buyBoxHtml = renderBuyBox([deviceA, deviceB], config);
+  const bodyHtml = `${introHtml}\n${tableHtml}\n${summaryHtml}\n${verdictHtml}\n${buyBoxHtml}`;
 
-  if (countWords(bodyHtml) < 150) throw new Error(`comparison too short (${countWords(bodyHtml)} words)`);
+  // Word count excludes the buy box — it is navigation, not article content,
+  // and must never be what lifts a thin article over the minimum.
+  const articleWords = countWords(`${introHtml}\n${tableHtml}\n${summaryHtml}\n${verdictHtml}`);
+  if (articleWords < 150) throw new Error(`comparison too short (${articleWords} words)`);
 
   // Two hero images (one per device) via the device-photo cascade. Either
   // side is allowed to come back empty — a missing photo never fails the
@@ -362,9 +367,11 @@ async function writeRankingStory(candidateItems) {
     })
     .join("\n");
   const verdictHtml = parsed.verdict || "";
-  const bodyHtml = `${introHtml}\n${rationaleHtml}\n${itemsHtml}\n${verdictHtml}`;
+  const buyBoxHtml = renderBuyBox(items.map((it) => it.name), config);
+  const bodyHtml = `${introHtml}\n${rationaleHtml}\n${itemsHtml}\n${verdictHtml}\n${buyBoxHtml}`;
 
-  if (countWords(bodyHtml) < 200) throw new Error(`ranking too short (${countWords(bodyHtml)} words)`);
+  const articleWords = countWords(`${introHtml}\n${rationaleHtml}\n${itemsHtml}\n${verdictHtml}`);
+  if (articleWords < 200) throw new Error(`ranking too short (${articleWords} words)`);
 
   // Hero image: first ranked item whose device photo resolves. We stop at
   // the first hit rather than looking up every item's photo (N extra API
