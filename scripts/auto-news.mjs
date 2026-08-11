@@ -32,7 +32,9 @@ import { fileURLToPath } from "node:url";
 import { ProviderPool, extractJson } from "./lib/providers.mjs";
 import { fetchAllFeeds, storyKey, significantWords, titlesOverlap } from "./lib/feeds.mjs";
 import { findImage, findYouTubeVideo, mediaPreflight, findWikipediaPortrait } from "./lib/images.mjs";
-import { renderArticlePage, slugify } from "./lib/template.mjs";
+import { findDeviceImage } from "./lib/images/index.mjs";
+import { renderArticlePage, renderComparisonTable, slugify, escapeHtml } from "./lib/template.mjs";
+import { buildComparisonSystemPrompt, buildRankingSystemPrompt, buildNichePrompt } from "./lib/gadget-prompts.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -116,12 +118,31 @@ console.log(`Fetched ${fetchedTotal} raw stories across ${byCategory.size} categ
 const priority = config.categoryPriority.filter((c) => byCategory.has(c));
 for (const c of byCategory.keys()) if (!priority.includes(c)) priority.push(c);
 
+// Gadget Comparisons / Sacred Places / AI Tips & Tools are capped at
+// newCategoryVolume[category] PUBLISHED PER DAY (across all runs), not per
+// run like every other category's PER_CATEGORY. We enforce that by reusing
+// the existing registry bookkeeping (registry[key].d === today, .c ===
+// category) rather than a parallel counter — the same data every other
+// piece of daily-cap logic in this file already relies on. If the config
+// value is missing or 0 for one of these three categories, the computed
+// budget is 0 and the category silently produces nothing that day — no
+// crash, no special-cased error path, config-only toggle.
+const NICHE_DAILY_CATEGORIES = new Set(["Gadget Comparisons", "Sacred Places", "AI Tips & Tools"]);
+function categoryPublishedToday(category) {
+  return Object.values(registry).filter((r) => r.d === today && r.c === category).length;
+}
+
 const queue = [];
 for (const category of priority) {
   const items = byCategory.get(category) || [];
   let picked = 0;
+  let categoryBudget = PER_CATEGORY;
+  if (NICHE_DAILY_CATEGORIES.has(category)) {
+    const dailyCap = Number(config.newCategoryVolume?.[category] || 0);
+    categoryBudget = Math.max(0, dailyCap - categoryPublishedToday(category));
+  }
   for (const item of items) {
-    if (picked >= PER_CATEGORY || queue.length >= budget) break;
+    if (picked >= categoryBudget || queue.length >= budget) break;
     if (item.title.length < 25) continue;
     if (isDuplicate(item)) continue;
     claim(item);
@@ -216,6 +237,194 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 300, 
   console.log(`  ✔ [${item.category}] ${title}`);
 }
 
+// buildProductJsonLd — Product schema.org blocks for the devices in a
+// comparison/ranking article. Deliberately NO Review/aggregateRating type:
+// a star rating is a specific fabricated number if we invent one, and this
+// whole build's spec-accuracy rule exists precisely to avoid confidently-
+// wrong numbers on a monetized site. Product-only structured data is a
+// smaller SEO win than a full Review rich-result, but it's the honest one —
+// we skip the rich-result eligibility rather than invent a rating.
+function buildProductJsonLd(name, imageUrl) {
+  if (!name) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name,
+    image: imageUrl ? [imageUrl] : undefined,
+    brand: { "@type": "Brand", name: (name.split(/\s+/)[0] || name) },
+  };
+}
+
+// writeComparisonStory — Gadget Comparisons. Derives a two-device head-to-
+// head from a single-device headline (see buildComparisonSystemPrompt for
+// the "pick a rival, never invent a spec" rules). Does not touch or reuse
+// writeStory()'s internals; ordinary categories are completely unaffected.
+async function writeComparisonStory(item) {
+  const userPrompt = `Headline: ${item.title}\nCategory: ${item.category}\nOriginal reporting by: ${item.sourceName}\nPublished: ${item.pubDate || today}\nSource snippet: ${item.summary || "(headline only — pick a realistic rival and do not invent specs)"}`;
+
+  const { text } = await pool.chat({ system: buildComparisonSystemPrompt(), user: userPrompt, maxTokens: 3600 });
+  const parsed = extractJson(text);
+
+  const title = (parsed.title || item.title).slice(0, 110);
+  const deviceA = parsed.deviceA || item.title;
+  const deviceB = parsed.deviceB || "";
+  const specRows = Array.isArray(parsed.specRows) ? parsed.specRows : [];
+
+  const introHtml = parsed.intro ? `<p>${escapeHtml(parsed.intro)}</p>` : "";
+  const tableHtml = renderComparisonTable(specRows, deviceA || "Device A", deviceB || "Device B");
+  const summaryHtml = parsed.summary ? `<p>${escapeHtml(parsed.summary)}</p>` : "";
+  const verdictHtml = parsed.verdict || "";
+  const bodyHtml = `${introHtml}\n${tableHtml}\n${summaryHtml}\n${verdictHtml}`;
+
+  if (countWords(bodyHtml) < 150) throw new Error(`comparison too short (${countWords(bodyHtml)} words)`);
+
+  // Two hero images (one per device) via the device-photo cascade. Either
+  // side is allowed to come back empty — a missing photo never fails the
+  // article. renderArticlePage() only accepts a single hero image today,
+  // so we prefer deviceA's photo and fall back to deviceB's; a real
+  // side-by-side two-photo layout is a template change for a later phase.
+  const slugA = slugify(deviceA);
+  const slugB = slugify(deviceB);
+  const [imgA, imgB] = await Promise.all([
+    findDeviceImage({ deviceName: deviceA, deviceSlug: slugA, category: item.category, fallbackImages: config.fallbackImages }),
+    deviceB ? findDeviceImage({ deviceName: deviceB, deviceSlug: slugB, category: item.category, fallbackImages: config.fallbackImages }) : Promise.resolve(null),
+  ]);
+  const chosenImg = imgA || imgB;
+  const heroImage = chosenImg ? chosenImg.url : (config.fallbackImages["Gadget Comparisons"] || config.fallbackImages._default)[0];
+  const heroCredit = chosenImg
+    ? { provider: chosenImg.provider, author: chosenImg.author, license: chosenImg.license, sourceUrl: chosenImg.sourceUrl }
+    : "Pexels";
+
+  let slug = slugify(title) || slugify(`${deviceA}-vs-${deviceB}`) || `comparison-${Date.now()}`;
+  let filename = `${today}-${slug}.html`;
+  let n = 2;
+  while (existsSync(path.join(ARTICLES_DIR, filename))) {
+    filename = `${today}-${slug}-${n++}.html`;
+  }
+
+  const html = renderArticlePage({
+    title,
+    description: parsed.description || parsed.seoDescription || title,
+    category: "Gadget Comparisons",
+    date: today,
+    heroImage,
+    heroCredit,
+    keyPoints: parsed.keyPoints || [],
+    bodyHtml,
+    sourceName: item.sourceName,
+    sourceUrl: item.sourceUrl,
+    youtubeId: "",
+    slug: filename.replace(/\.html$/, ""),
+    adsensePublisherId: ADSENSE_ID,
+    adsenseAdSlot: ADSENSE_SLOT,
+    siteUrl: config.site.url || "",
+    extraJsonLd: [
+      buildProductJsonLd(deviceA, imgA ? imgA.url : ""),
+      buildProductJsonLd(deviceB, imgB ? imgB.url : ""),
+    ],
+  });
+
+  writeFileSync(path.join(ARTICLES_DIR, filename), html);
+  results.written++;
+  results.files.push(filename);
+  if (results.written % 20 === 0) saveRegistry();
+  console.log(`  ✔ [Gadget Comparisons] ${title}`);
+}
+
+// writeRankingStory — periodic "top N" gadget listicle, built from a batch
+// of recent Gadget Comparisons headlines rather than a single item. Kept
+// deliberately simple and follows the same shape as writeComparisonStory /
+// the weekly-feature special below it, rather than introducing a new
+// abstraction.
+async function writeRankingStory(candidateItems) {
+  const listText = candidateItems
+    .map((c, i) => `${i + 1}. ${c.title}${c.summary ? " — " + c.summary : ""}`)
+    .join("\n");
+  const userPrompt = `Recent gadget headlines to draw ranking candidates from:\n${listText}\nPublished: ${today}`;
+
+  const { text } = await pool.chat({ system: buildRankingSystemPrompt(), user: userPrompt, maxTokens: 4200 });
+  const parsed = extractJson(text);
+
+  const title = (parsed.title || "Top phones ranked").slice(0, 110);
+  const items = Array.isArray(parsed.items) ? parsed.items : [];
+
+  const introHtml = parsed.intro ? `<p>${escapeHtml(parsed.intro)}</p>` : "";
+  const rationaleHtml = parsed.rankingRationale
+    ? `<p><strong>How we ranked these:</strong> ${escapeHtml(parsed.rankingRationale)}</p>`
+    : "";
+  const itemsHtml = items
+    .map((it) => {
+      const heading = `<h3>#${Number(it.rank) || ""} ${escapeHtml(it.name || "")}</h3>`;
+      const why = it.whyRanked ? `<p>${escapeHtml(it.whyRanked)}</p>` : "";
+      const priceLine = `<p><strong>Price:</strong> ${it.price ? escapeHtml(it.price) : "—"}</p>`;
+      const table = renderComparisonTable(Array.isArray(it.specRows) ? it.specRows : []);
+      return `${heading}${why}${priceLine}${table}`;
+    })
+    .join("\n");
+  const verdictHtml = parsed.verdict || "";
+  const bodyHtml = `${introHtml}\n${rationaleHtml}\n${itemsHtml}\n${verdictHtml}`;
+
+  if (countWords(bodyHtml) < 200) throw new Error(`ranking too short (${countWords(bodyHtml)} words)`);
+
+  // Hero image: first ranked item whose device photo resolves. We stop at
+  // the first hit rather than looking up every item's photo (N extra API
+  // calls for a single hero image isn't worth it) — heroImageForName below
+  // tracks which item it belongs to, purely for the Product schema block.
+  let heroImage = "";
+  let heroCredit = "Pexels";
+  let heroImageForName = "";
+  for (const it of items) {
+    if (!it.name) continue;
+    const img = await findDeviceImage({
+      deviceName: it.name,
+      deviceSlug: slugify(it.name),
+      category: "Gadget Comparisons",
+      fallbackImages: config.fallbackImages,
+    });
+    if (img) {
+      heroImage = img.url;
+      heroCredit = { provider: img.provider, author: img.author, license: img.license, sourceUrl: img.sourceUrl };
+      heroImageForName = it.name;
+      break;
+    }
+  }
+  if (!heroImage) heroImage = (config.fallbackImages["Gadget Comparisons"] || config.fallbackImages._default)[0];
+
+  let slug = slugify(title) || `gadget-ranking-${Date.now()}`;
+  let filename = `${today}-${slug}.html`;
+  let n = 2;
+  while (existsSync(path.join(ARTICLES_DIR, filename))) {
+    filename = `${today}-${slug}-${n++}.html`;
+  }
+
+  const html = renderArticlePage({
+    title,
+    description: parsed.description || parsed.seoDescription || title,
+    category: "Gadget Comparisons",
+    date: today,
+    heroImage,
+    heroCredit,
+    keyPoints: parsed.keyPoints || [],
+    bodyHtml,
+    sourceName: "TIVRA News Gadgets Desk",
+    sourceUrl: "",
+    youtubeId: "",
+    slug: filename.replace(/\.html$/, ""),
+    adsensePublisherId: ADSENSE_ID,
+    adsenseAdSlot: ADSENSE_SLOT,
+    siteUrl: config.site.url || "",
+    extraJsonLd: items.map((it) =>
+      buildProductJsonLd(it.name, it.name === heroImageForName ? heroImage : "")
+    ),
+  });
+
+  writeFileSync(path.join(ARTICLES_DIR, filename), html);
+  results.written++;
+  results.files.push(filename);
+  if (results.written % 20 === 0) saveRegistry();
+  console.log(`  ✔ [Gadget Comparisons] ${title} (ranking)`);
+}
+
 async function runQueue(items, worker) {
   let index = 0;
   const lanes = Array.from({ length: Math.min(CONCURRENCY, items.length) }, async () => {
@@ -233,7 +442,26 @@ async function runQueue(items, worker) {
   await Promise.all(lanes);
 }
 
-await runQueue(queue, (item) => writeStory(item));
+// Category dispatch. Every ordinary category still goes through the exact
+// same writeStory(item) call as before (byte-identical behavior). Only the
+// three new niche categories are routed differently:
+//   - Gadget Comparisons needs a whole different two-device shape, so it
+//     gets its own writer.
+//   - Sacred Places / AI Tips & Tools reuse writeStory() completely
+//     unchanged, just with a different systemPrompt — the same override
+//     mechanism ANALYSIS_SYSTEM/FEATURE_SYSTEM already use below.
+const NICHE_SYSTEM_PROMPTS = {
+  "Sacred Places": buildNichePrompt("temple", SYSTEM_PROMPT),
+  "AI Tips & Tools": buildNichePrompt("ai-tips", SYSTEM_PROMPT),
+};
+function dispatchWrite(item) {
+  if (item.category === "Gadget Comparisons") return writeComparisonStory(item);
+  const nicheSystem = NICHE_SYSTEM_PROMPTS[item.category];
+  if (nicheSystem) return writeStory(item, { systemPrompt: nicheSystem });
+  return writeStory(item);
+}
+
+await runQueue(queue, dispatchWrite);
 
 // ---------- Specials ----------
 if (!NO_SPECIALS && pool.providers.length > 0) {
@@ -323,6 +551,27 @@ if (!NO_SPECIALS && pool.providers.length > 0) {
         registry[weekKey] = { t: "weekly feature", d: today, c: "Features", k: "feature" };
       } catch (err) {
         console.log(`  ✖ [Features] weekly long-form — ${err.message} (will retry next run)`);
+      }
+    }
+  }
+
+  // Weekly gadget ranking listicle. Reuses the same weekly-cadence pattern
+  // as the long-form feature just above (least new plumbing) rather than
+  // a per-run/per-batch trigger — a "top 5 phones" listicle doesn't need to
+  // exist more than once a week, and gating it on weekKey (already computed
+  // above) means it costs nothing extra to track. Still respects the
+  // Gadget Comparisons on/off toggle: if newCategoryVolume["Gadget
+  // Comparisons"] is 0 or missing, it's skipped, no error.
+  const gadgetRankKey = `gadget-ranking-${weekKey.replace("feature-", "")}`;
+  const gcDailyCap = Number(config.newCategoryVolume?.["Gadget Comparisons"] || 0);
+  if (gcDailyCap > 0 && !registry[gadgetRankKey] && budget - results.written > 0) {
+    const rankCandidates = (byCategory.get("Gadget Comparisons") || []).slice(0, 8);
+    if (rankCandidates.length >= 3) {
+      try {
+        await writeRankingStory(rankCandidates);
+        registry[gadgetRankKey] = { t: "weekly gadget ranking", d: today, c: "Gadget Comparisons", k: "ranking" };
+      } catch (err) {
+        console.log(`  ✖ [Gadget Comparisons] weekly ranking — ${err.message} (will retry next run)`);
       }
     }
   }

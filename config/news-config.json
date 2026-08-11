@@ -54,12 +54,20 @@
     "Sports",
     "Entertainment",
     "Technology",
-    "Health"
+    "Health",
+    "Gadget Comparisons",
+    "Sacred Places",
+    "AI Tips & Tools"
   ],
   "specials": {
     "horoscopesPerDay": true,
     "analysisPerDay": 2,
     "weeklyLongform": 2
+  },
+  "newCategoryVolume": {
+    "Gadget Comparisons": 3,
+    "Sacred Places": 3,
+    "AI Tips & Tools": 3
   },
   "feeds": [
     {
@@ -178,6 +186,18 @@
     {
       "category": "Delhi",
       "url": "https://news.google.com/rss/headlines/section/geo/Delhi?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Gadget Comparisons",
+      "url": "https://news.google.com/rss/search?q=smartphone+launch+review+specifications&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Sacred Places",
+      "url": "https://news.google.com/rss/search?q=temple+heritage+pilgrimage+sacred+site&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "AI Tips & Tools",
+      "url": "https://news.google.com/rss/search?q=AI+tool+launch+chatgpt+gemini+claude+prompt&hl=en-IN&gl=IN&ceid=IN:en"
     }
   ],
   "categoryPriority": [
@@ -209,7 +229,10 @@
     "Lifestyle",
     "Culture & Arts",
     "Religion",
-    "Inventions"
+    "Inventions",
+    "Gadget Comparisons",
+    "Sacred Places",
+    "AI Tips & Tools"
   ],
   "fallbackImages": {
     "Breaking News": [
@@ -283,6 +306,15 @@
     ],
     "Inventions": [
       "https://images.pexels.com/photos/356040/pexels-photo-356040.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Gadget Comparisons": [
+      "https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Sacred Places": [
+      "https://images.pexels.com/photos/2161467/pexels-photo-2161467.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "AI Tips & Tools": [
+      "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
     ],
     "Astrology": [
       "https://images.pexels.com/photos/956981/milky-way-starry-sky-night-sky-star-956981.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"

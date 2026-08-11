@@ -5,13 +5,15 @@
  * Repairs articles whose hero image is broken or generic:
  *   - Pixabay hotlinks (their API URLs EXPIRE — never hotlink Pixabay)
  *   - category fallback images (used when image APIs were unreachable)
+ *   - Gadget articles via device-image cascade
  *
  * For each, tries in order:
- *   1. Wikipedia portrait if the headline names a famous person
+ *   1. (Gadget Comparisons only) Device image cascade via findDeviceImage
+ *   2. Wikipedia portrait if the headline names a famous person
  *      (skipped for Crime & Law / Wars & Conflicts)
- *   2. Pexels photo matched to the headline (quota-limited via --budget,
+ *   3. Pexels photo matched to the headline (quota-limited via --budget,
  *      Pexels allows only 200 requests/hour)
- *   3. category fallback (stable Pexels URL — never a dead link)
+ *   4. category fallback (stable Pexels URL — never a dead link)
  *
  * Runs automatically in every scheduled workflow run (self-healing), and
  * can be run manually:
@@ -28,6 +30,8 @@ import {
   findWikipediaPortrait,
   personCandidatesFromTitle,
 } from "./lib/images.mjs";
+import { slugify, buildHeroCredit } from "./lib/template.mjs";
+import { findDeviceImage } from "./lib/images/index.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -68,7 +72,7 @@ targets.sort((a, b) => Number(b.isPixabay) - Number(a.isPixabay));
 console.log(`${files.length} scanned — ${targets.length} need repair (${targets.filter((t) => t.isPixabay).length} expired-link, ${targets.length - targets.filter((t) => t.isPixabay).length} fallback).`);
 if (DRY_RUN) process.exit(0);
 
-let pexelsUsed = 0, wiki = 0, stock = 0, fallbackFixed = 0;
+let pexelsUsed = 0, wiki = 0, stock = 0, fallbackFixed = 0, deviceRepaired = 0;
 
 function applyImage(target, img, credit) {
   let html = readFileSync(target.p, "utf-8");
@@ -77,11 +81,7 @@ function applyImage(target, img, credit) {
   html = html.split(oldEsc).join(newEsc);
   html = html.split(target.src).join(img);
   const captionRe = /<figcaption>(?:Photo:|Representative image)[^<]*<\/figcaption>/;
-  const caption = credit.startsWith("Wikimedia")
-    ? `<figcaption>Photo: ${credit.replace(/&/g, "&amp;")}</figcaption>`
-    : credit
-      ? `<figcaption>Representative image · ${credit} (free license)</figcaption>`
-      : `<figcaption>Representative image</figcaption>`;
+  const caption = `<figcaption>${buildHeroCredit(credit)}</figcaption>`;
   html = html.replace(captionRe, caption);
   writeFileSync(target.p, html);
 }
@@ -89,8 +89,23 @@ function applyImage(target, img, credit) {
 for (const t of targets) {
   let img = null, credit = "";
 
-  // 1. Real person portrait from Wikipedia.
-  if (!NO_PERSON_CATEGORIES.has(t.category)) {
+  // 1. Device image cascade (Gadget Comparisons only).
+  if (t.category === "Gadget Comparisons") {
+    const deviceResult = await findDeviceImage({
+      deviceName: t.title,
+      deviceSlug: slugify(t.title),
+      category: t.category,
+      fallbackImages: config.fallbackImages,
+    });
+    if (deviceResult) {
+      img = deviceResult.url;
+      credit = deviceResult; // Pass structured object
+      deviceRepaired++;
+    }
+  }
+
+  // 2. Real person portrait from Wikipedia.
+  if (!img && !NO_PERSON_CATEGORIES.has(t.category)) {
     for (const name of personCandidatesFromTitle(t.title)) {
       const w = await findWikipediaPortrait(name);
       if (w) { img = w.url; credit = w.credit; wiki++; break; }
@@ -98,7 +113,7 @@ for (const t of targets) {
     }
   }
 
-  // 2. Pexels scene photo (within hourly quota).
+  // 3. Pexels scene photo (within hourly quota).
   if (!img && pexelsUsed < PEXELS_BUDGET) {
     pexelsUsed++;
     const found = await searchPexels(imageQueryFromTitle(t.title, t.category));
@@ -106,7 +121,7 @@ for (const t of targets) {
     await sleep(350);
   }
 
-  // 3. Stable category fallback — only for expired links (a generic image
+  // 4. Stable category fallback — only for expired links (a generic image
   //    beats a dead one; fallback-image articles just wait for more budget).
   if (!img && t.isPixabay) {
     const pool = config.fallbackImages[t.category] || config.fallbackImages._default || [];
@@ -118,5 +133,5 @@ for (const t of targets) {
   if (img) applyImage(t, img, credit);
 }
 
-console.log(`Repaired: ${wiki} Wikipedia portraits, ${stock} Pexels scene photos, ${fallbackFixed} stabilized on category images.`);
+console.log(`Repaired: ${wiki} Wikipedia portraits, ${stock} Pexels scene photos, ${deviceRepaired} device images, ${fallbackFixed} stabilized on category images.`);
 console.log(`Pexels requests used: ${pexelsUsed}/${PEXELS_BUDGET}. Remaining repairs continue next run.`);

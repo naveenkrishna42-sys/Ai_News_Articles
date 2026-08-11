@@ -1,0 +1,17 @@
+# Normalize line endings to LF in the repo regardless of the checkout OS,
+# so a Windows checkout doesn't turn every existing file into a full-file
+# diff the moment it's saved. Without this, ~4,000 already-committed article
+# files show as "modified" on Windows purely from CRLF vs LF — no content
+# change, just noise that would bury real diffs in every future commit.
+* text=auto eol=lf
+
+# Binary/media — never touch line endings, never diff as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.svg binary
+*.ico binary
+*.mp4 binary
+*.mp3 binary
+*.wav binary

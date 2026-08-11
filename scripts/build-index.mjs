@@ -108,6 +108,11 @@ function resetPublicDir() {
   }
 
   copyDir(ARTICLES_DIR, path.join(PUBLIC_DIR, "articles"));
+
+  const assetsDir = path.join(ROOT, "assets");
+  if (existsSync(assetsDir)) {
+    copyDir(assetsDir, path.join(PUBLIC_DIR, "assets"));
+  }
 }
 
 function extract(html, regex, fallback = "") {

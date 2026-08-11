@@ -19,6 +19,110 @@ export function escapeHtml(str) {
   }[c]));
 }
 
+/**
+ * buildHeroCredit — format credit line for hero image.
+ * Accepts either:
+ *   - string: plain credit text ("Pexels", "Wikimedia...", "")
+ *   - object: {provider, author, license, sourceUrl}
+ * Returns figcaption inner HTML (may include <a> tag if sourceUrl exists).
+ */
+export function buildHeroCredit(heroCredit) {
+  // String case: keep exact existing behavior unchanged
+  if (typeof heroCredit === "string" || !heroCredit) {
+    const credit = heroCredit;
+    if (credit && credit.startsWith("Wikimedia")) {
+      return `Photo: ${escapeHtml(credit)}`;
+    } else if (credit) {
+      return `Representative image · ${escapeHtml(credit)} (free license)`;
+    } else {
+      return "Representative image";
+    }
+  }
+
+  // Object case: {provider, author, license, sourceUrl}
+  if (typeof heroCredit === "object") {
+    const { provider, author, license, sourceUrl } = heroCredit;
+    
+    // Build credit text: "Photo: {author / }{provider} ({license})"
+    let creditText = "Photo: ";
+    if (author) {
+      creditText += escapeHtml(author) + " / ";
+    }
+    creditText += escapeHtml(provider || "");
+    if (license) {
+      creditText += ` (${escapeHtml(license)})`;
+    }
+
+    // If sourceUrl exists, wrap in link so credit is CC-compliant
+    if (sourceUrl) {
+      return `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">${creditText}</a>`;
+    }
+    return creditText;
+  }
+
+  // Fallback (shouldn't happen)
+  return "Representative image";
+}
+
+/**
+ * renderComparisonTable — HTML for a gadget comparison / ranking spec table.
+ * Accepts an array of rows in either shape:
+ *   - two-column comparison: {label, valueA, valueB}
+ *   - single-column ranking:  {label, value}
+ * Shape is auto-detected from the first row (does it have a "valueA" key?).
+ * Any null/undefined/empty value renders as a muted em-dash, never a blank
+ * cell and never the literal strings "null"/"undefined". Colours reuse the
+ * site palette already defined in this file's <style> block: #0b1220
+ * (dark heading text), #e11d48 (accent), #e2e8f0 (borders), #64748b (muted
+ * text) — no new colours introduced.
+ *
+ * Mobile: the wrapper scrolls horizontally below the table's natural width
+ * (overflow-x:auto) rather than reflowing into stacked cards, so a
+ * two-column table never overflows a narrow (e.g. 360px) viewport — it just
+ * becomes swipeable, and the max-width matches the site's existing
+ * `.wrap{max-width:840px}` convention.
+ *
+ * This function is intentionally NOT wired into renderArticlePage()'s
+ * signature — callers concatenate its output into bodyHtml themselves.
+ */
+export function renderComparisonTable(specRows, labelA = "Device A", labelB = "Device B") {
+  if (!Array.isArray(specRows) || specRows.length === 0) return "";
+
+  const isComparison = Object.prototype.hasOwnProperty.call(specRows[0] || {}, "valueA");
+
+  const cell = (v) => {
+    if (v === null || v === undefined || v === "") {
+      return `<span style="color:#64748b">&mdash;</span>`;
+    }
+    return escapeHtml(String(v));
+  };
+
+  const thStyle = `padding:10px 14px;text-align:left;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#fff;background:#0b1220;border-bottom:2px solid #e11d48;white-space:nowrap;`;
+  const tdLabelStyle = `padding:10px 14px;font-weight:700;color:#0b1220;border-bottom:1px solid #e2e8f0;white-space:nowrap;`;
+  const tdValStyle = `padding:10px 14px;color:#334155;border-bottom:1px solid #e2e8f0;`;
+
+  const headHtml = isComparison
+    ? `<tr><th style="${thStyle}">Spec</th><th style="${thStyle}">${escapeHtml(labelA)}</th><th style="${thStyle}">${escapeHtml(labelB)}</th></tr>`
+    : `<tr><th style="${thStyle}">Spec</th><th style="${thStyle}">Value</th></tr>`;
+
+  const bodyHtml = specRows
+    .map((row) => {
+      const label = `<td style="${tdLabelStyle}">${escapeHtml(row.label || "")}</td>`;
+      if (isComparison) {
+        return `<tr>${label}<td style="${tdValStyle}">${cell(row.valueA)}</td><td style="${tdValStyle}">${cell(row.valueB)}</td></tr>`;
+      }
+      return `<tr>${label}<td style="${tdValStyle}">${cell(row.value)}</td></tr>`;
+    })
+    .join("");
+
+  return `<div style="max-width:840px;margin:20px auto;overflow-x:auto;border:1px solid #e2e8f0;border-radius:10px;">
+<table style="width:100%;min-width:480px;border-collapse:collapse;font-size:.92rem;background:#fff;">
+<thead>${headHtml}</thead>
+<tbody>${bodyHtml}</tbody>
+</table>
+</div>`;
+}
+
 const LOGO_SVG = `<svg viewBox="0 0 210 44" width="150" height="32" aria-label="TIVRA News" role="img"><text x="0" y="27" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="800" letter-spacing="2" fill="#f8fafc">T<tspan fill="#e11d48">I</tspan>VRA</text><polyline points="2,36 42,36 50,29 58,41 64,36 118,36" fill="none" stroke="#e11d48" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="118" cy="36" r="2.6" fill="#e11d48"/><text x="128" y="39" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="600" letter-spacing="4" fill="#94a3b8">NEWS</text></svg>`;
 
 export function renderArticlePage({
@@ -27,7 +131,7 @@ export function renderArticlePage({
   category,
   date,          // YYYY-MM-DD
   heroImage,
-  heroCredit,    // "Pexels" | "Pixabay" | ""
+  heroCredit,    // "Pexels" | "Pixabay" | "" OR {provider, author, license, sourceUrl}
   keyPoints,     // string[]
   bodyHtml,      // <h2>/<h3>/<p> content from the model
   sourceName,
@@ -37,6 +141,10 @@ export function renderArticlePage({
   adsensePublisherId, // optional
   adsenseAdSlot,      // optional
   siteUrl = "",       // absolute origin for canonical/OG/JSON-LD
+  extraJsonLd = [],    // optional array of extra schema.org objects (e.g.
+                        // Product+Review for gadget comparisons) rendered as
+                        // additional <script type="application/ld+json">
+                        // tags alongside the NewsArticle block below.
 }) {
   const safeTitle = escapeHtml(title);
   const safeDesc = escapeHtml(description).slice(0, 300);
@@ -64,6 +172,14 @@ export function renderArticlePage({
     mainEntityOfPage: pageUrl || undefined,
   });
 
+  // Extra structured-data blocks (Product+Review for comparisons/rankings).
+  // Each entry is JSON.stringify'd independently so one bad object can't
+  // break the others; falsy entries are skipped silently.
+  const extraJsonLdHtml = (extraJsonLd || [])
+    .filter(Boolean)
+    .map((obj) => `<script type="application/ld+json">${JSON.stringify(obj)}</script>`)
+    .join("\n");
+
   const socialMeta = `
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="TIVRA News">
@@ -77,7 +193,8 @@ ${pageUrl ? `<meta property="og:url" content="${escapeHtml(pageUrl)}">\n<link re
 <meta name="twitter:title" content="${safeTitle}">
 <meta name="twitter:description" content="${safeDesc}">
 ${heroImage ? `<meta name="twitter:image" content="${escapeHtml(heroImage)}">` : ""}
-<script type="application/ld+json">${jsonLd}</script>`;
+<script type="application/ld+json">${jsonLd}</script>
+${extraJsonLdHtml}`;
 
   const hasAds = adsensePublisherId && !adsensePublisherId.startsWith("ca-pub-000") && !adsensePublisherId.includes("X");
   const adsHead = hasAds
@@ -100,11 +217,7 @@ ${heroImage ? `<meta name="twitter:image" content="${escapeHtml(heroImage)}">` :
 
   const ytSearch = `https://www.youtube.com/results?search_query=${encodeURIComponent(title)}`;
   const gnSearch = `https://news.google.com/search?q=${encodeURIComponent(title)}`;
-  const credit = heroCredit.startsWith("Wikimedia")
-    ? `<figcaption>Photo: ${escapeHtml(heroCredit)}</figcaption>`
-    : heroCredit
-      ? `<figcaption>Representative image · ${escapeHtml(heroCredit)} (free license)</figcaption>`
-      : `<figcaption>Representative image</figcaption>`;
+  const credit = heroCredit ? `<figcaption>${buildHeroCredit(heroCredit)}</figcaption>` : `<figcaption>Representative image</figcaption>`;
 
   return `<!DOCTYPE html>
 <html lang="en">
