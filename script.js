@@ -247,20 +247,66 @@ searchInput.addEventListener("input", (e) => {
 });
 loadMoreBtn.addEventListener("click", renderNextPage);
 
-fetch("/articles.json", { cache: "no-store" })
+// Two-stage load. feed-latest.json is a few tens of KB and carries the newest
+// 400 stories — everything the first screen can possibly show — so the page
+// paints immediately no matter how large the archive grows. The full index
+// (about a megabyte at current volume) then loads quietly in the background
+// so search and deep pagination still reach every article.
+//
+// Neither request uses cache:"no-store" any more: that forced a fresh
+// download on every single visit. The feed is rebuilt every two hours and
+// Cloudflare revalidates it, so normal caching is both correct and far faster
+// for returning readers.
+
+function renderFeed(articles, featured) {
+  // The light feed omits url (pure redundancy at this volume) — rebuild it
+  // from slug so every renderer below keeps working unchanged.
+  state.all = articles.map((a) => (a.url ? a : { ...a, url: `/articles/${a.slug}.html` }));
+  state.featured = featured;
+  buildTicker(state.all);
+  buildHero(state.all);
+  buildCategoryCarousels(state.all, state.featured);
+  const categories = [...new Set(state.all.map((a) => a.category))];
+  buildCategoryUI(categories, state.featured.length ? state.featured : categories);
+  applyFilters();
+}
+
+function loadFullIndex() {
+  fetch("/articles.json")
+    .then((r) => r.json())
+    .then((data) => {
+      const all = data.articles || [];
+      if (all.length <= state.all.length) return;
+      // Swap in the complete set without disturbing what the reader is
+      // looking at: keep their category, query and scroll depth.
+      const shown = state.shown;
+      state.all = all.map((a) => (a.url ? a : { ...a, url: `/articles/${a.slug}.html` }));
+      applyFilters();
+      while (state.shown < shown && state.shown < state.filtered.length) renderNextPage();
+    })
+    .catch(() => {
+      /* The light feed is already on screen; the site stays usable. */
+    });
+}
+
+fetch("/feed-latest.json")
   .then((r) => r.json())
   .then((data) => {
-    state.all = data.articles || [];
-    state.featured = data.featuredCategories || [];
-    buildTicker(state.all);
-    buildHero(state.all);
-    buildCategoryCarousels(state.all, state.featured);
-    const categories = [...new Set(state.all.map((a) => a.category))];
-    buildCategoryUI(categories, state.featured.length ? state.featured : categories);
-    applyFilters();
+    renderFeed(data.articles || [], data.featuredCategories || []);
+    // Only worth fetching the full index if there is more to fetch.
+    if ((data.total || 0) > (data.articles || []).length) {
+      if ("requestIdleCallback" in window) requestIdleCallback(loadFullIndex, { timeout: 4000 });
+      else setTimeout(loadFullIndex, 1200);
+    }
   })
   .catch(() => {
-    grid.innerHTML = "";
-    emptyState.textContent = "Couldn't load articles right now — please refresh.";
-    emptyState.hidden = false;
+    // Fall back to the full index so an older cached page still works.
+    fetch("/articles.json")
+      .then((r) => r.json())
+      .then((data) => renderFeed(data.articles || [], data.featuredCategories || []))
+      .catch(() => {
+        grid.innerHTML = "";
+        emptyState.textContent = "Couldn't load articles right now — please refresh.";
+        emptyState.hidden = false;
+      });
   });

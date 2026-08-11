@@ -212,19 +212,45 @@ function main() {
   // Assemble the deployable /public folder fresh on every build.
   resetPublicDir();
 
-  // ---- Homepage feed: all published articles ----
+  // ---- Homepage feed ----
+  // Two files, because one grew too heavy to be the thing a visitor waits on:
+  // at ~7,500 articles the full feed is ~1 MB even after compression, and the
+  // homepage cannot paint until it arrives.
+  //
+  //   feed-latest.json  the newest LIGHT_FEED_COUNT articles, trimmed to the
+  //                     fields the homepage actually renders. First paint.
+  //   articles.json     everything, fetched in the background afterwards so
+  //                     search and deep pagination still cover the full set.
+  //
+  // Both are minified — pretty-printing this much JSON cost ~30% for nothing.
+  const LIGHT_FEED_COUNT = 400;
+  const meta = {
+    generatedAt: new Date().toISOString(),
+    site: CONFIG.site.name || "TIVRA News",
+    featuredCategories: CONFIG.featuredCategories || [],
+  };
+
+  writeFileSync(
+    path.join(PUBLIC_DIR, "feed-latest.json"),
+    JSON.stringify({
+      ...meta,
+      total: published.length,
+      // url is omitted: the client derives it from slug, and at this volume
+      // that single field was ~650 KB of pure redundancy.
+      articles: published.slice(0, LIGHT_FEED_COUNT).map((a) => ({
+        slug: a.slug,
+        title: a.title,
+        description: (a.description || "").slice(0, 160),
+        image: a.image,
+        date: a.date,
+        category: a.category,
+      })),
+    })
+  );
+
   writeFileSync(
     path.join(PUBLIC_DIR, "articles.json"),
-    JSON.stringify(
-      {
-        generatedAt: new Date().toISOString(),
-        site: CONFIG.site.name || "TIVRA News",
-        featuredCategories: CONFIG.featuredCategories || [],
-        articles: published,
-      },
-      null,
-      2
-    )
+    JSON.stringify({ ...meta, articles: published })
   );
 
   // ---- Group by month (archive JSONs + sitemaps) ----
