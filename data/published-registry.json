@@ -42431,62 +42431,290 @@
   "c": "Religion",
   "k": "news"
  },
- "backfill-2026-08-11-10-ai-side-hustles-start-with-chatgpt-or-claude-today": {
-  "t": "10 AI Side Hustles: Start With ChatGPT or Claude Today",
+ "8fb4c260effa9324": {
+  "t": "'Cowards': Congress on Amit Shah's 'no show ' in Lok Sabha, Rijiju hits back | India News",
   "d": "2026-08-11",
-  "c": "AI Tips & Tools",
+  "c": "Breaking News",
   "k": "news"
  },
- "backfill-2026-08-11-ayodhya-ram-navami-2026-light-displays-and-a-pilgrim-s-guide": {
-  "t": "Ayodhya Ram Navami 2026: Light Displays and a Pilgrim's Guide",
+ "c22f0872ead63300": {
+  "t": "China’s media slams India’s move of formally naming 27 places in Arunachal Pradesh",
   "d": "2026-08-11",
-  "c": "Sacred Places",
+  "c": "Top Stories",
   "k": "news"
  },
- "backfill-2026-08-11-how-to-import-chatgpt-and-gemini-memory-into-claude": {
-  "t": "How to Import ChatGPT and Gemini Memory into Claude",
+ "65fc5d3fd62186d1": {
+  "t": "Syria court sentences ousted ruler Bashar al-Assad to death in absentia | World News",
   "d": "2026-08-11",
-  "c": "AI Tips & Tools",
+  "c": "Top Stories",
   "k": "news"
  },
- "backfill-2026-08-11-how-to-pick-one-ai-subscription-and-cancel-the-rest": {
-  "t": "How to pick one AI subscription and cancel the rest",
+ "e84ab47d8847ffb9": {
+  "t": "Air India CEO meets MoCA, DGCA amid Phuket flight turbulence probe",
   "d": "2026-08-11",
-  "c": "AI Tips & Tools",
+  "c": "India",
   "k": "news"
  },
- "backfill-2026-08-11-india-faith-tourism-sacred-sites-practical-travel-guide": {
-  "t": "India Faith Tourism: Sacred Sites, Practical Travel Guide",
+ "56d0ccf9d0176b4a": {
+  "t": "Iran, US set new conditions during Hormuz talks: What does this mean?",
   "d": "2026-08-11",
-  "c": "Sacred Places",
+  "c": "World",
   "k": "news"
  },
- "backfill-2026-08-11-motorola-edge-70-pro-vs-oneplus-13r-which-should-you-buy": {
-  "t": "Motorola Edge 70 Pro vs OnePlus 13R: Which Should You Buy?",
+ "5f70a1a7cb3fc4f5": {
+  "t": "Yemen’s Houthis launch ballistic missile attacks on al-Makha and Marib",
+  "d": "2026-08-11",
+  "c": "World",
+  "k": "news"
+ },
+ "b00e24fd7f6d34fb": {
+  "t": "Fitch affirms India’s sovereign rating at BBB-, retains stable outlook",
+  "d": "2026-08-11",
+  "c": "Business",
+  "k": "news"
+ },
+ "30500bcf4f35c47a": {
+  "t": "Intel Increases Size of Stock Offering to Raise $20 Billion",
+  "d": "2026-08-11",
+  "c": "Business",
+  "k": "news"
+ },
+ "5592ee44fdaf27be": {
+  "t": "Bengal cricketer Abhishek Porel arrested on rape charges",
+  "d": "2026-08-11",
+  "c": "Sports",
+  "k": "news"
+ },
+ "2867a95ae14092f5": {
+  "t": "Araujo pens farewell message to Barcelona fans after Liverpool move: 'Time to face a new challenge'",
+  "d": "2026-08-11",
+  "c": "Sports",
+  "k": "news"
+ },
+ "f5d24919fe370981": {
+  "t": "Urmila Matondkar's ex-husband Mohsin Akhtar drops reception PICS months after second wedding with Nidhaa",
+  "d": "2026-08-11",
+  "c": "Entertainment",
+  "k": "news"
+ },
+ "21d943a8091a5d6a": {
+  "t": "Kangana Ranaut calls Naseeruddin Shah a ‘lomdi’ for his comment on student protests: ‘Khaate toh iss desh ka hain’ | Bol",
+  "d": "2026-08-11",
+  "c": "Entertainment",
+  "k": "news"
+ },
+ "c71d0eb5b4a9eb86": {
+  "t": "Modder crams Steam Deck hardware inside a GameBoy chassis, creating the SteamBoy",
+  "d": "2026-08-11",
+  "c": "Technology",
+  "k": "news"
+ },
+ "4e81b200d7947971": {
+  "t": "Amazfit gains FTMS rowing and manual swim rest tracking",
+  "d": "2026-08-11",
+  "c": "Technology",
+  "k": "news"
+ },
+ "52c9dccf5c8accd1": {
+  "t": "India's Delhi reports spike in H1N1 cases: media",
+  "d": "2026-08-11",
+  "c": "Health",
+  "k": "news"
+ },
+ "97388c91f0b5d006": {
+  "t": "Respiratory Infections Rise Among Healthcare Shift Workers",
+  "d": "2026-08-11",
+  "c": "Health",
+  "k": "news"
+ },
+ "8609160dd30094db": {
+  "t": "Independence Day 2026: Chak De! to Kesari 2, Bollywood films that spark patriotism",
+  "d": "2026-08-11",
+  "c": "Movies",
+  "k": "news"
+ },
+ "44a2e889d0fe867e": {
+  "t": "Pankaj Tripathi on Kaleen Bhaiyya in Mirzapur The Movie; says, He is not the entire story",
+  "d": "2026-08-11",
+  "c": "Movies",
+  "k": "news"
+ },
+ "f2781fc788c6fdc9": {
+  "t": "Sensex Today | Nifty 50 | Stock Market Highlights: Sensex settles 388 points lower, Nifty below 24,500; T...",
+  "d": "2026-08-11",
+  "c": "Markets",
+  "k": "news"
+ },
+ "c5b00063ccabb632": {
+  "t": "Stock Market Today Highlights, Aug 11: Sensex drops 388 pts, Nifty slips to 24,471 on surging crude oil prices",
+  "d": "2026-08-11",
+  "c": "Markets",
+  "k": "news"
+ },
+ "df96c782244ba633": {
+  "t": "BRS alleges nepotism in Fourth City land allotment to CM kin firm",
+  "d": "2026-08-11",
+  "c": "Hyderabad",
+  "k": "news"
+ },
+ "56ee4c21a8b22002": {
+  "t": "Milad-un-Nabi preparations begin",
+  "d": "2026-08-11",
+  "c": "Hyderabad",
+  "k": "news"
+ },
+ "84db56191855ee07": {
+  "t": "There is much more to unravel about Chennai’s biological diversity: Environmental activist Jayshree Vencatesan",
+  "d": "2026-08-11",
+  "c": "Chennai",
+  "k": "news"
+ },
+ "868d61ebfe970db6": {
+  "t": "Security arrangements stepped up ahead of Independence Day celebrations in Chennai",
+  "d": "2026-08-11",
+  "c": "Chennai",
+  "k": "news"
+ },
+ "676be9f73f65bfd9": {
+  "t": "Tunnel road awaits clearance, Hebbal project gets cautious nod",
+  "d": "2026-08-11",
+  "c": "Bengaluru",
+  "k": "news"
+ },
+ "24d4204382ee81db": {
+  "t": "Bengaluru eco activists revive ‘No Balloons Please’ campaign ahead of Independence Day",
+  "d": "2026-08-11",
+  "c": "Bengaluru",
+  "k": "news"
+ },
+ "a250b07ad7bbdf2b": {
+  "t": "monsoon struggle at Kanjurmarg stn",
+  "d": "2026-08-11",
+  "c": "Mumbai",
+  "k": "news"
+ },
+ "6318eeed0ddbe4a4": {
+  "t": "CM orders investigation into Siddhivinayak hundi collections",
+  "d": "2026-08-11",
+  "c": "Mumbai",
+  "k": "news"
+ },
+ "ea32d4cf3762d06d": {
+  "t": "Solar eclipse 2026: Where will it be visible in MENA?",
+  "d": "2026-08-11",
+  "c": "Science",
+  "k": "news"
+ },
+ "bcd80e958b763a98": {
+  "t": "NASA shares pic of debris of history's brightest star explosion | It's a bubble of hot gas, dust and debris | Inshorts",
+  "d": "2026-08-11",
+  "c": "Science",
+  "k": "news"
+ },
+ "9a585f6fc608c900": {
+  "t": "NASA invites ISRO to join Moon Base programme",
+  "d": "2026-08-11",
+  "c": "Space",
+  "k": "news"
+ },
+ "1f46b08a706a9cfc": {
+  "t": "NASA’s Moon Base Plan Has An India Connection: What We Know",
+  "d": "2026-08-11",
+  "c": "Space",
+  "k": "news"
+ },
+ "97be0190abe25977": {
+  "t": "Keel abandons Bitcoin mining and pivots to AI",
+  "d": "2026-08-11",
+  "c": "Crypto",
+  "k": "news"
+ },
+ "d56c85af449a9fad": {
+  "t": "Cryptocurrency prices show mixed movements with Bitcoin down 1.2% and Binance Coin up 1.2%.",
+  "d": "2026-08-11",
+  "c": "Crypto",
+  "k": "news"
+ },
+ "bd988586b7933a5a": {
+  "t": "RBI proposes new capital norms for banks to cover risks of financial contracts",
+  "d": "2026-08-11",
+  "c": "Banking",
+  "k": "news"
+ },
+ "0781c738482f5dae": {
+  "t": "RBI Pushes AI-Based Fraud Detection, Announces Digital Payment Intelligence Platform",
+  "d": "2026-08-11",
+  "c": "Banking",
+  "k": "news"
+ },
+ "c723bc6427d6e6ea": {
+  "t": "When Every Door Opens Into Another Queue – Indias Education Crisis",
+  "d": "2026-08-11",
+  "c": "Education",
+  "k": "news"
+ },
+ "c8c6fddfc5921fbe": {
+  "t": "Chapter 1: Fighting Lens: Military Doctrine and the Future of Warfare in Asia",
+  "d": "2026-08-11",
+  "c": "Wars & Conflicts",
+  "k": "news"
+ },
+ "4bfea565f9eeb60f": {
+  "t": "Redmi Turbo 5 Launching Today: Know Price in India, Features, Specifications and More",
   "d": "2026-08-11",
   "c": "Gadget Comparisons",
   "k": "news"
  },
- "backfill-2026-08-11-oneplus-15-vs-iphone-16-pro-max-which-flagship-wins": {
-  "t": "OnePlus 15 vs iPhone 16 Pro Max: Which Flagship Wins?",
+ "b15a870809c00384": {
+  "t": "Xiaomi 17T roundup: India launch date, specifications, price in India, and more",
   "d": "2026-08-11",
   "c": "Gadget Comparisons",
   "k": "news"
  },
- "backfill-2026-08-11-redmi-turbo-5-vs-poco-x7-pro-which-should-you-buy": {
-  "t": "Redmi Turbo 5 vs Poco X7 Pro: Which Should You Buy?",
+ "36fd4e164874ae71": {
+  "t": "OnePlus 15 launched in India: Price, specifications, offers and more",
   "d": "2026-08-11",
   "c": "Gadget Comparisons",
   "k": "news"
  },
- "backfill-2026-08-11-somnath-temple-history-architecture-and-visitor-guide": {
-  "t": "Somnath Temple: History, Architecture, and Visitor Guide",
+ "442c21fc4a760948": {
+  "t": "Somnath: The Eternal Flame of Bharat",
   "d": "2026-08-11",
   "c": "Sacred Places",
   "k": "news"
  },
- "backfill-2026-08-11-top-5-new-smartphones-in-india-ranked-by-value": {
-  "t": "Top 5 New Smartphones in India Ranked by Value",
+ "7d0b0bd1dcf24e07": {
+  "t": "India Faith Based Tourism Market",
+  "d": "2026-08-11",
+  "c": "Sacred Places",
+  "k": "news"
+ },
+ "1db59b17a01a0f12": {
+  "t": "Jagmag Ayodhya: Signify Lights up a Host of Sacred Heritage Sites for Millions of Devotees Ahead of Ram Navami",
+  "d": "2026-08-11",
+  "c": "Sacred Places",
+  "k": "news"
+ },
+ "ea4d61f69af4bad0": {
+  "t": "I pay for Gemini, ChatGPT, and Claude — and there's a clear winner",
+  "d": "2026-08-11",
+  "c": "AI Tips & Tools",
+  "k": "news"
+ },
+ "a72efc6400fb7190": {
+  "t": "10 AI-Powered Side Hustles: Smart Business Ideas Using ChatGPT Or Claude",
+  "d": "2026-08-11",
+  "c": "AI Tips & Tools",
+  "k": "news"
+ },
+ "4476ab15eb762c01": {
+  "t": "I Made Claude, Gemini and ChatGPT Build the Same App With an Epic Prompt",
+  "d": "2026-08-11",
+  "c": "AI Tips & Tools",
+  "k": "news"
+ },
+ "gadget-ranking-2026-w32": {
+  "t": "weekly gadget ranking",
   "d": "2026-08-11",
   "c": "Gadget Comparisons",
   "k": "ranking"
