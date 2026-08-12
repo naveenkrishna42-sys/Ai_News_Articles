@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microsoft patches 400+ flaws, including zero-day under active attack</title>
+<meta name="description" content="Microsoft&#39;s August Patch Tuesday addresses over 400 vulnerabilities, including a Windows driver zero-day (CVE-2026-68820) already exploited in attacks.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="TIVRA News">
+<meta property="og:title" content="Microsoft patches 400+ flaws, including zero-day under active attack">
+<meta property="og:description" content="Microsoft&#39;s August Patch Tuesday addresses over 400 vulnerabilities, including a Windows driver zero-day (CVE-2026-68820) already exploited in attacks.">
+<meta property="og:image" content="https://images.pexels.com/photos/4508748/pexels-photo-4508748.jpeg?auto=compress&amp;cs=tinysrgb&amp;fit=crop&amp;h=627&amp;w=1200">
+<meta property="og:url" content="https://ainewsss.naveenkrishna42.workers.dev/articles/2026-08-12-microsoft-patches-400-flaws-including-zero-day-under-active-attack.html">
+<link rel="canonical" href="https://ainewsss.naveenkrishna42.workers.dev/articles/2026-08-12-microsoft-patches-400-flaws-including-zero-day-under-active-attack.html">
+<meta property="article:published_time" content="2026-08-12">
+<meta property="article:section" content="Technology">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Microsoft patches 400+ flaws, including zero-day under active attack">
+<meta name="twitter:description" content="Microsoft&#39;s August Patch Tuesday addresses over 400 vulnerabilities, including a Windows driver zero-day (CVE-2026-68820) already exploited in attacks.">
+<meta name="twitter:image" content="https://images.pexels.com/photos/4508748/pexels-photo-4508748.jpeg?auto=compress&amp;cs=tinysrgb&amp;fit=crop&amp;h=627&amp;w=1200">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"NewsArticle","headline":"Microsoft patches 400+ flaws, including zero-day under active attack","description":"Microsoft's August Patch Tuesday addresses over 400 vulnerabilities, including a Windows driver zero-day (CVE-2026-68820) already exploited in attacks.","image":["https://images.pexels.com/photos/4508748/pexels-photo-4508748.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200"],"datePublished":"2026-08-12","dateModified":"2026-08-12","articleSection":"Technology","author":{"@type":"Organization","name":"TIVRA News","url":"https://ainewsss.naveenkrishna42.workers.dev"},"publisher":{"@type":"Organization","name":"TIVRA News","logo":{"@type":"ImageObject","url":"https://ainewsss.naveenkrishna42.workers.dev/logo.svg"}},"mainEntityOfPage":"https://ainewsss.naveenkrishna42.workers.dev/articles/2026-08-12-microsoft-patches-400-flaws-including-zero-day-under-active-attack.html"}</script>
+
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:#f7f8fa;color:#1e293b;line-height:1.75}
+a{color:#be123c}
+header.masthead{background:#0b1220;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+header.masthead a.logo{display:inline-flex;align-items:center;text-decoration:none}
+header.masthead a.home{color:#94a3b8;text-decoration:none;font-size:.85rem;white-space:nowrap}
+header.masthead a.home:hover{color:#fff}
+nav.catbar{background:#111a2e;padding:9px 20px;display:flex;gap:18px;overflow-x:auto;white-space:nowrap}
+nav.catbar a{color:#94a3b8;text-decoration:none;font-size:.78rem;text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+nav.catbar a:hover{color:#fb7185}
+.wrap{max-width:840px;margin:28px auto;padding:0 18px}
+.crumb{font-size:.78rem;color:#64748b;margin-bottom:14px}
+.crumb a{color:#be123c;text-decoration:none}
+.cat-pill{display:inline-block;background:#fff1f2;color:#be123c;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:4px 11px;border-radius:999px;margin-bottom:12px}
+h1{font-size:clamp(1.5rem,4vw,2.15rem);font-weight:800;color:#0b1220;line-height:1.22;letter-spacing:-.4px;margin-bottom:12px}
+.meta{font-size:.82rem;color:#64748b;margin-bottom:20px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.meta a{color:#be123c;text-decoration:none;font-weight:600}
+figure.hero{margin:0 0 8px}
+figure.hero img{width:100%;max-height:440px;object-fit:cover;border-radius:12px;background:#e2e8f0}
+figure.hero figcaption{font-size:.72rem;color:#94a3b8;margin-top:6px}
+.keypoints{background:#fff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;padding:18px 22px;margin:26px 0}
+.keypoints .kp-head{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:10px}
+.keypoints ul{margin:0 0 0 18px;color:#334155;font-size:.95rem}
+.keypoints li{margin-bottom:7px}
+.body{font-size:1.05rem;color:#334155}
+.body h2{font-size:1.35rem;color:#0b1220;font-weight:800;margin:30px 0 12px;letter-spacing:-.3px}
+.body h3{font-size:1.12rem;color:#0b1220;font-weight:700;margin:24px 0 10px}
+.body p{margin-bottom:18px}
+.srcbox{margin:34px 0 0;padding:18px 20px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;font-size:.88rem;color:#475569}
+.srcbox .s-head{font-weight:800;color:#0b1220;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.srcbox a{color:#be123c;text-decoration:none;font-weight:600}
+.srcbox .links{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+.related{margin-top:36px}
+.notice{margin-top:26px;padding:14px 18px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;font-size:.8rem;color:#92400e}
+footer.site{background:#0b1220;color:#94a3b8;text-align:center;padding:26px 18px;margin-top:52px;font-size:.82rem}
+footer.site a{color:#64748b;text-decoration:none;margin:0 9px}
+footer.site a:hover{color:#e2e8f0}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <a href="/" class="logo" aria-label="TIVRA News home"><svg viewBox="0 0 210 44" width="150" height="32" aria-label="TIVRA News" role="img"><text x="0" y="27" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="800" letter-spacing="2" fill="#f8fafc">T<tspan fill="#e11d48">I</tspan>VRA</text><polyline points="2,36 42,36 50,29 58,41 64,36 118,36" fill="none" stroke="#e11d48" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="118" cy="36" r="2.6" fill="#e11d48"/><text x="128" y="39" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="600" letter-spacing="4" fill="#94a3b8">NEWS</text></svg></a>
+  <a href="/" class="home">← Home</a>
+</header>
+<nav class="catbar">
+  <a href="/">Home</a>
+  <a href="/category.html?cat=top-stories">Top Stories</a>
+  <a href="/category.html?cat=india">India</a>
+  <a href="/category.html?cat=world">World</a>
+  <a href="/category.html?cat=business">Business</a>
+  <a href="/category.html?cat=sports">Sports</a>
+  <a href="/category.html?cat=entertainment">Entertainment</a>
+  <a href="/category.html?cat=technology">Technology</a>
+  <a href="/archive.html">Archive</a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="/">Home</a> › <a href="/category.html?cat=technology">Technology</a></div>
+  <span class="cat-pill">Technology</span>
+  <h1>Microsoft patches 400+ flaws, including zero-day under active attack</h1>
+  <div class="meta">
+    <span>📅 2026-08-12</span>
+    <span>📂 Technology</span>
+    <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxQU3U0b25sRkUtbEo1Um92Y0xneThHeDlQMFc4b0NJRHBtUVFlb3ZOclBkR2lxSWhzVURwVlFxRWxoZ2RGdE1VUWxlTUFjaGo2ZEw4ZjMwdnR2T1Zmb1JGckZVSUEwY2hsUzgwbHVuRVI5R0xvSVEyNWUtTXRPWFliTG50bGp4VXZ5TVdCMw?oc=5" target="_blank" rel="noopener noreferrer nofollow">Original source ↗</a>
+  </div>
+  <figure class="hero"><img src="https://images.pexels.com/photos/4508748/pexels-photo-4508748.jpeg?auto=compress&amp;cs=tinysrgb&amp;fit=crop&amp;h=627&amp;w=1200" alt="Microsoft patches 400+ flaws, including zero-day under active attack"><figcaption>Representative image · Pexels (free license)</figcaption></figure>
+  <div class="keypoints"><div class="kp-head">Key points</div><ul><li>Microsoft released patches for more than 400 vulnerabilities in its August 2026 Patch Tuesday update.</li><li>A zero-day in a Windows driver (CVE-2026-68820) is under active attack, prompting urgent patching.</li><li>Updates are available for Windows 11 (KB5121003, KB5120240, KB5121000) and other affected products.</li></ul></div>
+  <div class="body">
+<h2>Largest Patch Tuesday in recent memory</h2><p>Microsoft has released its August 2026 Patch Tuesday updates, addressing more than 400 vulnerabilities across its product ecosystem. The sheer volume marks one of the largest monthly security fixes in the company's history, covering Windows, Office, Edge, and several developer tools.</p><p>Among the patches are fixes for 398 flaws detailed by third-party researchers, alongside additional advisories. The updates include critical remote code execution bugs, privilege escalation flaws, and information disclosure issues. Security teams are now racing to triage and deploy the patches, prioritising those marked as actively exploited.</p><h2>Zero-day under attack: CVE-2026-68820</h2><p>The most urgent item is CVE-2026-68820, a Windows driver vulnerability that is already being exploited in the wild. Microsoft has confirmed that the flaw is under active attack, though it has not yet disclosed the full scope of the campaigns or the threat actors involved.</p><p>The vulnerability allows an attacker to gain elevated privileges on a target system, a common stepping stone for deeper compromise. Check Point Research, which flagged the issue in its analysis, noted that driver-related zero-days are particularly dangerous because they can bypass security products and operate at the kernel level.</p><p>Microsoft has classified the flaw as 'important' severity but has urged users to apply the update immediately due to active exploitation. Organisations that cannot patch right away are advised to monitor for indicators of compromise and restrict driver installation where possible.</p><h2>Windows 11 updates and what they include</h2><p>The Patch Tuesday release includes cumulative updates for Windows 11: KB5121003, KB5120240, and KB5121000. These updates deliver the security fixes and also include non-security improvements, such as stability enhancements and performance tweaks.</p><p>For Windows 10 users, Microsoft has provided similar cumulative updates, though the company has been gradually winding down support for older versions. Enterprises using Windows Server variants will also need to apply corresponding patches to protect infrastructure.</p><p>Adobe, which often aligns its Patch Tuesday with Microsoft's, has also released its own set of security updates. The Qualys review of the August 2026 Patch Tuesday highlights several critical vulnerabilities in Adobe products that require immediate attention, particularly in Reader and Acrobat.</p><h2>What security teams should do now</h2><p>Experts recommend prioritising the zero-day CVE-2026-68820 first, followed by any remote code execution flaws in internet-facing services. Patching should be tested in staging environments before full deployment, but delays carry risk given the active exploitation.</p><p>Organisations should also review their endpoint detection and response (EDR) logs for signs of unusual driver loading or privilege escalation attempts. The Windows driver flaw may leave traces that can help identify earlier intrusions.</p><p>For home users, enabling automatic updates on Windows 11 is the simplest way to stay protected. The cumulative updates will download and install automatically, though a reboot may be required to complete the process.</p><h3>Looking ahead</h3><p>Microsoft is expected to release additional guidance on CVE-2026-68820 in the coming days, including more details on the attack vectors and potential mitigations. Security researchers will likely reverse-engineer the patch to identify the root cause, which could lead to further discoveries.</p><p>With the volume of patches this month, experts caution that attackers may exploit the chaos to target laggards. The next few weeks will be critical for organisations to close the gap before more sophisticated attacks emerge.</p>
+  </div>
+  
+  
+  <div class="srcbox">
+    <div class="s-head">Verify this story</div>
+    Reported by helpnetsecurity.com. This article was written with AI assistance from publicly available reporting — always cross-check important details with the original coverage.
+    <div class="links">
+      <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxQU3U0b25sRkUtbEo1Um92Y0xneThHeDlQMFc4b0NJRHBtUVFlb3ZOclBkR2lxSWhzVURwVlFxRWxoZ2RGdE1VUWxlTUFjaGo2ZEw4ZjMwdnR2T1Zmb1JGckZVSUEwY2hsUzgwbHVuRVI5R0xvSVEyNWUtTXRPWFliTG50bGp4VXZ5TVdCMw?oc=5" target="_blank" rel="noopener noreferrer nofollow">Read the original report</a>
+      <a href="https://news.google.com/search?q=Microsoft%20patches%20400%2B%20flaws%2C%20including%20zero-day%20under%20active%20attack" target="_blank" rel="noopener noreferrer nofollow">More coverage on Google News</a>
+      <a href="https://www.youtube.com/results?search_query=Microsoft%20patches%20400%2B%20flaws%2C%20including%20zero-day%20under%20active%20attack" target="_blank" rel="noopener noreferrer nofollow">Watch on YouTube</a>
+    </div>
+  </div>
+  <div class="related" id="relatedArticles" data-category="technology" data-slug="2026-08-12-microsoft-patches-400-flaws-including-zero-day-under-active-attack"></div>
+  <div class="notice">This content is AI-assisted and published for information only. TIVRA News links every story to its original source above — please verify dates, figures and statements there. See our <a href="/disclaimer.html" style="color:#92400e;font-weight:700;">Disclaimer</a> and <a href="/editorial-policy.html" style="color:#92400e;font-weight:700;">Editorial Policy</a>.</div>
+</div>
+<footer class="site">
+  <div style="margin-bottom:8px;">
+    <a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/archive.html">Archive</a><a href="/privacy.html">Privacy</a><a href="/cookie-policy.html">Cookies</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/editorial-policy.html">Editorial Policy</a><a href="/dmca.html">DMCA</a><a href="/affiliate-disclosure.html">Affiliate Disclosure</a><a href="/sitemap-index.xml">Sitemap</a>
+  </div>
+  <div>© 2026 TIVRA News — Trusted Insights, Verified Reports &amp; Alerts.</div>
+</footer>
+<script src="/related.js" defer></script>
+</body>
+</html>
