@@ -65,7 +65,8 @@
   },
   "newCategoryVolume": {
     "Gadget Comparisons": 9,
-    "AI Tips & Tools": 3
+    "AI Tips & Tools": 3,
+    "Sacred Places": 3
   },
   "feeds": [
     {
@@ -204,6 +205,22 @@
     {
       "category": "Gadget Comparisons",
       "url": "https://news.google.com/rss/search?q=laptop%20computer%20hardware%20launch%20review%20specifications&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Sacred Places",
+      "url": "https://news.google.com/rss/search?q=sacred%20temple%20pilgrimage%20site%20history&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Sacred Places",
+      "url": "https://news.google.com/rss/search?q=Vatican%20Jerusalem%20Christian%20holy%20site&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Sacred Places",
+      "url": "https://news.google.com/rss/search?q=ancient%20Egypt%20temple%20pyramid%20history&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Sacred Places",
+      "url": "https://news.google.com/rss/search?q=Scotland%20Iceland%20Norse%20Viking%20sacred%20site%20history&hl=en-IN&gl=IN&ceid=IN:en"
     }
   ],
   "categoryPriority": [
@@ -237,7 +254,8 @@
     "Religion",
     "Inventions",
     "Gadget Comparisons",
-    "AI Tips & Tools"
+    "AI Tips & Tools",
+    "Sacred Places"
   ],
   "fallbackImages": {
     "Breaking News": [
@@ -343,6 +361,9 @@
       "https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
     ],
     "_default": [
+      "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Sacred Places": [
       "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
     ]
   },

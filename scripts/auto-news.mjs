@@ -128,7 +128,7 @@ for (const c of byCategory.keys()) if (!priority.includes(c)) priority.push(c);
 // value is missing or 0 for one of these three categories, the computed
 // budget is 0 and the category silently produces nothing that day — no
 // crash, no special-cased error path, config-only toggle.
-const NICHE_DAILY_CATEGORIES = new Set(["Gadget Comparisons", "AI Tips & Tools"]);
+const NICHE_DAILY_CATEGORIES = new Set(["Gadget Comparisons", "AI Tips & Tools", "Sacred Places"]);
 function categoryPublishedToday(category) {
   return Object.values(registry).filter((r) => r.d === today && r.c === category).length;
 }
@@ -553,6 +553,7 @@ async function runQueue(items, worker) {
 //     ANALYSIS_SYSTEM/FEATURE_SYSTEM already use below.
 const NICHE_SYSTEM_PROMPTS = {
   "AI Tips & Tools": buildNichePrompt("ai-tips", SYSTEM_PROMPT),
+  "Sacred Places": buildNichePrompt("temple", SYSTEM_PROMPT),
 };
 // Gadget Comparisons format mix: mostly single-product reviews (matches
 // what was actually asked for — "product review, ratings, specifications,
@@ -562,8 +563,10 @@ const NICHE_SYSTEM_PROMPTS = {
 // predictable and testable rather than a coin flip per run.
 function dispatchWrite(item) {
   if (item.category === "Gadget Comparisons") {
-    const doneToday = categoryPublishedToday("Gadget Comparisons");
-    return doneToday % 3 === 2 ? writeComparisonStory(item) : writeReviewStory(item);
+    // writeComparisonStory / writeRankingStory are silenced, not deleted —
+    // kept for a later site. All 9/day go through writeReviewStory now,
+    // reframed as value-for-money deal spotlights (see buildReviewSystemPrompt).
+    return writeReviewStory(item);
   }
   const nicheSystem = NICHE_SYSTEM_PROMPTS[item.category];
   if (nicheSystem) return writeStory(item, { systemPrompt: nicheSystem });
@@ -673,7 +676,8 @@ if (!NO_SPECIALS && pool.providers.length > 0) {
   // Comparisons"] is 0 or missing, it's skipped, no error.
   const gadgetRankKey = `gadget-ranking-${weekKey.replace("feature-", "")}`;
   const gcDailyCap = Number(config.newCategoryVolume?.["Gadget Comparisons"] || 0);
-  if (gcDailyCap > 0 && !registry[gadgetRankKey] && budget - results.written > 0) {
+  const GADGET_RANKING_SILENCED = true; // silenced, not deleted — deals-only for now
+  if (!GADGET_RANKING_SILENCED && gcDailyCap > 0 && !registry[gadgetRankKey] && budget - results.written > 0) {
     const rankCandidates = (byCategory.get("Gadget Comparisons") || []).slice(0, 8);
     if (rankCandidates.length >= 3) {
       try {
