@@ -85,6 +85,42 @@ export function buildHeroCredit(heroCredit) {
  * This function is intentionally NOT wired into renderArticlePage()'s
  * signature — callers concatenate its output into bodyHtml themselves.
  */
+
+/**
+ * specTableHasData — true if at least one row has a real, non-null value.
+ * A pre-launch story (e.g. "Vivo T5x 5G launches tomorrow") legitimately
+ * confirms nothing yet, so the accuracy rule ("null if unsure") correctly
+ * nulls every single row — the caller should check this BEFORE calling
+ * renderComparisonTable() and skip the table entirely rather than publish
+ * an all-dashes table that reads as broken even though it's technically
+ * honest. See buildAwaitingSpecsNotice() for the replacement copy.
+ */
+export function specTableHasData(specRows) {
+  if (!Array.isArray(specRows)) return false;
+  return specRows.some((row) => {
+    if (!row) return false;
+    const vals = "valueA" in row ? [row.valueA, row.valueB] : [row.value];
+    return vals.some((v) => v !== null && v !== undefined && String(v).trim() !== "");
+  });
+}
+
+// Honest replacement for an all-null spec table — same visual weight as the
+// site's existing amber `.notice` box (see renderArticlePage below), so it
+// reads as an intentional editorial note, not a rendering failure.
+//
+// When the model has real, reported/leaked highlights to share (e.g. "an
+// expected periscope camera"), pass them as `highlights` — they're rendered
+// as a real paragraph ABOVE the notice, so the reader gets substance instead
+// of just an apology for missing data. `highlights` is optional; omitting it
+// (or passing empty/null) falls back to the notice alone, unchanged from the
+// original single-line version.
+export function buildAwaitingSpecsNotice(highlights) {
+  const highlightsHtml = highlights && String(highlights).trim()
+    ? `<p>${escapeHtml(String(highlights).trim())}</p>`
+    : "";
+  return `${highlightsHtml}<div style="margin:20px 0;padding:14px 18px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;font-size:.9rem;color:#92400e;">Official specifications haven't been confirmed yet — this article will be updated with full details once they're announced. Check the source report below for the latest.</div>`;
+}
+
 export function renderComparisonTable(specRows, labelA = "Device A", labelB = "Device B") {
   if (!Array.isArray(specRows) || specRows.length === 0) return "";
 

@@ -33,7 +33,7 @@ import { ProviderPool, extractJson } from "./lib/providers.mjs";
 import { fetchAllFeeds, storyKey, significantWords, titlesOverlap } from "./lib/feeds.mjs";
 import { findImage, findYouTubeVideo, mediaPreflight, findWikipediaPortrait } from "./lib/images.mjs";
 import { findDeviceImage } from "./lib/images/index.mjs";
-import { renderArticlePage, renderComparisonTable, slugify, escapeHtml } from "./lib/template.mjs";
+import { renderArticlePage, renderComparisonTable, specTableHasData, buildAwaitingSpecsNotice, slugify, escapeHtml } from "./lib/template.mjs";
 import { renderBuyBox } from "./lib/affiliate.mjs";
 import { buildComparisonSystemPrompt, buildRankingSystemPrompt, buildReviewSystemPrompt, buildNichePrompt } from "./lib/gadget-prompts.mjs";
 
@@ -273,7 +273,9 @@ async function writeReviewStory(item) {
   const cons = (Array.isArray(parsed.cons) ? parsed.cons : []).filter(Boolean);
 
   const whyNowHtml = parsed.whyNow ? `<p>${escapeHtml(parsed.whyNow)}</p>` : "";
-  const tableHtml = renderComparisonTable(specRows, deviceName || "Spec");
+  const tableHtml = specTableHasData(specRows)
+    ? renderComparisonTable(specRows, deviceName || "Spec")
+    : buildAwaitingSpecsNotice(parsed.expectedHighlights);
   const receptionHtml = parsed.reception ? `<p><strong>What reviewers generally say:</strong> ${escapeHtml(parsed.reception)}</p>` : "";
   const prosConsHtml = pros.length || cons.length
     ? `<div style="display:flex;gap:20px;flex-wrap:wrap;margin:20px 0;">
@@ -282,7 +284,11 @@ ${cons.length ? `<div style="flex:1;min-width:220px;"><strong style="color:#be12
 </div>`
     : "";
   const verdictHtml = parsed.verdict || "";
-  const buyBoxHtml = renderBuyBox([deviceName], config);
+  // No Buy button unless the device is actually launched/available AND the
+  // model is confident it's sold on Amazon — a link next to an unreleased or
+  // Amazon-unavailable product is a false, actionable claim.
+  const canBuy = parsed.isLaunched !== false && parsed.amazonAvailable !== false;
+  const buyBoxHtml = canBuy ? renderBuyBox([deviceName], config) : "";
   const bodyHtml = `${whyNowHtml}\n${tableHtml}\n${receptionHtml}\n${prosConsHtml}\n${verdictHtml}\n${buyBoxHtml}`;
 
   const articleWords = countWords(`${whyNowHtml}\n${receptionHtml}\n${prosConsHtml}\n${verdictHtml}`);
@@ -344,10 +350,18 @@ async function writeComparisonStory(item) {
   const specRows = Array.isArray(parsed.specRows) ? parsed.specRows : [];
 
   const introHtml = parsed.intro ? `<p>${escapeHtml(parsed.intro)}</p>` : "";
-  const tableHtml = renderComparisonTable(specRows, deviceA || "Device A", deviceB || "Device B");
+  const tableHtml = specTableHasData(specRows)
+    ? renderComparisonTable(specRows, deviceA || "Device A", deviceB || "Device B")
+    : buildAwaitingSpecsNotice(parsed.expectedHighlights);
   const summaryHtml = parsed.summary ? `<p>${escapeHtml(parsed.summary)}</p>` : "";
   const verdictHtml = parsed.verdict || "";
-  const buyBoxHtml = renderBuyBox([deviceA, deviceB], config);
+  // Buy button per device, independently gated — deviceA can be launched
+  // and on Amazon while deviceB isn't (or vice versa), so filter per side
+  // rather than an all-or-nothing box.
+  const buyNames = [];
+  if (deviceA && parsed.isLaunchedA !== false && parsed.amazonAvailableA !== false) buyNames.push(deviceA);
+  if (deviceB && parsed.isLaunchedB !== false && parsed.amazonAvailableB !== false) buyNames.push(deviceB);
+  const buyBoxHtml = renderBuyBox(buyNames, config);
   const bodyHtml = `${introHtml}\n${tableHtml}\n${summaryHtml}\n${verdictHtml}\n${buyBoxHtml}`;
 
   // Word count excludes the buy box — it is navigation, not article content,
@@ -434,12 +448,20 @@ async function writeRankingStory(candidateItems) {
       const heading = `<h3>#${Number(it.rank) || ""} ${escapeHtml(it.name || "")}</h3>`;
       const why = it.whyRanked ? `<p>${escapeHtml(it.whyRanked)}</p>` : "";
       const priceLine = `<p><strong>Price:</strong> ${it.price ? escapeHtml(it.price) : "—"}</p>`;
-      const table = renderComparisonTable(Array.isArray(it.specRows) ? it.specRows : []);
+      const rows = Array.isArray(it.specRows) ? it.specRows : [];
+      const table = specTableHasData(rows) ? renderComparisonTable(rows) : buildAwaitingSpecsNotice(it.expectedHighlights);
       return `${heading}${why}${priceLine}${table}`;
     })
     .join("\n");
   const verdictHtml = parsed.verdict || "";
-  const buyBoxHtml = renderBuyBox(items.map((it) => it.name), config);
+  // Only items that are actually launched and confidently sold on Amazon get
+  // a Buy button — an unreleased or Amazon-unavailable item is skipped
+  // entirely rather than linking to a search page for something you can't
+  // actually buy there.
+  const buyNames = items
+    .filter((it) => it.name && it.isLaunched !== false && it.amazonAvailable !== false)
+    .map((it) => it.name);
+  const buyBoxHtml = renderBuyBox(buyNames, config);
   const bodyHtml = `${introHtml}\n${rationaleHtml}\n${itemsHtml}\n${verdictHtml}\n${buyBoxHtml}`;
 
   const articleWords = countWords(`${introHtml}\n${rationaleHtml}\n${itemsHtml}\n${verdictHtml}`);
