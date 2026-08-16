@@ -101,10 +101,27 @@ function resetPublicDir() {
   rmSync(PUBLIC_DIR, { recursive: true, force: true });
   mkdirSync(PUBLIC_DIR, { recursive: true });
 
+  const publisherId = process.env.ADSENSE_PUBLISHER_ID || CONFIG.adsense?.publisherId || "";
+  const hasAds = publisherId && !publisherId.startsWith("ca-pub-000") && !publisherId.includes("X");
+  const adScript = hasAds
+    ? `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}" crossorigin="anonymous"></script>`
+    : "";
+
   for (const file of STATIC_FILES) {
     const srcPath = path.join(ROOT, file);
     if (existsSync(srcPath)) {
-      copyFileSync(srcPath, path.join(PUBLIC_DIR, file));
+      if (hasAds && file.endsWith(".html")) {
+        let html = readFileSync(srcPath, "utf-8");
+        html = html.replace("</head>", `${adScript}\n</head>`);
+        writeFileSync(path.join(PUBLIC_DIR, file), html, "utf-8");
+      } else if (hasAds && file === "ads.txt") {
+        let txt = readFileSync(srcPath, "utf-8");
+        const cleanPubId = publisherId.replace(/^ca-/, "");
+        txt = txt.replaceAll("pub-0000000000000000", cleanPubId);
+        writeFileSync(path.join(PUBLIC_DIR, file), txt, "utf-8");
+      } else {
+        copyFileSync(srcPath, path.join(PUBLIC_DIR, file));
+      }
     }
   }
 

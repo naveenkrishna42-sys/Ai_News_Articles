@@ -2,7 +2,7 @@
   "site": {
     "name": "TIVRA News",
     "tagline": "Trusted Insights, Verified Reports & Alerts",
-    "url": "https://ainewsss.naveenkrishna42.workers.dev"
+    "url": "https://tivranews.com"
   },
   "volume": {
     "perCategoryPerRun": 2,
@@ -16,7 +16,7 @@
     "registryDays": 90
   },
   "adsense": {
-    "publisherId": "",
+    "publisherId": "ca-pub-6206818645443465",
     "adSlot": ""
   },
   "providers": [
