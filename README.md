@@ -236,7 +236,7 @@ work depends on these — they're additive, whenever you're ready.
 
 - Build command: `npm run build` · Deploy: `npx wrangler deploy` (uses
   `wrangler.jsonc` → serves `/public`, 404s go to `404.html`).
-- Live at: https://ainewsss.naveenkrishna42.workers.dev
+- Live at: https://tivranews.com
 - Optional: set `SITE_URL` env var in Cloudflare build settings to your
   custom domain so sitemap URLs are absolute-correct.
 
