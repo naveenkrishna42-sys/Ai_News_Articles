@@ -83,6 +83,7 @@ const STATIC_FILES = [
   "favicon.svg",
   "ads.txt",
   "googlef491165cc2b344ea.html",
+  "BingSiteAuth.xml",
 ];
 
 function copyDir(src, dest) {
