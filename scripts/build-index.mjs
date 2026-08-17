@@ -82,6 +82,7 @@ const STATIC_FILES = [
   "logo.svg",
   "favicon.svg",
   "ads.txt",
+  "googlef491165cc2b344ea.html",
 ];
 
 function copyDir(src, dest) {
