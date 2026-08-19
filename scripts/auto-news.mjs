@@ -171,7 +171,7 @@ function countWords(html) {
 
 const results = { written: 0, failed: 0, files: [] };
 
-async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 300, maxTokens = 3200, kind = "news" } = {}) {
+async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, maxTokens = 3200, kind = "news" } = {}) {
   const userPrompt = `Headline: ${item.title}\nCategory: ${item.category}\nOriginal reporting by: ${item.sourceName}\nPublished: ${item.pubDate || today}\nSource snippet: ${item.summary || "(headline only — write carefully around unknown details)"}`;
 
   const { text } = await pool.chat({ system: systemPrompt, user: userPrompt, maxTokens });
