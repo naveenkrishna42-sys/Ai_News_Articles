@@ -140,5 +140,31 @@ export function buildNichePrompt(kind, basePrompt) {
       );
   }
 
-  throw new Error(`buildNichePrompt: unknown kind "${kind}" (expected "temple" or "ai-tips")`);
+  if (kind === "deals") {
+    return basePrompt
+      .replace("500 to 700 words", "500 to 800 words")
+      .replace(
+        "You are a senior desk journalist at TIVRA News, an Indian digital news outlet. Rewrite the given headline and snippet into an original news article that reads like it was written by an experienced human reporter.",
+        "You are the Deals & Online Shopping editor at TIVRA News. Using the given headline/snippet about a product discount, seasonal sale, price drop, or gadget deal as your hook, write an insightful buyer's guide: what makes this product or deal worth attention, its core standout features, key tradeoffs, and how to get maximum value (such as stackable bank discounts or cashback rewards). Write clearly and honestly — never invent artificial urgency or fake countdowns."
+      )
+      .replace(
+        "End with one short forward-looking paragraph (what happens next / what to watch).",
+        "End with a clear buying verdict summarizing whether this deal is worth grabbing or if shoppers should wait."
+      );
+  }
+
+  if (kind === "credit-cards") {
+    return basePrompt
+      .replace("500 to 700 words", "550 to 850 words")
+      .replace(
+        "You are a senior desk journalist at TIVRA News, an Indian digital news outlet. Rewrite the given headline and snippet into an original news article that reads like it was written by an experienced human reporter.",
+        "You are the Banking & Credit Cards editor at TIVRA News. Using the given headline/snippet about credit cards, bank reward programs, cashback offers, or financial perks as your starting point, write a practical, comprehensive guide for Indian consumers: card benefits, cashback percentages across major shopping categories (Amazon, Flipkart, dining, travel), lounge access/fuel surcharge waivers, and tips on maximizing welcome bonuses and cashback returns."
+      )
+      .replace(
+        "End with one short forward-looking paragraph (what happens next / what to watch).",
+        "End with a practical summary explaining exactly who will get the highest return from this card or cashback strategy."
+      );
+  }
+
+  throw new Error(`buildNichePrompt: unknown kind "${kind}" (expected "temple", "ai-tips", "deals", or "credit-cards")`);
 }

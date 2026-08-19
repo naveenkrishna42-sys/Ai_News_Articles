@@ -29,6 +29,8 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync, unlinkSync, statSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+try { process.loadEnvFile(); } catch {}
 import { ProviderPool, extractJson } from "./lib/providers.mjs";
 import { fetchAllFeeds, storyKey, significantWords, titlesOverlap } from "./lib/feeds.mjs";
 import { findImage, findYouTubeVideo, mediaPreflight, findWikipediaPortrait } from "./lib/images.mjs";
@@ -128,20 +130,11 @@ for (const c of byCategory.keys()) if (!priority.includes(c)) priority.push(c);
 // value is missing or 0 for one of these three categories, the computed
 // budget is 0 and the category silently produces nothing that day — no
 // crash, no special-cased error path, config-only toggle.
-const NICHE_DAILY_CATEGORIES = new Set(["Gadget Comparisons", "AI Tips & Tools", "Sacred Places"]);
-function categoryPublishedToday(category) {
-  return Object.values(registry).filter((r) => r.d === today && r.c === category).length;
-}
-
 const queue = [];
 for (const category of priority) {
   const items = byCategory.get(category) || [];
   let picked = 0;
-  let categoryBudget = PER_CATEGORY;
-  if (NICHE_DAILY_CATEGORIES.has(category)) {
-    const dailyCap = Number(config.newCategoryVolume?.[category] || 0);
-    categoryBudget = Math.max(0, dailyCap - categoryPublishedToday(category));
-  }
+  let categoryBudget = Number(config.newCategoryVolume?.[category] || PER_CATEGORY);
   for (const item of items) {
     if (picked >= categoryBudget || queue.length >= budget) break;
     if (item.title.length < 25) continue;
@@ -213,6 +206,12 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 300, 
     filename = `${today}-${slug}-${n++}.html`;
   }
 
+  let finalBodyHtml = bodyHtml;
+  if (item.category === "Product Deals & Offers" || item.category === "Credit Cards & Cashback") {
+    const buyBoxHtml = renderBuyBox([title], config, item.category);
+    if (buyBoxHtml) finalBodyHtml += `\n${buyBoxHtml}`;
+  }
+
   const html = renderArticlePage({
     title,
     description: parsed.description || title,
@@ -221,7 +220,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 300, 
     heroImage,
     heroCredit,
     keyPoints: parsed.key_points || [],
-    bodyHtml,
+    bodyHtml: finalBodyHtml,
     sourceName: item.sourceName,
     sourceUrl: item.sourceUrl,
     youtubeId,
@@ -554,6 +553,8 @@ async function runQueue(items, worker) {
 const NICHE_SYSTEM_PROMPTS = {
   "AI Tips & Tools": buildNichePrompt("ai-tips", SYSTEM_PROMPT),
   "Sacred Places": buildNichePrompt("temple", SYSTEM_PROMPT),
+  "Product Deals & Offers": buildNichePrompt("deals", SYSTEM_PROMPT),
+  "Credit Cards & Cashback": buildNichePrompt("credit-cards", SYSTEM_PROMPT),
 };
 // Gadget Comparisons format mix: mostly single-product reviews (matches
 // what was actually asked for — "product review, ratings, specifications,

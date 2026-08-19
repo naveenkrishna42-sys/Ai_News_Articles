@@ -21,6 +21,12 @@
   },
   "providers": [
     {
+      "name": "pollinations",
+      "baseUrl": "https://gen.pollinations.ai/v1",
+      "model": "chigwell/llm7-fast",
+      "envKey": "POLLINATIONS_API_KEY"
+    },
+    {
       "name": "groq",
       "baseUrl": "https://api.groq.com/openai/v1",
       "model": "llama-3.3-70b-versatile",
@@ -56,6 +62,8 @@
     "Technology",
     "Health",
     "Gadget Comparisons",
+    "Product Deals & Offers",
+    "Credit Cards & Cashback",
     "AI Tips & Tools"
   ],
   "specials": {
@@ -64,9 +72,11 @@
     "weeklyLongform": 2
   },
   "newCategoryVolume": {
-    "Gadget Comparisons": 9,
+    "Gadget Comparisons": 4,
+    "Product Deals & Offers": 3,
+    "Credit Cards & Cashback": 3,
     "AI Tips & Tools": 3,
-    "Sacred Places": 3
+    "Sacred Places": 2
   },
   "feeds": [
     {
@@ -207,6 +217,22 @@
       "url": "https://news.google.com/rss/search?q=laptop%20computer%20hardware%20launch%20review%20specifications&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
+      "category": "Product Deals & Offers",
+      "url": "https://news.google.com/rss/search?q=amazon+india+deals+discount+offers+price+drop&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Product Deals & Offers",
+      "url": "https://news.google.com/rss/search?q=best+smartphone+earbuds+smartwatch+deals+sale+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Credit Cards & Cashback",
+      "url": "https://news.google.com/rss/search?q=best+credit+card+cashback+reward+points+offers+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Credit Cards & Cashback",
+      "url": "https://news.google.com/rss/search?q=hdfc+sbi+icici+axis+credit+card+benefits+lounge+access&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
       "category": "Sacred Places",
       "url": "https://news.google.com/rss/search?q=sacred%20temple%20pilgrimage%20site%20history&hl=en-IN&gl=IN&ceid=IN:en"
     },
@@ -233,6 +259,10 @@
     "Entertainment",
     "Technology",
     "Health",
+    "Product Deals & Offers",
+    "Credit Cards & Cashback",
+    "Gadget Comparisons",
+    "AI Tips & Tools",
     "Politics",
     "Movies",
     "Markets",
@@ -253,8 +283,6 @@
     "Culture & Arts",
     "Religion",
     "Inventions",
-    "Gadget Comparisons",
-    "AI Tips & Tools",
     "Sacred Places"
   ],
   "fallbackImages": {
@@ -333,6 +361,12 @@
     "Gadget Comparisons": [
       "https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
     ],
+    "Product Deals & Offers": [
+      "https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Credit Cards & Cashback": [
+      "https://images.pexels.com/photos/164501/pexels-photo-164501.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
     "AI Tips & Tools": [
       "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
     ],
@@ -369,9 +403,13 @@
   },
   "affiliate": {
     "enabled": true,
-    "network": "Amazon Associates",
+    "network": "Amazon Associates & CashKaro",
     "marketplace": "amazon.in",
     "amazonTag": "sirmohana-21",
+    "cashkaro": {
+      "enabled": true,
+      "referralUrl": "https://cashkaro.com?r=22926292&fname=Naveen+Maheswaram"
+    },
     "products": {}
   }
 }

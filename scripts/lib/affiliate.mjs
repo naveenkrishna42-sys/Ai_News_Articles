@@ -1,18 +1,9 @@
-// TIVRA News — Amazon Associates links for gadget articles.
+// TIVRA News — Affiliate & Partner links (Amazon Associates & CashKaro).
 //
-// Deliberately conservative. Links are built from the device name string, so
-// there is no way for the model to invent a product: the worst case is a
-// search page with no results, never a link to the wrong phone. No price or
-// stock data is shown anywhere — Amazon's Product Advertising API is the only
-// sanctioned source for that, this site does not qualify for it yet, and a
-// scraped or model-guessed price would go stale and breach their terms.
-//
-// A manual override (config.affiliate.products) can point a specific device
-// at a real product URL you verified yourself; everything else falls back to
-// the search link. Same shape as the manual device-photo override.
-//
-// Amazon requires the disclosure to be visible wherever links appear, so
-// renderBuyBox() always emits it — there is no flag to turn it off.
+// Links are constructed safely to prevent invalid redirects.
+// Amazon buttons search or deep-link with tag=sirmohana-21.
+// CashKaro buttons provide cashback opportunities without exposing raw parameter strings in UI text.
+// Disclosures are cleanly appended for regulatory compliance.
 
 import { escapeHtml } from "./template.mjs";
 
@@ -23,34 +14,35 @@ const MARKETPLACES = {
 };
 
 export const DISCLOSURE =
-  "As an Amazon Associate, TIVRA News earns from qualifying purchases. Prices and availability are shown on Amazon and may change.";
+  "As an Amazon Associate and CashKaro partner, TIVRA News earns from qualifying purchases and applications. Prices, cashback rates, and availability are subject to change.";
 
 function affiliateConfig(config) {
   const a = config?.affiliate || {};
-  if (!a.enabled || !a.amazonTag) return null;
+  if (!a.enabled) return null;
   const base = MARKETPLACES[a.marketplace] || MARKETPLACES["amazon.in"];
-  return { base, tag: a.amazonTag, products: a.products || {} };
+  const cashkaroUrl = a.cashkaro?.referralUrl || a.cashkaroReferral || "https://cashkaro.com?r=22926292&fname=Naveen+Maheswaram";
+  return {
+    base,
+    tag: a.amazonTag || "sirmohana-21",
+    products: a.products || {},
+    cashkaroUrl,
+    cashkaroEnabled: a.cashkaro?.enabled !== false,
+  };
 }
 
-/**
- * Buy URL for a device. Manual override first, then a search link.
- * Returns "" when affiliate links are disabled or the name is unusable.
- */
-// Table headers and placeholders that are not products. Without this a
-// generic column header like "Value" becomes a "Check Value price on Amazon"
-// button pointing at a meaningless search.
-const NOT_A_PRODUCT = new Set(
-  ["spec", "specs", "specification", "specifications", "value", "price", "feature", "features",
-   "device a", "device b", "model", "phone", "product", "item", "rank", "verdict", "winner"]
-);
+const NOT_A_PRODUCT = new Set([
+  "spec", "specs", "specification", "specifications", "value", "price", "feature", "features",
+  "device a", "device b", "model", "phone", "product", "item", "rank", "verdict", "winner"
+]);
 
+/**
+ * Buy URL for a device or product on Amazon.
+ */
 export function buyUrl(deviceName, config) {
   const cfg = affiliateConfig(config);
   if (!cfg || !deviceName || deviceName.trim().length < 3) return "";
   if (NOT_A_PRODUCT.has(deviceName.trim().toLowerCase())) return "";
-  // A real device name carries a model identifier — a digit or a letter+digit
-  // token ("15", "S25", "X7") — which generic prose headings do not.
-  if (!/\d/.test(deviceName)) return "";
+  if (!/\d/.test(deviceName) && deviceName.trim().split(" ").length < 2) return "";
 
   const override = cfg.products[deviceName.trim().toLowerCase()];
   if (override) {
@@ -61,28 +53,51 @@ export function buyUrl(deviceName, config) {
 }
 
 /**
- * The buy box shown under a gadget article: one button per device plus the
- * Amazon-required disclosure. Returns "" when disabled, so callers can
- * concatenate it unconditionally.
+ * CashKaro Cashback Action URL
  */
-export function renderBuyBox(deviceNames, config) {
+export function cashkaroUrl(config) {
+  const cfg = affiliateConfig(config);
+  return cfg?.cashkaroUrl || "";
+}
+
+/**
+ * The buy / deals box shown under gadget, deals, and credit card articles.
+ */
+export function renderBuyBox(deviceNames, config, category = "") {
   const cfg = affiliateConfig(config);
   if (!cfg) return "";
 
-  const buttons = (deviceNames || [])
+  const isFinancial = category.toLowerCase().includes("card") || category.toLowerCase().includes("cashback") || category.toLowerCase().includes("bank");
+  const isDeal = category.toLowerCase().includes("deal") || category.toLowerCase().includes("offer");
+
+  const amazonButtons = (deviceNames || [])
     .filter((n) => n && n.trim().length > 2)
     .map((name) => {
       const url = buyUrl(name, config);
       if (!url) return "";
-      return `<a href="${escapeHtml(url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-block;background:#e11d48;color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;padding:11px 18px;border-radius:8px;margin:6px 8px 6px 0;">Check ${escapeHtml(name)} price on Amazon <span style="font-weight:400;opacity:.85;">(paid link)</span></a>`;
+      return `<a href="${escapeHtml(url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;padding:11px 18px;border-radius:8px;margin:6px 8px 6px 0;transition:opacity 0.2s;"><span>🛒 Check ${escapeHtml(name)} on Amazon</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span></a>`;
     })
     .filter(Boolean);
 
-  if (!buttons.length) return "";
+  let cashkaroButton = "";
+  if (cfg.cashkaroEnabled && cfg.cashkaroUrl) {
+    const label = isFinancial
+      ? "💳 Apply & Claim Extra Cashback via CashKaro"
+      : isDeal
+      ? "🎁 Get Extra Cashback on Deals via CashKaro"
+      : "💰 Get Extra Cashback & Coupons via CashKaro";
 
-  return `<div class="buybox" style="margin:30px 0;padding:18px 20px;background:#fff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;">
-<div style="font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:10px;">Where to buy</div>
-${buttons.join("")}
-<p style="font-size:.75rem;color:#64748b;margin:10px 0 0;">${escapeHtml(DISCLOSURE)}</p>
+    cashkaroButton = `<a href="${escapeHtml(cfg.cashkaroUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#059669;color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;padding:11px 18px;border-radius:8px;margin:6px 8px 6px 0;transition:opacity 0.2s;"><span>${label}</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Partner Offer)</span></a>`;
+  }
+
+  if (!amazonButtons.length && !cashkaroButton) return "";
+
+  return `<div class="buybox" style="margin:30px 0;padding:20px 22px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+<div style="font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:12px;">Top Offers & Where to Buy</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;">
+${amazonButtons.join("")}
+${cashkaroButton}
+</div>
+<p style="font-size:.75rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
 </div>`;
 }
