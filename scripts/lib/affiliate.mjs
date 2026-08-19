@@ -73,9 +73,15 @@ export function renderBuyBox(deviceNames, config, category = "") {
   const amazonButtons = (deviceNames || [])
     .filter((n) => n && n.trim().length > 2)
     .map((name) => {
-      const url = buyUrl(name, config);
+      let displayName = name.trim();
+      if (displayName.includes(":")) displayName = displayName.split(":")[0].trim();
+      if (displayName.includes(" — ")) displayName = displayName.split(" — ")[0].trim();
+      if (displayName.includes(" - ")) displayName = displayName.split(" - ")[0].trim();
+      if (displayName.length > 40) displayName = displayName.slice(0, 40).trim();
+
+      const url = buyUrl(displayName || name, config);
       if (!url) return "";
-      return `<a href="${escapeHtml(url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;padding:11px 18px;border-radius:8px;margin:6px 8px 6px 0;transition:opacity 0.2s;"><span>🛒 Check ${escapeHtml(name)} on Amazon</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span></a>`;
+      return `<a href="${escapeHtml(url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;padding:11px 18px;border-radius:8px;margin:6px 8px 6px 0;transition:opacity 0.2s;"><span>🛒 Check ${escapeHtml(displayName)} on Amazon</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span></a>`;
     })
     .filter(Boolean);
 
