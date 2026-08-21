@@ -1,11 +1,12 @@
 /**
  * Cloudflare Worker for TIVRA News (tivranews.com)
  *
- * Provides:
+ * Implements:
  *  1. Canonical 301 redirects (www -> apex, workers.dev -> custom domain).
- *  2. Edge News Feed API: GET /api/feed?category=...&page=1&limit=12
- *  3. Edge Fast Search API: GET /api/search?q=...
- *  4. High-performance static asset pass-through with edge caching.
+ *  2. CORS preflight (OPTIONS) handler.
+ *  3. Edge News Feed API with Worker Cache API (caches.default): GET /api/feed?category=...&page=1&limit=12
+ *  4. Edge Search API with Relevance Scoring & Pagination: GET /api/search?q=...&page=1&limit=20
+ *  5. Cloudflare-native caching headers (cloudflare-cdn-cache-control) + complete static extension handling.
  */
 
 function slugify(text) {
@@ -29,14 +30,31 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
 
-    // 2. Edge API: GET /api/feed
+    // 2. CORS Preflight (OPTIONS)
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          "Access-Control-Max-Age": "86400",
+        },
+      });
+    }
+
+    // 3. Edge API: GET /api/feed
     if (url.pathname === "/api/feed") {
       try {
+        const cacheKey = new Request(url.toString(), request);
+        const cache = caches.default;
+        const cached = await cache.match(cacheKey);
+        if (cached) return cached;
+
         const catParam = url.searchParams.get("category") || "all";
         const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10));
         const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get("limit") || "12", 10)));
 
-        // Fetch the fast feed JSON from static assets
         const feedReq = new Request(new URL("/feed-latest.json", request.url));
         const feedRes = await env.ASSETS.fetch(feedReq);
         if (!feedRes.ok) {
@@ -49,7 +67,6 @@ export default {
         const data = await feedRes.json();
         let articles = data.articles || [];
 
-        // Category filter if not "all"
         if (catParam && catParam !== "all") {
           const targetSlug = slugify(catParam);
           articles = articles.filter(
@@ -74,14 +91,18 @@ export default {
           articles: pagedArticles,
         };
 
-        return new Response(JSON.stringify(responsePayload), {
+        const response = new Response(JSON.stringify(responsePayload), {
           status: 200,
           headers: {
             "Content-Type": "application/json; charset=utf-8",
-            "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=600",
+            "Cache-Control": "public, max-age=60",
+            "cloudflare-cdn-cache-control": "public, max-age=300, stale-while-revalidate=600",
             "Access-Control-Allow-Origin": "*",
           },
         });
+
+        ctx.waitUntil(cache.put(cacheKey, response.clone()));
+        return response;
       } catch (err) {
         return new Response(JSON.stringify({ status: "error", message: err.message }), {
           status: 500,
@@ -90,18 +111,28 @@ export default {
       }
     }
 
-    // 3. Edge API: GET /api/search
+    // 4. Edge API: GET /api/search
     if (url.pathname === "/api/search") {
       try {
         const query = (url.searchParams.get("q") || "").trim().toLowerCase();
         if (query.length < 2) {
-          return new Response(JSON.stringify({ status: "ok", query, total: 0, articles: [] }), {
-            status: 200,
-            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-          });
+          return new Response(
+            JSON.stringify({ status: "ok", query, total: 0, page: 1, totalPages: 0, articles: [] }),
+            {
+              status: 200,
+              headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+            }
+          );
         }
 
-        // Fetch feed from assets
+        const cacheKey = new Request(url.toString(), request);
+        const cache = caches.default;
+        const cached = await cache.match(cacheKey);
+        if (cached) return cached;
+
+        const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10));
+        const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get("limit") || "20", 10)));
+
         const feedReq = new Request(new URL("/feed-latest.json", request.url));
         const feedRes = await env.ASSETS.fetch(feedReq);
         if (!feedRes.ok) {
@@ -114,27 +145,53 @@ export default {
         const data = await feedRes.json();
         const terms = query.split(/\s+/).filter(Boolean);
 
-        const matches = (data.articles || []).filter((a) => {
-          const text = `${a.title || ""} ${a.description || ""} ${a.category || ""}`.toLowerCase();
-          return terms.every((t) => text.includes(t));
+        // Relevance Scoring: Title match weights 3x higher than description
+        const scoredMatches = (data.articles || [])
+          .map((a) => {
+            const titleText = (a.title || "").toLowerCase();
+            const descText = (a.description || "").toLowerCase();
+            const catText = (a.category || "").toLowerCase();
+
+            let score = 0;
+            for (const t of terms) {
+              if (titleText.includes(t)) score += 3;
+              if (descText.includes(t)) score += 1;
+              if (catText.includes(t)) score += 2;
+            }
+            return { article: a, score };
+          })
+          .filter((m) => m.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map((m) => m.article);
+
+        const total = scoredMatches.length;
+        const totalPages = Math.ceil(total / limit);
+        const start = (page - 1) * limit;
+        const pagedMatches = scoredMatches.slice(start, start + limit);
+
+        const responsePayload = {
+          status: "ok",
+          query,
+          total,
+          page,
+          limit,
+          totalPages,
+          hasMore: page < totalPages,
+          articles: pagedMatches,
+        };
+
+        const response = new Response(JSON.stringify(responsePayload), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "public, max-age=60",
+            "cloudflare-cdn-cache-control": "public, max-age=600, stale-while-revalidate=1200",
+            "Access-Control-Allow-Origin": "*",
+          },
         });
 
-        return new Response(
-          JSON.stringify({
-            status: "ok",
-            query,
-            total: matches.length,
-            articles: matches.slice(0, 30),
-          }),
-          {
-            status: 200,
-            headers: {
-              "Content-Type": "application/json; charset=utf-8",
-              "Cache-Control": "public, max-age=120, s-maxage=600, stale-while-revalidate=1200",
-              "Access-Control-Allow-Origin": "*",
-            },
-          }
-        );
+        ctx.waitUntil(cache.put(cacheKey, response.clone()));
+        return response;
       } catch (err) {
         return new Response(JSON.stringify({ status: "error", message: err.message }), {
           status: 500,
@@ -143,27 +200,51 @@ export default {
       }
     }
 
-    // 4. Default: Static Asset Serving with Edge Cache optimization
+    // 5. Default Static Asset Serving with Full Format Cache Optimization
     if (env.ASSETS) {
       const response = await env.ASSETS.fetch(request);
-      
-      // If serving images or css/js assets, add long-cache headers
-      if (
-        response.ok &&
-        (url.pathname.endsWith(".css") ||
-         url.pathname.endsWith(".js") ||
-         url.pathname.endsWith(".svg") ||
-         url.pathname.endsWith(".png") ||
-         url.pathname.endsWith(".jpg") ||
-         url.pathname.endsWith(".woff2"))
-      ) {
-        const newHeaders = new Headers(response.headers);
-        newHeaders.set("Cache-Control", "public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400");
-        return new Response(response.body, {
-          status: response.status,
-          statusText: response.statusText,
-          headers: newHeaders,
-        });
+
+      if (response.ok) {
+        const pathLower = url.pathname.toLowerCase();
+
+        // 5a. JSON data files (dynamic feeds from auto-publisher)
+        if (pathLower.endsWith(".json")) {
+          const newHeaders = new Headers(response.headers);
+          newHeaders.set("Cache-Control", "public, max-age=60");
+          newHeaders.set("cloudflare-cdn-cache-control", "public, max-age=120, stale-while-revalidate=300");
+          return new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: newHeaders,
+          });
+        }
+
+        // 5b. Static media, fonts, and assets (immutable cache)
+        if (
+          pathLower.endsWith(".css") ||
+          pathLower.endsWith(".js") ||
+          pathLower.endsWith(".svg") ||
+          pathLower.endsWith(".png") ||
+          pathLower.endsWith(".jpg") ||
+          pathLower.endsWith(".jpeg") ||
+          pathLower.endsWith(".webp") ||
+          pathLower.endsWith(".avif") ||
+          pathLower.endsWith(".gif") ||
+          pathLower.endsWith(".ico") ||
+          pathLower.endsWith(".woff") ||
+          pathLower.endsWith(".woff2") ||
+          pathLower.endsWith(".ttf") ||
+          pathLower.endsWith(".webmanifest")
+        ) {
+          const newHeaders = new Headers(response.headers);
+          newHeaders.set("Cache-Control", "public, max-age=86400");
+          newHeaders.set("cloudflare-cdn-cache-control", "public, max-age=604800, stale-while-revalidate=86400");
+          return new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: newHeaders,
+          });
+        }
       }
 
       return response;
