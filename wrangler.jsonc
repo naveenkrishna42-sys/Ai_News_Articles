@@ -3,6 +3,9 @@
   "name": "ainewsss",
   "main": "src/index.js",
   "compatibility_date": "2025-09-01",
+  "build": {
+    "command": "npm run build"
+  },
   "assets": {
     "directory": "public",
     "binding": "ASSETS",
