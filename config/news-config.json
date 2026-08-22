@@ -5,9 +5,16 @@
     "url": "https://tivranews.com"
   },
   "volume": {
-    "perCategoryPerRun": 2,
+    "perCategoryPerRun": 3,
     "dailyCap": 600,
     "concurrency": 5
+  },
+  "newCategoryVolume": {
+    "Product Deals & Offers": 4,
+    "Credit Cards & Cashback": 4,
+    "Gadget Comparisons": 4,
+    "AI Tips & Tools": 3,
+    "Sacred Places": 3
   },
   "retention": {
     "days": 30,
