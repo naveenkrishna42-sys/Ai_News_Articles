@@ -93,6 +93,22 @@ jobs:
           # Retry once with a rebase in case another push landed mid-run.
           git push || (git pull --rebase && git push)
 
+      - name: Purge Cloudflare Edge Cache
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID || 'f13e234315fbf412f4e2dc908ea85119' }}
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "Purging Cloudflare cache for zone $CLOUDFLARE_ZONE_ID..."
+            curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d '{"purge_everything": true}' || true
+            echo "Cloudflare cache purge requested."
+          else
+            echo "CLOUDFLARE_API_TOKEN not set in GitHub secrets — skipping automated purge."
+          fi
+
       - name: Verify Live Site Health
         run: |
           sleep 45
