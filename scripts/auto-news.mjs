@@ -38,6 +38,8 @@ import { findDeviceImage } from "./lib/images/index.mjs";
 import { renderArticlePage, renderComparisonTable, specTableHasData, buildAwaitingSpecsNotice, slugify, escapeHtml } from "./lib/template.mjs";
 import { renderBuyBox } from "./lib/affiliate.mjs";
 import { buildComparisonSystemPrompt, buildRankingSystemPrompt, buildReviewSystemPrompt, buildNichePrompt } from "./lib/gadget-prompts.mjs";
+import { getBestAmazonUrl, extractCleanProductName } from "./lib/deal-extractor.mjs";
+import { generateAndValidateDealArticle } from "./lib/deal-validator.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -130,6 +132,7 @@ for (const c of byCategory.keys()) if (!priority.includes(c)) priority.push(c);
 // value is missing or 0 for one of these three categories, the computed
 // budget is 0 and the category silently produces nothing that day — no
 // crash, no special-cased error path, config-only toggle.
+// Pass 1: Standard fair distribution
 const queue = [];
 for (const category of priority) {
   const items = byCategory.get(category) || [];
@@ -144,6 +147,39 @@ for (const category of priority) {
     picked++;
   }
 }
+
+// Pass 2: Dynamic Overflow Backfill to hit target volume (up to budget / 50)
+const HIGH_MONETIZATION_ORDER = [
+  "Product Deals & Offers",
+  "Credit Cards & Cashback",
+  "Gadget Comparisons",
+  "Technology",
+  "Business",
+  "Markets",
+  "India",
+  "World",
+  "Sports",
+  "Entertainment",
+  "Science",
+  "Health",
+  "AI Tips & Tools",
+  ...priority
+];
+
+if (queue.length < budget) {
+  for (const category of HIGH_MONETIZATION_ORDER) {
+    if (queue.length >= budget) break;
+    const items = byCategory.get(category) || [];
+    for (const item of items) {
+      if (queue.length >= budget) break;
+      if (item.title.length < 25) continue;
+      if (isDuplicate(item)) continue;
+      claim(item);
+      queue.push(item);
+    }
+  }
+}
+
 console.log(`Selected ${queue.length} new stories to write.`);
 
 if (DRY_RUN) {
@@ -542,31 +578,98 @@ async function runQueue(items, worker) {
   await Promise.all(lanes);
 }
 
-// Category dispatch. Every ordinary category still goes through the exact
-// same writeStory(item) call as before (byte-identical behavior). Only the
-// three new niche categories are routed differently:
-//   - Gadget Comparisons needs a whole different two-device shape, so it
-//     gets its own writer.
-//   - AI Tips & Tools reuses writeStory() completely unchanged, just with a
-//     different systemPrompt — the same override mechanism
-//     ANALYSIS_SYSTEM/FEATURE_SYSTEM already use below.
+async function writeDealStory(item) {
+  const directUrl = await getBestAmazonUrl(
+    item,
+    item.title,
+    config.affiliate?.amazonTag || "sirmohana-21",
+    config.affiliate?.products || {}
+  );
+  const parsed = await generateAndValidateDealArticle(pool, item, directUrl);
+  if (!parsed) {
+    const nicheSystem = NICHE_SYSTEM_PROMPTS[item.category];
+    return writeStory(item, nicheSystem ? { systemPrompt: nicheSystem } : {});
+  }
+
+  const title = parsed.title;
+  const productName = parsed.productName || extractCleanProductName(item.title);
+  const ratingBadge = `<div class="rating-badge" style="display:inline-block;background:#059669;color:#fff;font-weight:800;padding:4px 10px;border-radius:6px;font-size:0.9rem;margin-bottom:12px;">★ ${parsed.rating} / 5.0 Value Rating</div>`;
+  const ratingText = parsed.ratingReason ? `<p><em>${escapeHtml(parsed.ratingReason)}</em></p>` : "";
+  const prosHtml = (parsed.pros || []).map((p) => `<li>✅ ${escapeHtml(p)}</li>`).join("");
+  const consHtml = (parsed.cons || []).map((c) => `<li>⚠️ ${escapeHtml(c)}</li>`).join("");
+  const prosConsBox = `<div style="background:#f8fafc;border:1px solid #e2e8f0;padding:16px 20px;border-radius:8px;margin:20px 0;">
+    <h4 style="margin-top:0;margin-bottom:10px;">Key Highlights & Tradeoffs</h4>
+    <ul style="padding-left:20px;margin-bottom:0;">
+      ${prosHtml}
+      ${consHtml}
+    </ul>
+  </div>`;
+  const verdictHtml = parsed.verdict ? `<h3>Final Buying Verdict</h3><p>${escapeHtml(parsed.verdict)}</p>` : "";
+  const buyBoxHtml = renderBuyBox([productName], config, item.category, directUrl);
+
+  const bodyHtml = `${ratingBadge}\n${ratingText}\n${parsed.articleBody}\n${prosConsBox}\n${verdictHtml}\n${buyBoxHtml}`;
+
+  let heroImage = "";
+  let heroCredit = "Pexels";
+  const img = await findDeviceImage({
+    deviceName: productName,
+    deviceSlug: slugify(productName),
+    category: item.category,
+    fallbackImages: config.fallbackImages,
+  });
+  if (img) {
+    heroImage = img.url;
+    heroCredit = { provider: img.provider, author: img.author, license: img.license, sourceUrl: img.sourceUrl };
+  }
+  if (!heroImage) heroImage = (config.fallbackImages[item.category] || config.fallbackImages._default)[0];
+
+  let slug = slugify(title) || `deal-${Date.now()}`;
+  let filename = `${today}-${slug}.html`;
+  let n = 2;
+  while (existsSync(path.join(ARTICLES_DIR, filename))) {
+    filename = `${today}-${slug}-${n++}.html`;
+  }
+
+  const html = renderArticlePage({
+    title,
+    description: parsed.dealSummary || title,
+    category: item.category,
+    date: today,
+    heroImage,
+    heroCredit,
+    keyPoints: [...(parsed.pros || []), parsed.verdict].filter(Boolean).slice(0, 4),
+    bodyHtml,
+    sourceName: item.sourceName || "TIVRA News Deals Desk",
+    sourceUrl: item.sourceUrl || "",
+    youtubeId: "",
+    slug: filename.replace(/\.html$/, ""),
+    adsensePublisherId: ADSENSE_ID,
+    adsenseAdSlot: ADSENSE_SLOT,
+    siteUrl: config.site.url || "",
+    extraJsonLd: [buildProductJsonLd(productName, heroImage)],
+  });
+
+  writeFileSync(path.join(ARTICLES_DIR, filename), html);
+  results.written++;
+  results.files.push(filename);
+  registry[item.key] = { t: title.slice(0, 120), d: today, c: item.category, k: "deal" };
+  if (results.written % 20 === 0) saveRegistry();
+  console.log(`  ✔ [${item.category}] ${title} (deal)`);
+}
+
+// Category dispatch.
 const NICHE_SYSTEM_PROMPTS = {
   "AI Tips & Tools": buildNichePrompt("ai-tips", SYSTEM_PROMPT),
   "Sacred Places": buildNichePrompt("temple", SYSTEM_PROMPT),
   "Product Deals & Offers": buildNichePrompt("deals", SYSTEM_PROMPT),
   "Credit Cards & Cashback": buildNichePrompt("credit-cards", SYSTEM_PROMPT),
 };
-// Gadget Comparisons format mix: mostly single-product reviews (matches
-// what was actually asked for — "product review, ratings, specifications,
-// verdict, pros and cons" — for whatever device is in the news right now),
-// with a head-to-head comparison every 3rd item for variety. Deterministic
-// on today's published-so-far count rather than random, so the mix is
-// predictable and testable rather than a coin flip per run.
+
 function dispatchWrite(item) {
+  if (item.category === "Product Deals & Offers") {
+    return writeDealStory(item);
+  }
   if (item.category === "Gadget Comparisons") {
-    // writeComparisonStory / writeRankingStory are silenced, not deleted —
-    // kept for a later site. All 9/day go through writeReviewStory now,
-    // reframed as value-for-money deal spotlights (see buildReviewSystemPrompt).
     return writeReviewStory(item);
   }
   const nicheSystem = NICHE_SYSTEM_PROMPTS[item.category];
