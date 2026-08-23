@@ -92,3 +92,28 @@ jobs:
           git commit -m "TIVRA auto news: $(date -u +'%Y-%m-%d %H:%M UTC') ($COUNT file changes)"
           # Retry once with a rebase in case another push landed mid-run.
           git push || (git pull --rebase && git push)
+
+      - name: Verify Live Site Health
+        run: |
+          sleep 45
+          node -e "
+          async function verify() {
+            const today = new Date().toISOString().slice(0, 10);
+            try {
+              const res = await fetch('https://tivranews.com/api/feed?page=1&limit=5&_t=' + Date.now());
+              if (!res.ok) throw new Error('Live API returned status ' + res.status);
+              const data = await res.json();
+              const latestDate = data.articles?.[0]?.date;
+              console.log('Live feed check — Newest article date:', latestDate, '(Today is ' + today + ')');
+              if (latestDate !== today) {
+                console.warn('⚠️ Warning: Live site latest date does not match today. Check deployment logs.');
+              } else {
+                console.log('✅ Live site is healthy and serving today\'s articles.');
+              }
+            } catch (err) {
+              console.warn('Live health check request error:', err.message);
+            }
+          }
+          verify();
+          "
+
