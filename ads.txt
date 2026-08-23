@@ -1,5 +1,2 @@
-# ads.txt — Authorized Digital Sellers
-# Required by Google AdSense once your site is approved.
-# Replace pub-0000000000000000 with your real AdSense publisher ID
-# (find it in AdSense under Account > Account information).
-google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+﻿# ads.txt ?" Authorized Digital Sellers
+google.com, pub-6206818645443465, DIRECT, f08c47fec0942fa0

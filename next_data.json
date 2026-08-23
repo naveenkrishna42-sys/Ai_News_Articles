@@ -1,0 +1,16 @@
+{
+  "props": {
+    "pageProps": {
+      "welcomepage": true,
+      "isUserLoggedIn": false
+    },
+    "__N_SSP": true
+  },
+  "page": "/",
+  "query": {},
+  "buildId": "84JtPdb2Fmb33Pb5mOgjz",
+  "isFallback": false,
+  "isExperimentalCompile": false,
+  "gssp": true,
+  "scriptLoader": []
+}

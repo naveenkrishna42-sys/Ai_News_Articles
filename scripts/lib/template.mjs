@@ -1,8 +1,8 @@
-// TIVRA News — article page template.
+﻿// TIVRA News â€” article page template.
 // Self-contained HTML (inline CSS) so every article renders perfectly forever,
 // independent of future site-css changes. Carries the exact markers
 // build-index.mjs parses: <title>, meta description, first <img>,
-// "📅 YYYY-MM-DD" and "📂 Category".
+// "ðŸ“… YYYY-MM-DD" and "ðŸ“‚ Category".
 
 export function slugify(text) {
   return text
@@ -20,7 +20,7 @@ export function escapeHtml(str) {
 }
 
 /**
- * buildHeroCredit — format credit line for hero image.
+ * buildHeroCredit â€” format credit line for hero image.
  * Accepts either:
  *   - string: plain credit text ("Pexels", "Wikimedia...", "")
  *   - object: {provider, author, license, sourceUrl}
@@ -33,7 +33,7 @@ export function buildHeroCredit(heroCredit) {
     if (credit && credit.startsWith("Wikimedia")) {
       return `Photo: ${escapeHtml(credit)}`;
     } else if (credit) {
-      return `Representative image · ${escapeHtml(credit)} (free license)`;
+      return `Representative image Â· ${escapeHtml(credit)} (free license)`;
     } else {
       return "Representative image";
     }
@@ -65,7 +65,7 @@ export function buildHeroCredit(heroCredit) {
 }
 
 /**
- * renderComparisonTable — HTML for a gadget comparison / ranking spec table.
+ * renderComparisonTable â€” HTML for a gadget comparison / ranking spec table.
  * Accepts an array of rows in either shape:
  *   - two-column comparison: {label, valueA, valueB}
  *   - single-column ranking:  {label, value}
@@ -74,23 +74,23 @@ export function buildHeroCredit(heroCredit) {
  * cell and never the literal strings "null"/"undefined". Colours reuse the
  * site palette already defined in this file's <style> block: #0b1220
  * (dark heading text), #e11d48 (accent), #e2e8f0 (borders), #64748b (muted
- * text) — no new colours introduced.
+ * text) â€” no new colours introduced.
  *
  * Mobile: the wrapper scrolls horizontally below the table's natural width
  * (overflow-x:auto) rather than reflowing into stacked cards, so a
- * two-column table never overflows a narrow (e.g. 360px) viewport — it just
+ * two-column table never overflows a narrow (e.g. 360px) viewport â€” it just
  * becomes swipeable, and the max-width matches the site's existing
  * `.wrap{max-width:840px}` convention.
  *
  * This function is intentionally NOT wired into renderArticlePage()'s
- * signature — callers concatenate its output into bodyHtml themselves.
+ * signature â€” callers concatenate its output into bodyHtml themselves.
  */
 
 /**
- * specTableHasData — true if at least one row has a real, non-null value.
+ * specTableHasData â€” true if at least one row has a real, non-null value.
  * A pre-launch story (e.g. "Vivo T5x 5G launches tomorrow") legitimately
  * confirms nothing yet, so the accuracy rule ("null if unsure") correctly
- * nulls every single row — the caller should check this BEFORE calling
+ * nulls every single row â€” the caller should check this BEFORE calling
  * renderComparisonTable() and skip the table entirely rather than publish
  * an all-dashes table that reads as broken even though it's technically
  * honest. See buildAwaitingSpecsNotice() for the replacement copy.
@@ -104,12 +104,12 @@ export function specTableHasData(specRows) {
   });
 }
 
-// Honest replacement for an all-null spec table — same visual weight as the
+// Honest replacement for an all-null spec table â€” same visual weight as the
 // site's existing amber `.notice` box (see renderArticlePage below), so it
 // reads as an intentional editorial note, not a rendering failure.
 //
 // When the model has real, reported/leaked highlights to share (e.g. "an
-// expected periscope camera"), pass them as `highlights` — they're rendered
+// expected periscope camera"), pass them as `highlights` â€” they're rendered
 // as a real paragraph ABOVE the notice, so the reader gets substance instead
 // of just an apology for missing data. `highlights` is optional; omitting it
 // (or passing empty/null) falls back to the notice alone, unchanged from the
@@ -118,7 +118,7 @@ export function buildAwaitingSpecsNotice(highlights) {
   const highlightsHtml = highlights && String(highlights).trim()
     ? `<p>${escapeHtml(String(highlights).trim())}</p>`
     : "";
-  return `${highlightsHtml}<div style="margin:20px 0;padding:14px 18px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;font-size:.9rem;color:#92400e;">Official specifications haven't been confirmed yet — this article will be updated with full details once they're announced. Check the source report below for the latest.</div>`;
+  return `${highlightsHtml}<div style="margin:20px 0;padding:14px 18px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;font-size:.9rem;color:#92400e;">Official specifications haven't been confirmed yet â€” this article will be updated with full details once they're announced. Check the source report below for the latest.</div>`;
 }
 
 export function renderComparisonTable(specRows, labelA = "Device A", labelB = "Device B") {
@@ -188,7 +188,7 @@ export function renderArticlePage({
   const year = date.slice(0, 4);
   const pageUrl = siteUrl ? `${siteUrl}/articles/${slug}.html` : "";
 
-  // NewsArticle structured data — what search engines and Google Discover
+  // NewsArticle structured data â€” what search engines and Google Discover
   // read. Built with JSON.stringify so titles with quotes can't break it.
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
@@ -303,11 +303,15 @@ footer.site{background:#0b1220;color:#94a3b8;text-align:center;padding:26px 18px
 footer.site a{color:#64748b;text-decoration:none;margin:0 9px}
 footer.site a:hover{color:#e2e8f0}
 </style>
+<!-- Ezoic Integration -->
+<script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
+<script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
+<script> window.ezstandalone = window.ezstandalone || {}; ezstandalone.cmd = ezstandalone.cmd || []; </script>
 </head>
 <body>
 <header class="masthead">
   <a href="/" class="logo" aria-label="TIVRA News home">${LOGO_SVG}</a>
-  <a href="/" class="home">← Home</a>
+  <a href="/" class="home">â† Home</a>
 </header>
 <nav class="catbar">
   <a href="/">Home</a>
@@ -321,13 +325,13 @@ footer.site a:hover{color:#e2e8f0}
   <a href="/archive.html">Archive</a>
 </nav>
 <div class="wrap">
-  <div class="crumb"><a href="/">Home</a> › <a href="/category.html?cat=${catSlug}">${escapeHtml(category)}</a></div>
+  <div class="crumb"><a href="/">Home</a> â€º <a href="/category.html?cat=${catSlug}">${escapeHtml(category)}</a></div>
   <span class="cat-pill">${escapeHtml(category)}</span>
   <h1>${safeTitle}</h1>
   <div class="meta">
-    <span>📅 ${date}</span>
-    <span>📂 ${escapeHtml(category)}</span>
-    ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">Original source ↗</a>` : ""}
+    <span>ðŸ“… ${date}</span>
+    <span>ðŸ“‚ ${escapeHtml(category)}</span>
+    ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">Original source â†—</a>` : ""}
   </div>
   ${heroImage ? `<figure class="hero"><img src="${escapeHtml(heroImage)}" alt="${safeTitle}">${credit}</figure>` : ""}
   ${keyPointsHtml}
@@ -338,7 +342,7 @@ ${bodyHtml}
   ${videoHtml}
   <div class="srcbox">
     <div class="s-head">Verify this story</div>
-    Reported by ${escapeHtml(sourceName || "news agencies")}. This article was written with AI assistance from publicly available reporting — always cross-check important details with the original coverage.
+    Reported by ${escapeHtml(sourceName || "news agencies")}. This article was written with AI assistance from publicly available reporting â€” always cross-check important details with the original coverage.
     <div class="links">
       ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">Read the original report</a>` : ""}
       <a href="${gnSearch}" target="_blank" rel="noopener noreferrer nofollow">More coverage on Google News</a>
@@ -346,15 +350,16 @@ ${bodyHtml}
     </div>
   </div>
   <div class="related" id="relatedArticles" data-category="${catSlug}" data-slug="${escapeHtml(slug)}"></div>
-  <div class="notice">This content is AI-assisted and published for information only. TIVRA News links every story to its original source above — please verify dates, figures and statements there. See our <a href="/disclaimer.html" style="color:#92400e;font-weight:700;">Disclaimer</a> and <a href="/editorial-policy.html" style="color:#92400e;font-weight:700;">Editorial Policy</a>.</div>
+  <div class="notice">This content is AI-assisted and published for information only. TIVRA News links every story to its original source above â€” please verify dates, figures and statements there. See our <a href="/disclaimer.html" style="color:#92400e;font-weight:700;">Disclaimer</a> and <a href="/editorial-policy.html" style="color:#92400e;font-weight:700;">Editorial Policy</a>.</div>
 </div>
 <footer class="site">
   <div style="margin-bottom:8px;">
     <a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/archive.html">Archive</a><a href="/privacy.html">Privacy</a><a href="/cookie-policy.html">Cookies</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/editorial-policy.html">Editorial Policy</a><a href="/dmca.html">DMCA</a><a href="/affiliate-disclosure.html">Affiliate Disclosure</a><a href="/sitemap-index.xml">Sitemap</a>
   </div>
-  <div>© ${year} TIVRA News — Trusted Insights, Verified Reports &amp; Alerts.</div>
+  <div>Â© ${year} TIVRA News â€” Trusted Insights, Verified Reports &amp; Alerts.</div>
 </footer>
 <script src="/related.js" defer></script>
 </body>
 </html>`;
 }
+

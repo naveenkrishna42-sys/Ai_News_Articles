@@ -1,17 +1,21 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact — TIVRA News</title>
+<title>Contact â€” TIVRA News</title>
 <meta name="description" content="Get in touch with the TIVRA News team.">
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- Ezoic Integration -->
+<script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
+<script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
+<script> window.ezstandalone = window.ezstandalone || {}; ezstandalone.cmd = ezstandalone.cmd || []; </script>
 </head>
 <body>
 <header class="site-header">
   <a href="/" class="brand"><img src="/logo.svg" alt="TIVRA News" width="158" height="33"></a>
-  <a href="/" class="back">← Back to Home</a>
+  <a href="/" class="back">â† Back to Home</a>
 </header>
 <nav class="site-nav">
   <a href="/">Home</a>
@@ -21,14 +25,14 @@
 </nav>
 
 <div class="container narrow">
-  <div class="breadcrumb"><a href="/">Home</a> › Contact</div>
+  <div class="breadcrumb"><a href="/">Home</a> â€º Contact</div>
   <h1 class="page-title">Contact Us</h1>
   <div class="prose">
     <p>Have a correction, takedown request, advertising inquiry, or general question? Send us a message below and we'll get back to you.</p>
   </div>
 
   <form class="contact-form" id="contactForm">
-    <!-- TODO: replace YOUR_WEB3FORMS_ACCESS_KEY below — see README "Contact form setup" -->
+    <!-- TODO: replace YOUR_WEB3FORMS_ACCESS_KEY below â€” see README "Contact form setup" -->
     <input type="hidden" name="access_key" value="0abc1531-0f56-4cf3-9afa-1b6b161aab87">
     <input type="hidden" name="subject" value="New message from TIVRA News contact form">
     <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
@@ -74,7 +78,7 @@
     <a href="/affiliate-disclosure.html">Affiliate Disclosure</a>
     <a href="/sitemap-index.xml">Sitemap</a>
   </div>
-  <div>© 2026 TIVRA News. All rights reserved.</div>
+  <div>Â© 2026 TIVRA News. All rights reserved.</div>
   <div class="disclaimer">Content on this site is AI-assisted / AI-generated for informational purposes. Always verify with original sources.</div>
 </footer>
 
@@ -86,7 +90,7 @@
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     submitBtn.disabled = true;
-    submitBtn.textContent = "Sending…";
+    submitBtn.textContent = "Sendingâ€¦";
     statusEl.className = "form-status";
     statusEl.hidden = true;
 
@@ -100,7 +104,7 @@
       });
       const result = await res.json();
       if (result.success) {
-        statusEl.textContent = "Message sent — thanks, we'll get back to you soon.";
+        statusEl.textContent = "Message sent â€” thanks, we'll get back to you soon.";
         statusEl.className = "form-status success";
         form.reset();
       } else {
@@ -118,3 +122,4 @@
 </script>
 </body>
 </html>
+
