@@ -1,14 +1,14 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
- * TIVRA News — auto-news.mjs
+ * TIVRA News â€” auto-news.mjs
  * The fully automated newsroom. One run does, in order:
  *
  *   1. FETCH    every feed in config/news-config.json (parallel)
- *   2. FILTER   drop everything already published — permanent registry
+ *   2. FILTER   drop everything already published â€” permanent registry
  *               (data/published-registry.json) + fuzzy same-story matching,
  *               with category priority so one story never posts twice
  *   3. WRITE    human-style 500+ word articles via the AI provider pool
- *               (Groq → Gemini → OpenRouter → DeepSeek, auto-failover),
+ *               (Groq â†’ Gemini â†’ OpenRouter â†’ DeepSeek, auto-failover),
  *               each with a copyright-free Pexels/Pixabay image
  *   4. SPECIALS daily horoscopes (12 signs), daily AI Analysis pieces,
  *               weekly long-form feature
@@ -83,17 +83,17 @@ function saveRegistry() {
 const todayCount = Object.values(registry).filter((r) => r.d === today).length;
 let budget = Math.max(0, MAX_TOTAL - todayCount);
 
-console.log(`TIVRA auto-news — ${new Date().toISOString()}`);
+console.log(`TIVRA auto-news â€” ${new Date().toISOString()}`);
 console.log(`Providers with keys: ${pool.providers.map((p) => p.name).join(", ") || "NONE"}`);
 console.log(`Published today so far: ${todayCount}. Budget this run: ${budget}. Per-category: ${PER_CATEGORY}.`);
 
 if (pool.providers.length === 0 && !DRY_RUN) {
-  console.error("No AI provider API keys found in environment — nothing to do. Add GitHub Secrets (see README).");
+  console.error("No AI provider API keys found in environment â€” nothing to do. Add GitHub Secrets (see README).");
   process.exit(0); // exit clean: a keyless scheduled run should not mark the workflow red forever
 }
 
 if (!DRY_RUN) {
-  for (const line of await mediaPreflight()) console.log(`Image providers — ${line}`);
+  for (const line of await mediaPreflight()) console.log(`Image providers â€” ${line}`);
 }
 
 // ---------- Story selection ----------
@@ -114,7 +114,7 @@ const feedList = ONLY_CATEGORIES.length
   ? config.feeds.filter((f) => ONLY_CATEGORIES.includes(f.category))
   : config.feeds;
 
-console.log(`Fetching ${feedList.length} feeds…`);
+console.log(`Fetching ${feedList.length} feedsâ€¦`);
 const byCategory = await fetchAllFeeds(feedList);
 let fetchedTotal = 0;
 for (const items of byCategory.values()) fetchedTotal += items.length;
@@ -127,10 +127,10 @@ for (const c of byCategory.keys()) if (!priority.includes(c)) priority.push(c);
 // newCategoryVolume[category] PUBLISHED PER DAY (across all runs), not per
 // run like every other category's PER_CATEGORY. We enforce that by reusing
 // the existing registry bookkeeping (registry[key].d === today, .c ===
-// category) rather than a parallel counter — the same data every other
+// category) rather than a parallel counter â€” the same data every other
 // piece of daily-cap logic in this file already relies on. If the config
 // value is missing or 0 for one of these three categories, the computed
-// budget is 0 and the category silently produces nothing that day — no
+// budget is 0 and the category silently produces nothing that day â€” no
 // crash, no special-cased error path, config-only toggle.
 // Pass 1: Standard fair distribution
 const queue = [];
@@ -188,18 +188,20 @@ if (DRY_RUN) {
 }
 
 // ---------- Writing ----------
-const SYSTEM_PROMPT = `You are a senior desk journalist at TIVRA News, an Indian digital news outlet. Rewrite the given headline and snippet into an original news article that reads like it was written by an experienced human reporter.
+const SYSTEM_PROMPT = `You are a senior desk journalist and expert analyst at TIVRA News, an Indian digital news outlet. Rewrite the given headline and snippet into an original, analytical news article that reads like it was written by an experienced human expert.
 
 Non-negotiable rules:
 - 500 to 700 words. Use 3-5 <h2>/<h3> subheadings and short paragraphs (2-4 sentences).
+- Add expert opinion and critical analysis. Do not just summarize. Explain WHY this matters, the broader impact, and whether the claims hold up.
+- You MUST include at least one HTML table (<table><tr><th>...) summarizing key data, specs, or timelines.
+- You MUST include a bulleted list (<ul><li>) of Pros/Cons or Key Facts.
 - Vary sentence length. Active voice. Concrete and direct, never flowery.
-- BANNED phrases and habits: "in conclusion", "it is important to note", "delve", "landscape", "furthermore", "moreover", "in today's fast-paced world", "stay tuned", starting consecutive paragraphs the same way.
-- NEVER invent quotes, statistics, casualty figures, dates or names that are not in the provided material. If a detail is unknown, write around it ("officials have not yet confirmed…").
-- Indian English conventions (lakh/crore where natural). Neutral, factual tone — report, don't editorialise.
-- End with one short forward-looking paragraph (what happens next / what to watch).
+- BANNED phrases and habits: "in conclusion", "it is important to note", "delve", "landscape", "furthermore", "moreover", "in today's fast-paced world", "stay tuned".
+- NEVER invent quotes, statistics, casualty figures, dates or names. If unknown, write around it.
+- Indian English conventions (lakh/crore where natural).
 
 Output STRICT JSON only, no markdown fences, exactly this shape:
-{"title":"SEO headline under 70 chars, no clickbait","description":"news summary, 140-160 chars","key_points":["point 1","point 2","point 3"],"content":"article body HTML using only <h2>,<h3>,<p>,<ul>,<li> tags","image_person":"Full name of the single famous person this story is centrally about (e.g. \\"Aamir Khan\\"), or \\"\\" if the story is not about one specific famous person","image_query":"2-4 word LITERAL visual scene for a stock-photo search, describing objects/places only, never a person's name (e.g. \\"cricket stadium floodlights\\", \\"courtroom gavel\\", \\"smartphone factory line\\")"}`;
+{"title":"SEO headline under 70 chars, no clickbait","description":"news summary, 140-160 chars","key_points":["point 1","point 2","point 3"],"content":"article body HTML using only <h2>,<h3>,<p>,<ul>,<li>,<table>,<tr>,<td>,<th> tags","image_person":"Full name of the single famous person this story is centrally about (e.g. \"Aamir Khan\"), or \"\" if the story is not about one specific famous person","image_query":"2-4 word LITERAL visual scene for a stock-photo search, describing objects/places only, never a person's name (e.g. \"cricket stadium floodlights\", \"courtroom gavel\", \"smartphone factory line\")"}`;
 
 function countWords(html) {
   return html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
@@ -208,7 +210,7 @@ function countWords(html) {
 const results = { written: 0, failed: 0, files: [] };
 
 async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, maxTokens = 3200, kind = "news" } = {}) {
-  const userPrompt = `Headline: ${item.title}\nCategory: ${item.category}\nOriginal reporting by: ${item.sourceName}\nPublished: ${item.pubDate || today}\nSource snippet: ${item.summary || "(headline only — write carefully around unknown details)"}`;
+  const userPrompt = `Headline: ${item.title}\nCategory: ${item.category}\nOriginal reporting by: ${item.sourceName}\nPublished: ${item.pubDate || today}\nSource snippet: ${item.summary || "(headline only â€” write carefully around unknown details)"}`;
 
   const { text } = await pool.chat({ system: systemPrompt, user: userPrompt, maxTokens });
   const parsed = extractJson(text);
@@ -217,7 +219,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
   if (countWords(bodyHtml) < minWords) throw new Error(`too short (${countWords(bodyHtml)} words)`);
 
   // Image strategy: real Wikipedia portrait when the story is about one
-  // famous person (never for crime/war stories — wrong-face risk), else a
+  // famous person (never for crime/war stories â€” wrong-face risk), else a
   // Pexels photo of the AI-chosen scene, else category fallback.
   const NO_PERSON_CATEGORIES = new Set(["Crime & Law", "Wars & Conflicts"]);
   let heroImage = "";
@@ -270,15 +272,15 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
   results.written++;
   results.files.push(filename);
   if (results.written % 20 === 0) saveRegistry();
-  console.log(`  ✔ [${item.category}] ${title}`);
+  console.log(`  âœ” [${item.category}] ${title}`);
 }
 
-// buildProductJsonLd — Product schema.org blocks for the devices in a
+// buildProductJsonLd â€” Product schema.org blocks for the devices in a
 // comparison/ranking article. Deliberately NO Review/aggregateRating type:
 // a star rating is a specific fabricated number if we invent one, and this
 // whole build's spec-accuracy rule exists precisely to avoid confidently-
 // wrong numbers on a monetized site. Product-only structured data is a
-// smaller SEO win than a full Review rich-result, but it's the honest one —
+// smaller SEO win than a full Review rich-result, but it's the honest one â€”
 // we skip the rich-result eligibility rather than invent a rating.
 function buildProductJsonLd(name, imageUrl) {
   if (!name) return null;
@@ -291,8 +293,8 @@ function buildProductJsonLd(name, imageUrl) {
   };
 }
 
-// writeReviewStory — Gadget Comparisons. Single-product spotlight: specs,
-// qualitative reception (never a fabricated star rating — see the prompt),
+// writeReviewStory â€” Gadget Comparisons. Single-product spotlight: specs,
+// qualitative reception (never a fabricated star rating â€” see the prompt),
 // pros/cons, verdict, buy link. Same shape and same honesty rules as
 // writeComparisonStory below, just one device instead of two.
 async function writeReviewStory(item) {
@@ -320,7 +322,7 @@ ${cons.length ? `<div style="flex:1;min-width:220px;"><strong style="color:#be12
     : "";
   const verdictHtml = parsed.verdict || "";
   // No Buy button unless the device is actually launched/available AND the
-  // model is confident it's sold on Amazon — a link next to an unreleased or
+  // model is confident it's sold on Amazon â€” a link next to an unreleased or
   // Amazon-unavailable product is a false, actionable claim.
   const canBuy = parsed.isLaunched !== false && parsed.amazonAvailable !== false;
   const buyBoxHtml = canBuy ? renderBuyBox([deviceName], config) : "";
@@ -366,15 +368,15 @@ ${cons.length ? `<div style="flex:1;min-width:220px;"><strong style="color:#be12
   results.written++;
   results.files.push(filename);
   if (results.written % 20 === 0) saveRegistry();
-  console.log(`  ✔ [Gadget Comparisons] ${title} (review)`);
+  console.log(`  âœ” [Gadget Comparisons] ${title} (review)`);
 }
 
-// writeComparisonStory — Gadget Comparisons. Derives a two-device head-to-
+// writeComparisonStory â€” Gadget Comparisons. Derives a two-device head-to-
 // head from a single-device headline (see buildComparisonSystemPrompt for
 // the "pick a rival, never invent a spec" rules). Does not touch or reuse
 // writeStory()'s internals; ordinary categories are completely unaffected.
 async function writeComparisonStory(item) {
-  const userPrompt = `Headline: ${item.title}\nCategory: ${item.category}\nOriginal reporting by: ${item.sourceName}\nPublished: ${item.pubDate || today}\nSource snippet: ${item.summary || "(headline only — pick a realistic rival and do not invent specs)"}`;
+  const userPrompt = `Headline: ${item.title}\nCategory: ${item.category}\nOriginal reporting by: ${item.sourceName}\nPublished: ${item.pubDate || today}\nSource snippet: ${item.summary || "(headline only â€” pick a realistic rival and do not invent specs)"}`;
 
   const { text } = await pool.chat({ system: buildComparisonSystemPrompt(), user: userPrompt, maxTokens: 3600 });
   const parsed = extractJson(text);
@@ -390,7 +392,7 @@ async function writeComparisonStory(item) {
     : buildAwaitingSpecsNotice(parsed.expectedHighlights);
   const summaryHtml = parsed.summary ? `<p>${escapeHtml(parsed.summary)}</p>` : "";
   const verdictHtml = parsed.verdict || "";
-  // Buy button per device, independently gated — deviceA can be launched
+  // Buy button per device, independently gated â€” deviceA can be launched
   // and on Amazon while deviceB isn't (or vice versa), so filter per side
   // rather than an all-or-nothing box.
   const buyNames = [];
@@ -399,13 +401,13 @@ async function writeComparisonStory(item) {
   const buyBoxHtml = renderBuyBox(buyNames, config);
   const bodyHtml = `${introHtml}\n${tableHtml}\n${summaryHtml}\n${verdictHtml}\n${buyBoxHtml}`;
 
-  // Word count excludes the buy box — it is navigation, not article content,
+  // Word count excludes the buy box â€” it is navigation, not article content,
   // and must never be what lifts a thin article over the minimum.
   const articleWords = countWords(`${introHtml}\n${tableHtml}\n${summaryHtml}\n${verdictHtml}`);
   if (articleWords < 150) throw new Error(`comparison too short (${articleWords} words)`);
 
   // Two hero images (one per device) via the device-photo cascade. Either
-  // side is allowed to come back empty — a missing photo never fails the
+  // side is allowed to come back empty â€” a missing photo never fails the
   // article. renderArticlePage() only accepts a single hero image today,
   // so we prefer deviceA's photo and fall back to deviceB's; a real
   // side-by-side two-photo layout is a template change for a later phase.
@@ -454,17 +456,17 @@ async function writeComparisonStory(item) {
   results.written++;
   results.files.push(filename);
   if (results.written % 20 === 0) saveRegistry();
-  console.log(`  ✔ [Gadget Comparisons] ${title}`);
+  console.log(`  âœ” [Gadget Comparisons] ${title}`);
 }
 
-// writeRankingStory — periodic "top N" gadget listicle, built from a batch
+// writeRankingStory â€” periodic "top N" gadget listicle, built from a batch
 // of recent Gadget Comparisons headlines rather than a single item. Kept
 // deliberately simple and follows the same shape as writeComparisonStory /
 // the weekly-feature special below it, rather than introducing a new
 // abstraction.
 async function writeRankingStory(candidateItems) {
   const listText = candidateItems
-    .map((c, i) => `${i + 1}. ${c.title}${c.summary ? " — " + c.summary : ""}`)
+    .map((c, i) => `${i + 1}. ${c.title}${c.summary ? " â€” " + c.summary : ""}`)
     .join("\n");
   const userPrompt = `Recent gadget headlines to draw ranking candidates from:\n${listText}\nPublished: ${today}`;
 
@@ -482,7 +484,7 @@ async function writeRankingStory(candidateItems) {
     .map((it) => {
       const heading = `<h3>#${Number(it.rank) || ""} ${escapeHtml(it.name || "")}</h3>`;
       const why = it.whyRanked ? `<p>${escapeHtml(it.whyRanked)}</p>` : "";
-      const priceLine = `<p><strong>Price:</strong> ${it.price ? escapeHtml(it.price) : "—"}</p>`;
+      const priceLine = `<p><strong>Price:</strong> ${it.price ? escapeHtml(it.price) : "â€”"}</p>`;
       const rows = Array.isArray(it.specRows) ? it.specRows : [];
       const table = specTableHasData(rows) ? renderComparisonTable(rows) : buildAwaitingSpecsNotice(it.expectedHighlights);
       return `${heading}${why}${priceLine}${table}`;
@@ -490,7 +492,7 @@ async function writeRankingStory(candidateItems) {
     .join("\n");
   const verdictHtml = parsed.verdict || "";
   // Only items that are actually launched and confidently sold on Amazon get
-  // a Buy button — an unreleased or Amazon-unavailable item is skipped
+  // a Buy button â€” an unreleased or Amazon-unavailable item is skipped
   // entirely rather than linking to a search page for something you can't
   // actually buy there.
   const buyNames = items
@@ -504,7 +506,7 @@ async function writeRankingStory(candidateItems) {
 
   // Hero image: first ranked item whose device photo resolves. We stop at
   // the first hit rather than looking up every item's photo (N extra API
-  // calls for a single hero image isn't worth it) — heroImageForName below
+  // calls for a single hero image isn't worth it) â€” heroImageForName below
   // tracks which item it belongs to, purely for the Product schema block.
   let heroImage = "";
   let heroCredit = "Pexels";
@@ -558,7 +560,7 @@ async function writeRankingStory(candidateItems) {
   results.written++;
   results.files.push(filename);
   if (results.written % 20 === 0) saveRegistry();
-  console.log(`  ✔ [Gadget Comparisons] ${title} (ranking)`);
+  console.log(`  âœ” [Gadget Comparisons] ${title} (ranking)`);
 }
 
 async function runQueue(items, worker) {
@@ -571,7 +573,7 @@ async function runQueue(items, worker) {
       } catch (err) {
         results.failed++;
         delete registry[item.key]; // unclaim so the next run retries it
-        console.log(`  ✖ [${item.category}] ${item.title.slice(0, 60)} — ${err.message}`);
+        console.log(`  âœ– [${item.category}] ${item.title.slice(0, 60)} â€” ${err.message}`);
       }
     }
   });
@@ -593,10 +595,10 @@ async function writeDealStory(item) {
 
   const title = parsed.title;
   const productName = parsed.productName || extractCleanProductName(item.title);
-  const ratingBadge = `<div class="rating-badge" style="display:inline-block;background:#059669;color:#fff;font-weight:800;padding:4px 10px;border-radius:6px;font-size:0.9rem;margin-bottom:12px;">★ ${parsed.rating} / 5.0 Value Rating</div>`;
+  const ratingBadge = `<div class="rating-badge" style="display:inline-block;background:#059669;color:#fff;font-weight:800;padding:4px 10px;border-radius:6px;font-size:0.9rem;margin-bottom:12px;">â˜… ${parsed.rating} / 5.0 Value Rating</div>`;
   const ratingText = parsed.ratingReason ? `<p><em>${escapeHtml(parsed.ratingReason)}</em></p>` : "";
-  const prosHtml = (parsed.pros || []).map((p) => `<li>✅ ${escapeHtml(p)}</li>`).join("");
-  const consHtml = (parsed.cons || []).map((c) => `<li>⚠️ ${escapeHtml(c)}</li>`).join("");
+  const prosHtml = (parsed.pros || []).map((p) => `<li>âœ… ${escapeHtml(p)}</li>`).join("");
+  const consHtml = (parsed.cons || []).map((c) => `<li>âš ï¸ ${escapeHtml(c)}</li>`).join("");
   const prosConsBox = `<div style="background:#f8fafc;border:1px solid #e2e8f0;padding:16px 20px;border-radius:8px;margin:20px 0;">
     <h4 style="margin-top:0;margin-bottom:10px;">Key Highlights & Tradeoffs</h4>
     <ul style="padding-left:20px;margin-bottom:0;">
@@ -654,7 +656,7 @@ async function writeDealStory(item) {
   results.files.push(filename);
   registry[item.key] = { t: title.slice(0, 120), d: today, c: item.category, k: "deal" };
   if (results.written % 20 === 0) saveRegistry();
-  console.log(`  ✔ [${item.category}] ${title} (deal)`);
+  console.log(`  âœ” [${item.category}] ${title} (deal)`);
 }
 
 // Category dispatch.
@@ -681,18 +683,18 @@ await runQueue(queue, dispatchWrite);
 
 // ---------- Specials ----------
 if (!NO_SPECIALS && pool.providers.length > 0) {
-  // Daily horoscopes — 12 signs from one AI call.
+  // Daily horoscopes â€” 12 signs from one AI call.
   const horoKey = `horoscopes-${today}`;
   if (config.specials.horoscopesPerDay && !registry[horoKey] && budget - results.written > 0) {
     try {
       const { text } = await pool.chat({
-        system: `You write TIVRA News daily horoscopes. Output STRICT JSON only: {"horoscopes":[{"sign":"Aries","title":"catchy title under 65 chars","description":"140-160 char summary","content":"HTML with <p> tags, 150-200 words covering love, career, health and a lucky colour/number"} , … all 12 zodiac signs]}`,
-        user: `Write the 12 daily horoscopes for ${today}. Warm, encouraging, specific-feeling but general. Vary the openings — no two signs may start with the same words.`,
+        system: `You write TIVRA News daily horoscopes. Output STRICT JSON only: {"horoscopes":[{"sign":"Aries","title":"catchy title under 65 chars","description":"140-160 char summary","content":"HTML with <p> tags, 150-200 words covering love, career, health and a lucky colour/number"} , â€¦ all 12 zodiac signs]}`,
+        user: `Write the 12 daily horoscopes for ${today}. Warm, encouraging, specific-feeling but general. Vary the openings â€” no two signs may start with the same words.`,
         maxTokens: 7000,
       });
       const parsed = extractJson(text);
       for (const h of parsed.horoscopes || []) {
-        const title = h.title || `${h.sign} Horoscope Today — ${today}`;
+        const title = h.title || `${h.sign} Horoscope Today â€” ${today}`;
         const slug = slugify(`${h.sign}-horoscope-${today}`);
         const filename = `${today}-${slug}.html`;
         const html = renderArticlePage({
@@ -717,16 +719,16 @@ if (!NO_SPECIALS && pool.providers.length > 0) {
         results.files.push(filename);
       }
       registry[horoKey] = { t: "daily horoscopes", d: today, c: "Astrology", k: "special" };
-      console.log(`  ✔ [Astrology] 12 daily horoscopes`);
+      console.log(`  âœ” [Astrology] 12 daily horoscopes`);
     } catch (err) {
-      console.log(`  ✖ [Astrology] horoscopes failed — ${err.message} (will retry next run)`);
+      console.log(`  âœ– [Astrology] horoscopes failed â€” ${err.message} (will retry next run)`);
     }
   }
 
-  // Daily AI Analysis — original commentary on the biggest stories (clearly labeled).
+  // Daily AI Analysis â€” original commentary on the biggest stories (clearly labeled).
   const ANALYSIS_SYSTEM = SYSTEM_PROMPT.replace("500 to 700 words", "700 to 900 words").replace(
     "You are a senior desk journalist",
-    "You are the analysis editor. Write an original ANALYSIS piece (context, background, why it matters, what to watch) about the given story — clearly analytical, still strictly factual,"
+    "You are the analysis editor. Write an original ANALYSIS piece (context, background, why it matters, what to watch) about the given story â€” clearly analytical, still strictly factual,"
   );
   const analysisWanted = Number(config.specials.analysisPerDay || 0);
   const analysisDone = Object.values(registry).filter((r) => r.d === today && r.k === "analysis").length;
@@ -742,7 +744,7 @@ if (!NO_SPECIALS && pool.providers.length > 0) {
       registry[aKey] = { t: cand.title.slice(0, 120), d: today, c: "Analysis", k: "analysis" };
       analysisMade++;
     } catch (err) {
-      console.log(`  ✖ [Analysis] ${cand.title.slice(0, 50)} — ${err.message}`);
+      console.log(`  âœ– [Analysis] ${cand.title.slice(0, 50)} â€” ${err.message}`);
     }
   }
 
@@ -766,21 +768,21 @@ if (!NO_SPECIALS && pool.providers.length > 0) {
         await writeStory(item, { systemPrompt: FEATURE_SYSTEM, minWords: 900, maxTokens: 6000, kind: "feature" });
         registry[weekKey] = { t: "weekly feature", d: today, c: "Features", k: "feature" };
       } catch (err) {
-        console.log(`  ✖ [Features] weekly long-form — ${err.message} (will retry next run)`);
+        console.log(`  âœ– [Features] weekly long-form â€” ${err.message} (will retry next run)`);
       }
     }
   }
 
   // Weekly gadget ranking listicle. Reuses the same weekly-cadence pattern
   // as the long-form feature just above (least new plumbing) rather than
-  // a per-run/per-batch trigger — a "top 5 phones" listicle doesn't need to
+  // a per-run/per-batch trigger â€” a "top 5 phones" listicle doesn't need to
   // exist more than once a week, and gating it on weekKey (already computed
   // above) means it costs nothing extra to track. Still respects the
   // Gadget Comparisons on/off toggle: if newCategoryVolume["Gadget
   // Comparisons"] is 0 or missing, it's skipped, no error.
   const gadgetRankKey = `gadget-ranking-${weekKey.replace("feature-", "")}`;
   const gcDailyCap = Number(config.newCategoryVolume?.["Gadget Comparisons"] || 0);
-  const GADGET_RANKING_SILENCED = true; // silenced, not deleted — deals-only for now
+  const GADGET_RANKING_SILENCED = true; // silenced, not deleted â€” deals-only for now
   if (!GADGET_RANKING_SILENCED && gcDailyCap > 0 && !registry[gadgetRankKey] && budget - results.written > 0) {
     const rankCandidates = (byCategory.get("Gadget Comparisons") || []).slice(0, 8);
     if (rankCandidates.length >= 3) {
@@ -788,7 +790,7 @@ if (!NO_SPECIALS && pool.providers.length > 0) {
         await writeRankingStory(rankCandidates);
         registry[gadgetRankKey] = { t: "weekly gadget ranking", d: today, c: "Gadget Comparisons", k: "ranking" };
       } catch (err) {
-        console.log(`  ✖ [Gadget Comparisons] weekly ranking — ${err.message} (will retry next run)`);
+        console.log(`  âœ– [Gadget Comparisons] weekly ranking â€” ${err.message} (will retry next run)`);
       }
     }
   }
@@ -800,7 +802,7 @@ function articleDate(filePath, filename) {
   if (fromName) return fromName[1];
   try {
     const html = readFileSync(filePath, "utf-8");
-    const m = html.match(/📅\s*(\d{4}-\d{2}-\d{2})/);
+    const m = html.match(/ðŸ“…\s*(\d{4}-\d{2}-\d{2})/);
     if (m) return m[1];
   } catch { /* fall through */ }
   try { return statSync(filePath).mtime.toISOString().slice(0, 10); } catch { return today; }
@@ -808,7 +810,7 @@ function articleDate(filePath, filename) {
 function articleCategory(filePath) {
   try {
     const html = readFileSync(filePath, "utf-8");
-    const m = html.match(/📂\s*([^<]+)</);
+    const m = html.match(/ðŸ“‚\s*([^<]+)</);
     return m ? m[1].trim() : "General";
   } catch { return "General"; }
 }
@@ -853,7 +855,8 @@ for (const [key, row] of Object.entries(registry)) {
 
 saveRegistry();
 
-console.log("— — —");
+console.log("â€” â€” â€”");
 console.log(`Run complete: ${results.written} written, ${results.failed} failed (auto-retry next run).`);
 console.log(`Cleanup: ${deleted} old article(s) removed, ${pruned} registry rows pruned, ${remaining.length} live articles.`);
 console.log(`Provider stats: ${pool.stats()}`);
+
