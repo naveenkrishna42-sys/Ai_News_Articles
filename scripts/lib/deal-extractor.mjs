@@ -1,5 +1,5 @@
-/**
- * TIVRA News — Amazon Direct ASIN & Product Link Resolver
+﻿/**
+ * TIVRA News â€” Amazon Direct ASIN & Product Link Resolver
  *
  * Resolves source article URLs (from Google News RSS / tech news feeds)
  * and scans the HTML for real Amazon ASINs (amazon.in/dp/B0XXXXXXXX).
@@ -9,7 +9,7 @@
  */
 
 const ASIN_REGEX = /amazon\.in\/(?:dp|gp\/product|d)\/([A-Z0-9]{10})/i;
-const CLEAN_NAME_REGEX = /^(.*?)(?:\s*[:—–-]\s*(?:price|specs|launch|deal|discount|sale|review|unveil|offers|buy).*$)/i;
+const CLEAN_NAME_REGEX = /^(.*?)(?:\s*[:â€”â€“-]\s*(?:price|specs|launch|deal|discount|sale|review|unveil|offers|buy).*$)/i;
 
 /**
  * Clean product name from noisy news headlines
@@ -22,8 +22,8 @@ export function extractCleanProductName(headline) {
   if (clean.includes(":")) {
     const left = clean.split(":")[0].trim();
     if (left.length >= 4 && left.length <= 40) clean = left;
-  } else if (clean.includes(" — ")) {
-    const left = clean.split(" — ")[0].trim();
+  } else if (clean.includes(" â€” ")) {
+    const left = clean.split(" â€” ")[0].trim();
     if (left.length >= 4 && left.length <= 40) clean = left;
   } else if (clean.includes(" - ")) {
     const left = clean.split(" - ")[0].trim();
@@ -40,7 +40,7 @@ export function extractCleanProductName(headline) {
     .replace(/\s+price drop.*$/i, "")
     .replace(/\s+discount.*$/i, "")
     .replace(/\s+under rs.*$/i, "")
-    .replace(/\s+under ₹.*$/i, "")
+    .replace(/\s+under â‚¹.*$/i, "")
     .trim();
 
   return clean.length >= 3 ? clean : headline.slice(0, 40).trim();
@@ -140,5 +140,10 @@ export async function getBestAmazonUrl(item, productName, amazonTag = "sirmohana
   }
 
   // 3. Fallback to clean Amazon search URL
+  if (cleanName.toLowerCase().includes("flipkart") || (item && item.title && item.title.toLowerCase().includes("flipkart"))) {
+    return `https://www.flipkart.com/search?q=${encodeURIComponent(cleanName)}`;
+  }
   return `https://www.amazon.in/s?k=${encodeURIComponent(cleanName)}&tag=${encodeURIComponent(amazonTag)}`;
 }
+
+
