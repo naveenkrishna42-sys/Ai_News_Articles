@@ -173,7 +173,7 @@ function parseArticle(filename) {
 
   // Category is written as: <span>📂 World</span>
   const categoryRaw = decodeEntities(
-    stripTags(extract(html, /📂\s*([^<]+)</, "General"))
+    stripTags(extract(html, /<span class="cat-pill">([^<]+)<\/span>/, "General"))
   );
 
   const dateObj = new Date();
@@ -366,4 +366,5 @@ function main() {
 }
 
 main();
+
 
