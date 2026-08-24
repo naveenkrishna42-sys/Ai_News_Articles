@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>News Archive â€” TIVRA News</title>
+<title>News Archive — TIVRA News</title>
 <meta name="description" content="Browse every story published on TIVRA News, organised by month.">
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -18,7 +18,7 @@
     <a href="/" class="brand"><img src="/logo.svg" alt="TIVRA News" width="158" height="33"></a>
     <span class="tagline">Trusted Insights, Verified Reports &amp; Alerts</span>
   </div>
-  <a href="/" class="back">â† Back to Home</a>
+  <a href="/" class="back">← Back to Home</a>
 </header>
 <nav class="site-nav">
   <a href="/">Home</a>
@@ -26,7 +26,7 @@
 </nav>
 
 <div class="container">
-  <div class="breadcrumb"><a href="/">Home</a> â€º Archive</div>
+  <div class="breadcrumb"><a href="/">Home</a> › Archive</div>
   <h1 class="page-title">News archive</h1>
   <p class="page-sub" id="archiveSub">Every story we've published, organised by month.</p>
 
@@ -34,7 +34,7 @@
 
   <div class="controls">
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Search this monthâ€¦" aria-label="Search archive">
+      <input type="text" id="searchInput" placeholder="Search this month…" aria-label="Search archive">
     </div>
   </div>
 
@@ -56,7 +56,7 @@
     <a href="/affiliate-disclosure.html">Affiliate Disclosure</a>
     <a href="/sitemap-index.xml">Sitemap</a>
   </div>
-  <div>Â© <span id="year"></span> TIVRA News. All rights reserved.</div>
+  <div>© <span id="year"></span> TIVRA News. All rights reserved.</div>
 </footer>
 
 <script>
@@ -113,9 +113,10 @@ fetch("/archive/index.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{
   loadMonth(months[0].key,months[0].label);
 }).catch(()=>{emptyState.hidden=false;});
 </script>
-<script type="text/javascript" src="https://s.skimresources.com/js/308051X1796347.skimlinks.js"></script>
+
 </body>
 </html>
+
 
 
 
