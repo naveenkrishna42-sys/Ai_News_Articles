@@ -246,7 +246,7 @@ function main() {
   const meta = {
     generatedAt: new Date().toISOString(),
     site: CONFIG.site.name || "TIVRA News",
-    featuredCategories: CONFIG.featuredCategories || [],
+    featuredCategories: CONFIG.categoryPriority || [],
   };
 
   writeFileSync(
@@ -366,3 +366,4 @@ function main() {
 }
 
 main();
+
