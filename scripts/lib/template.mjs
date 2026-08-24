@@ -361,9 +361,11 @@ ${bodyHtml}
   <div>Â© ${year} TIVRA News â€” Trusted Insights, Verified Reports &amp; Alerts.</div>
 </footer>
 <script src="/related.js" defer></script>
+<script type="text/javascript" src="https://s.skimresources.com/js/308051X179634.skimlinks.js"></script>
 </body>
 </html>`;
 }
+
 
 
 
