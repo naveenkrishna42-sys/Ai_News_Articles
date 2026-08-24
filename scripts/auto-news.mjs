@@ -826,7 +826,7 @@ const fileMeta = allFiles.map((f) => {
 let deleted = 0;
 const survivors = [];
 for (const m of fileMeta) {
-  if (m.date < cutoff) { unlinkSync(m.p); deleted++; } else survivors.push(m);
+  if (m.date < cutoff) { /* unlinkSync(m.p); deleted++; */ } else survivors.push(m);
 }
 
 const byCat = new Map();
@@ -838,12 +838,12 @@ let remaining = [];
 for (const [, items] of byCat) {
   items.sort((a, b) => (a.date < b.date ? 1 : -1));
   const keep = items.slice(0, config.retention.maxPerCategory);
-  for (const drop of items.slice(config.retention.maxPerCategory)) { unlinkSync(drop.p); deleted++; }
+  for (const drop of items.slice(config.retention.maxPerCategory)) { /* unlinkSync(drop.p); deleted++; */ }
   remaining.push(...keep);
 }
 if (remaining.length > config.retention.maxTotalLive) {
   remaining.sort((a, b) => (a.date < b.date ? 1 : -1));
-  for (const drop of remaining.slice(config.retention.maxTotalLive)) { unlinkSync(drop.p); deleted++; }
+  for (const drop of remaining.slice(config.retention.maxTotalLive)) { /* unlinkSync(drop.p); deleted++; */ }
   remaining = remaining.slice(0, config.retention.maxTotalLive);
 }
 
@@ -859,5 +859,6 @@ console.log("— — —");
 console.log(`Run complete: ${results.written} written, ${results.failed} failed (auto-retry next run).`);
 console.log(`Cleanup: ${deleted} old article(s) removed, ${pruned} registry rows pruned, ${remaining.length} live articles.`);
 console.log(`Provider stats: ${pool.stats()}`);
+
 
 
