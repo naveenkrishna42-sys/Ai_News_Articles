@@ -353,7 +353,7 @@ ${bodyHtml}
     </div>
   </div>
   <div class="related" id="relatedArticles" data-category="${catSlug}" data-slug="${escapeHtml(slug)}"></div>
-  <div class="notice">This content is AI-assisted and published for information only. TIVRA News links every story to its original source above — please verify dates, figures and statements there. See our <a href="/disclaimer.html" style="color:#92400e;font-weight:700;">Disclaimer</a> and <a href="/editorial-policy.html" style="color:#92400e;font-weight:700;">Editorial Policy</a>.</div>
+  <div class="notice">This content is published by the TIVRA News Editorial Team for information only. TIVRA News links every story to its original source above — please verify dates, figures and statements there. See our <a href="/disclaimer.html" style="color:#92400e;font-weight:700;">Disclaimer</a> and <a href="/editorial-policy.html" style="color:#92400e;font-weight:700;">Editorial Policy</a>.</div>
 </div>
 <footer class="site">
   <div style="margin-bottom:8px;">
