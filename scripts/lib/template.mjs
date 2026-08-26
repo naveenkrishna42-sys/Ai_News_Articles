@@ -264,7 +264,6 @@ ${extraJsonLdHtml}`;
 <meta name="description" content="${safeDesc}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">${socialMeta}
 ${adsHead}
-<script src="https://quge5.com/88/tag.min.js" data-zone="272630" async data-cfasync="false"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:#f7f8fa;color:#1e293b;line-height:1.75}
