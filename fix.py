@@ -1,10 +1,33 @@
-﻿import re
-path = 'scripts/build-index.mjs'
-with open(path, 'r', encoding='utf-8') as f:
-    text = f.read()
+﻿import os
 
-# The text has `extract(html, /...something...\s*([^<]+)</, "General")`
-text = re.sub(r'extract\(html,\s*/.*?\\s\*\(\[\^<\]\+\)</,\s*"General"\)', r'extract(html, /<span class="cat-pill">([^<]+)<\\/span>/, "General")', text)
+filepath = 'scripts/lib/template.mjs'
 
-with open(path, 'w', encoding='utf-8') as f:
-    f.write(text)
+with open(filepath, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Fix Mojibake
+replacements = {
+    'â€"': '—',
+    'â€¹': '‹',
+    'â€º': '›',
+    'â€¢': '•',
+    'â€˜': '‘',
+    'â€™': '’',
+    'â€œ': '“',
+    'â€': '”',
+    'â€°': '‰',
+    'Â©': '©'
+}
+
+for bad, good in replacements.items():
+    content = content.replace(bad, good)
+
+# Add Cuelinks Meta tag
+cuelinks_tag = '\n<meta name="cuelinks-verification" content="VERIFY-CL-RMCNURET">'
+if 'name="cuelinks-verification"' not in content:
+    content = content.replace('<head>', f'<head>{cuelinks_tag}')
+
+with open(filepath, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print("Fixed Mojibake and added Cuelinks to template.mjs")
