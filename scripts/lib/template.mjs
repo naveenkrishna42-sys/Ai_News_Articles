@@ -308,7 +308,7 @@ footer.site a:hover{color:#e2e8f0}
 <body>
 <header class="masthead">
   <a href="/" class="logo" aria-label="TIVRA News home">${LOGO_SVG}</a>
-  <a href="/" class="home">← Home</a>
+  <a href="/" class="home">&larr; Home</a>
 </header>
 <nav class="catbar">
   <a href="/">Home</a>
@@ -328,7 +328,7 @@ footer.site a:hover{color:#e2e8f0}
   <div class="meta">
     <span>📅 ${date}</span>
     <span>📂 ${escapeHtml(category)}</span>
-    ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">Original source ↗</a>` : ""}
+    ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">Original source &#8599;</a>` : ""}
   </div>
   ${heroImage ? `<figure class="hero"><img src="${escapeHtml(heroImage)}" alt="${safeTitle}">${credit}</figure>` : ""}
   ${keyPointsHtml}
