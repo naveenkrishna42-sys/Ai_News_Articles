@@ -38,7 +38,7 @@ import { findDeviceImage } from "./lib/images/index.mjs";
 import { renderArticlePage, renderComparisonTable, specTableHasData, buildAwaitingSpecsNotice, slugify, escapeHtml } from "./lib/template.mjs";
 import { renderBuyBox } from "./lib/affiliate.mjs";
 import { buildComparisonSystemPrompt, buildRankingSystemPrompt, buildReviewSystemPrompt, buildNichePrompt } from "./lib/gadget-prompts.mjs";
-import { getBestAmazonUrl, extractCleanProductName } from "./lib/deal-extractor.mjs";
+import { getBestMonetizedUrl, extractCleanProductName } from "./lib/deal-extractor.mjs";
 import { generateAndValidateDealArticle } from "./lib/deal-validator.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -581,7 +581,7 @@ async function runQueue(items, worker) {
 }
 
 async function writeDealStory(item) {
-  const directUrl = await getBestAmazonUrl(
+  const directUrl = await getBestMonetizedUrl(
     item,
     item.title,
     config.affiliate?.amazonTag || "sirmohana-21",
