@@ -1,4 +1,4 @@
-// AI News Factory — category page
+// AI News Factory - category page
 // Reads ?cat=<slug> from the URL and shows every recent article whose
 // category slugifies to the same value (so "World News" and "world-news"
 // both match cleanly regardless of exact casing/spacing in the source).
@@ -32,7 +32,7 @@ function cardHtml(a) {
       <div class="card-body">
         <span class="cat-tag">${escapeHtml(a.category)}</span>
         <h3><a href="${a.url}">${escapeHtml(a.title)}</a></h3>
-        <p class="excerpt">${escapeHtml((a.description || "").slice(0, 110))}${a.description && a.description.length > 110 ? "…" : ""}</p>
+        <p class="excerpt">${escapeHtml((a.description || "").slice(0, 110))}${a.description && a.description.length > 110 ? "..." : ""}</p>
         <div class="card-meta"><span>${timeAgo(a.date)}</span></div>
       </div>
     </article>`;
@@ -78,21 +78,21 @@ fetch("/articles.json", { cache: "no-store" })
     state.matching = matching;
 
     const label = matching[0] ? matching[0].category : catSlug.replace(/-/g, " ");
-    document.title = `${label} News — AI News Factory`;
+    document.title = `${label} News - AI News Factory`;
     document.getElementById("pageDescription").setAttribute(
       "content",
-      `Latest ${label} news, updated automatically — AI News Factory.`
+      `Latest ${label} news, updated automatically - AI News Factory.`
     );
     document.getElementById("categoryTitle").textContent = `${label} News`;
     document.getElementById("breadcrumbCat").textContent = label;
     document.getElementById("categorySub").textContent =
       matching.length > 0
         ? `${matching.length} recent ${label} ${matching.length === 1 ? "story" : "stories"}.`
-        : `No recent ${label} stories yet — check back soon.`;
+        : `No recent ${label} stories yet - check back soon.`;
 
     renderNextPage();
   })
   .catch(() => {
-    emptyState.textContent = "Couldn't load this category right now — please refresh.";
+    emptyState.textContent = "Couldn't load this category right now - please refresh.";
     emptyState.hidden = false;
   });
