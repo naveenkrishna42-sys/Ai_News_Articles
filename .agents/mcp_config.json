@@ -1,0 +1,10 @@
+﻿{
+    "mcpServers":  {
+                       "cuelinks":  {
+                                        "headers":  {
+                                                        "Authorization":  "Token xnrsT6vr3TP64MM7FSvCvdwY2jvD_jLrwU7B0zXvReI"
+                                                    },
+                                        "serverUrl":  "https://mcp.cuelinks.com/sse"
+                                    }
+                   }
+}
