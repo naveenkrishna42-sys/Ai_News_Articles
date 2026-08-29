@@ -1,9 +1,9 @@
-// TIVRA News — related stories box on article pages.
+// TIVRA News - related stories box on article pages.
 // Finds #relatedArticles (with data-category / data-slug), pulls the live
 // feed, and renders up to 3 same-category stories. Works on both new TIVRA
 // articles (data attrs on the div) and the older generator's pages (data
 // attrs on the script tag). Styles are inline because article pages are
-// self-contained. Hides itself if nothing matches — never an empty box.
+// self-contained. Hides itself if nothing matches - never an empty box.
 
 (function () {
   const box = document.getElementById("relatedArticles");

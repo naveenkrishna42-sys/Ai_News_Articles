@@ -1,4 +1,4 @@
-// TIVRA News — homepage & mobile news feed.
+// TIVRA News - homepage & mobile news feed.
 // Reads edge feed / static feed and renders: breaking ticker, auto-rotating hero slider,
 // auto-scrolling category rails, mobile infinite scroll & smart search. No heavy frameworks.
 
@@ -70,7 +70,7 @@ function buildHero(all) {
       <div class="hero-text">
         <span class="cat-pill">${escapeHtml(a.category)}</span>
         <h2>${escapeHtml(a.title)}</h2>
-        <div class="hero-meta">${timeAgo(a.date)} · ${escapeHtml((a.description || "").slice(0, 90))}${(a.description || "").length > 90 ? "…" : ""}</div>
+        <div class="hero-meta">${timeAgo(a.date)} · ${escapeHtml((a.description || "").slice(0, 90))}${(a.description || "").length > 90 ? "..." : ""}</div>
       </div>
     </a>`).join("");
 
@@ -182,7 +182,7 @@ function cardHtml(a) {
       <div class="card-body">
         <span class="cat-tag">${escapeHtml(a.category)}</span>
         <h3><a href="${a.url}">${escapeHtml(a.title)}</a></h3>
-        <p class="excerpt">${escapeHtml((a.description || "").slice(0, 110))}${a.description && a.description.length > 110 ? "…" : ""}</p>
+        <p class="excerpt">${escapeHtml((a.description || "").slice(0, 110))}${a.description && a.description.length > 110 ? "..." : ""}</p>
         <div class="card-meta"><span>${timeAgo(a.date)}</span></div>
       </div>
     </article>`;
@@ -235,7 +235,7 @@ function buildCategoryUI(categories, featuredOrder) {
     });
   }
 
-  // Filter chips over the latest grid — featured categories only, "All" first.
+  // Filter chips over the latest grid - featured categories only, "All" first.
   const mkChip = (label, cat) => {
     const chip = document.createElement("button");
     chip.className = "chip" + (cat === "all" ? " active" : "");
@@ -320,7 +320,7 @@ fetch("/feed-latest.json")
       .catch(() => {
         if (grid) grid.innerHTML = "";
         if (emptyState) {
-          emptyState.textContent = "Couldn't load articles right now — please refresh.";
+          emptyState.textContent = "Couldn't load articles right now - please refresh.";
           emptyState.hidden = false;
         }
       });
