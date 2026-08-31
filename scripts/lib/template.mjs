@@ -306,6 +306,22 @@ footer.site a:hover{color:#e2e8f0}
 </style>
 <link rel="preconnect" href="https://images.pexels.com">
 <link rel="preconnect" href="https://images.unsplash.com">
+<link rel="alternate" type="application/rss+xml" title="TIVRA News RSS Feed" href="/feed.xml">
+
+<!-- OneSignal Web Push Notification SDK -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    if (window.ONESIGNAL_APP_ID) {
+      await OneSignal.init({
+        appId: window.ONESIGNAL_APP_ID,
+        notifyButton: { enable: false }
+      });
+    }
+  });
+</script>
+
 </head>
 <body>
 <header class="masthead">
