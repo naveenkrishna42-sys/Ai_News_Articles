@@ -21,6 +21,22 @@
 <script> window.ezstandalone = window.ezstandalone || {}; ezstandalone.cmd = ezstandalone.cmd || []; </script>
 <link rel="preconnect" href="https://images.pexels.com">
 <link rel="preconnect" href="https://images.unsplash.com">
+<link rel="alternate" type="application/rss+xml" title="TIVRA News RSS Feed" href="/feed.xml">
+
+<!-- OneSignal Web Push Notification SDK -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    if (window.ONESIGNAL_APP_ID) {
+      await OneSignal.init({
+        appId: window.ONESIGNAL_APP_ID,
+        notifyButton: { enable: false }
+      });
+    }
+  });
+</script>
+
 </head>
 <body>
 <h1 style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">TIVRA News &mdash; Trusted Insights, Verified Reports &amp; Alerts</h1>
