@@ -1,3 +1,27 @@
+
+const FALLBACK_IMG = "/fallback.jpg"; // or whatever the fallback is
+function getThumbnailUrl(url) {
+  if (!url) return FALLBACK_IMG;
+  url = url.replace(/&amp;/g, '&');
+  if (url.includes('images.pexels.com') || url.includes('images.unsplash.com')) {
+    return url.replace(/w=[0-9]+/, 'w=400').replace(/h=[0-9]+/, 'h=225');
+  }
+  if (url.includes('upload.wikimedia.org')) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=400&output=webp`;
+  }
+  return url;
+}
+function getHeroUrl(url) {
+  if (!url) return FALLBACK_IMG;
+  url = url.replace(/&amp;/g, '&');
+  if (url.includes('images.pexels.com') || url.includes('images.unsplash.com')) {
+    return url.replace(/w=[0-9]+/, 'w=1200').replace(/h=[0-9]+/, 'h=675');
+  }
+  if (url.includes('upload.wikimedia.org')) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=1200&output=webp`;
+  }
+  return url;
+}
 // TIVRA News - homepage & mobile news feed.
 // Reads edge feed / static feed and renders: breaking ticker, auto-rotating hero slider,
 // auto-scrolling category rails, mobile infinite scroll & smart search. No heavy frameworks.
@@ -65,7 +89,7 @@ function buildHero(all) {
 
   $("heroTrack").innerHTML = picks.map((a, idx) => `
     <a class="hero-slide" href="${a.url}">
-      <img src="${a.image ? `https://wsrv.nl/?url=${encodeURIComponent(a.image)}&w=1200&output=webp` : FALLBACK_IMG}" alt="${escapeHtml(a.title)}" width="1200" height="675" ${idx === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>
+      <img src="${getHeroUrl(a.image)}" alt="${escapeHtml(a.title)}" width="1200" height="675" ${idx === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>
       <div class="hero-overlay"></div>
       <div class="hero-text">
         <span class="cat-pill">${escapeHtml(a.category)}</span>
@@ -178,7 +202,7 @@ function buildCategoryCarousels(all, featuredOrder) {
 function cardHtml(a) {
   return `
     <article class="card">
-      <a href="${a.url}"><img src="${a.image ? `https://wsrv.nl/?url=${encodeURIComponent(a.image)}&w=400&output=webp` : FALLBACK_IMG}" alt="${escapeHtml(a.title)}" width="400" height="225" loading="lazy"></a>
+      <a href="${a.url}"><img src="${getThumbnailUrl(a.image)}" alt="${escapeHtml(a.title)}" width="400" height="225" loading="lazy"></a>
       <div class="card-body">
         <span class="cat-tag">${escapeHtml(a.category)}</span>
         <h3><a href="${a.url}">${escapeHtml(a.title)}</a></h3>
