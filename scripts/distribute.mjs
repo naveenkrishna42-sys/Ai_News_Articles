@@ -1,0 +1,224 @@
+﻿import fs from 'fs';
+import path from 'path';
+
+const SITE_URL = 'https://tivranews.com';
+const DISPATCHED_FILE = path.resolve('data/dispatched.json');
+
+export function pickTopStories(articles, limit = 3) {
+  if (!Array.isArray(articles) || articles.length === 0) return [];
+  
+  // Sort priority: Deals first, then recent items
+  const sorted = [...articles].sort((a, b) => {
+    const isDealA = (a.category || '').toLowerCase().includes('deal') || /deal|sale|discount|price drop/i.test(a.title);
+    const isDealB = (b.category || '').toLowerCase().includes('deal') || /deal|sale|discount|price drop/i.test(b.title);
+    if (isDealA && !isDealB) return -1;
+    if (!isDealA && isDealB) return 1;
+    return (b.date || '').localeCompare(a.date || '');
+  });
+
+  return sorted.slice(0, limit);
+}
+
+export function buildOneSignalPayload(appId, article) {
+  const fullUrl = article.url.startsWith('http') ? article.url : `${SITE_URL}${article.url}`;
+  const isDeal = (article.category || '').toLowerCase().includes('deal') || /deal|sale|price/i.test(article.title);
+  const heading = isDeal ? `🔥 Top Deal: ${article.title}` : `⚡ Breaking: ${article.title}`;
+
+  return {
+    app_id: appId,
+    included_segments: ['All'],
+    headings: { en: heading.slice(0, 100) },
+    contents: { en: (article.description || article.title).slice(0, 180) },
+    url: fullUrl,
+    big_picture: article.image || undefined,
+    chrome_web_image: article.image || undefined
+  };
+}
+
+export function buildTelegramMessage(article) {
+  const fullUrl = article.url.startsWith('http') ? article.url : `${SITE_URL}${article.url}`;
+  const isDeal = (article.category || '').toLowerCase().includes('deal') || /deal|sale|price/i.test(article.title);
+  const icon = isDeal ? '🛍️' : '📰';
+  
+  return `${icon} <b>${escapeHtml(article.title)}</b>\n\n${escapeHtml((article.description || '').slice(0, 200))}\n\n👉 <a href="${fullUrl}">Read Full Story</a>`;
+}
+
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = 5000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timeoutId);
+    return res;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+}
+
+async function sendOneSignal(article, isDryRun) {
+  const appId = process.env.ONESIGNAL_APP_ID;
+  const apiKey = process.env.ONESIGNAL_REST_API_KEY;
+
+  if (!appId || !apiKey) {
+    console.log('[OneSignal] Credentials not set in environment (skipping push notification).');
+    return false;
+  }
+
+  const payload = buildOneSignalPayload(appId, article);
+
+  if (isDryRun) {
+    console.log('[OneSignal Dry-Run] Would send payload:', JSON.stringify(payload, null, 2));
+    return true;
+  }
+
+  try {
+    const res = await fetchWithTimeout('https://onesignal.com/api/v1/notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${apiKey}`
+      },
+      body: JSON.stringify(payload)
+    }, 5000);
+
+    if (res.ok) {
+      console.log(`[OneSignal] Push sent successfully for: ${article.slug}`);
+      return true;
+    } else {
+      const err = await res.text();
+      console.warn(`[OneSignal] API responded with status ${res.status}: ${err}`);
+      return false;
+    }
+  } catch (err) {
+    console.warn(`[OneSignal] Request failed: ${err.message}`);
+    return false;
+  }
+}
+
+async function sendTelegram(article, isDryRun) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const channelId = process.env.TELEGRAM_CHANNEL_ID;
+
+  if (!token || !channelId) {
+    console.log('[Telegram] Credentials not set in environment (skipping Telegram post).');
+    return false;
+  }
+
+  const text = buildTelegramMessage(article);
+
+  if (isDryRun) {
+    console.log('[Telegram Dry-Run] Would post message:\n' + text);
+    return true;
+  }
+
+  try {
+    const res = await fetchWithTimeout(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: channelId,
+        text,
+        parse_mode: 'HTML',
+        disable_web_page_preview: false
+      })
+    }, 5000);
+
+    if (res.ok) {
+      console.log(`[Telegram] Message posted successfully for: ${article.slug}`);
+      return true;
+    } else {
+      const err = await res.text();
+      console.warn(`[Telegram] API responded with status ${res.status}: ${err}`);
+      return false;
+    }
+  } catch (err) {
+    console.warn(`[Telegram] Request failed: ${err.message}`);
+    return false;
+  }
+}
+
+function loadDispatched() {
+  try {
+    if (fs.existsSync(DISPATCHED_FILE)) {
+      return JSON.parse(fs.readFileSync(DISPATCHED_FILE, 'utf8'));
+    }
+  } catch (e) {
+    // Ignore corrupt state
+  }
+  return [];
+}
+
+function saveDispatched(list) {
+  try {
+    const dir = path.dirname(DISPATCHED_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(DISPATCHED_FILE, JSON.stringify(list.slice(-500), null, 2), 'utf8');
+  } catch (e) {
+    console.warn('Could not save dispatched state:', e.message);
+  }
+}
+
+export async function main() {
+  const isDryRun = process.argv.includes('--dry-run');
+  console.log(`Starting TIVRA News Distribution Dispatcher... (Dry-Run: ${isDryRun})`);
+
+  let articles = [];
+  const feedPath = path.resolve('public/feed-latest.json');
+  const altFeedPath = path.resolve('public/articles.json');
+
+  if (fs.existsSync(feedPath)) {
+    articles = JSON.parse(fs.readFileSync(feedPath, 'utf8')).articles || [];
+  } else if (fs.existsSync(altFeedPath)) {
+    articles = JSON.parse(fs.readFileSync(altFeedPath, 'utf8')).articles || [];
+  }
+
+  if (articles.length === 0) {
+    console.log('No articles found in public feed to distribute.');
+    return;
+  }
+
+  const dispatched = loadDispatched();
+  const dispatchedSet = new Set(dispatched);
+
+  const candidates = articles.filter(a => !dispatchedSet.has(a.slug || a.url));
+  const topPicks = pickTopStories(candidates, 3);
+
+  if (topPicks.length === 0) {
+    console.log('All recent top stories have already been dispatched.');
+    return;
+  }
+
+  console.log(`Found ${topPicks.length} fresh top stories to distribute.`);
+
+  for (const article of topPicks) {
+    console.log(`-> Distributing: "${article.title}"`);
+    await sendOneSignal(article, isDryRun);
+    await sendTelegram(article, isDryRun);
+    
+    if (!isDryRun) {
+      dispatched.push(article.slug || article.url);
+    }
+  }
+
+  if (!isDryRun) {
+    saveDispatched(dispatched);
+  }
+
+  console.log('Distribution completed successfully.');
+}
+
+// Run CLI if invoked directly
+if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) {
+  main().catch(err => {
+    console.warn('Distribution encountered an unhandled error but exited safely:', err.message);
+    process.exit(0);
+  });
+}
