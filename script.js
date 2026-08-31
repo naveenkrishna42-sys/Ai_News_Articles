@@ -1,5 +1,4 @@
 
-const FALLBACK_IMG = "/fallback.jpg"; // or whatever the fallback is
 function getThumbnailUrl(url) {
   if (!url) return FALLBACK_IMG;
   url = url.replace(/&amp;/g, '&');
@@ -235,7 +234,7 @@ function renderNextPage() {
 
 function buildCategoryUI(categories, featuredOrder) {
   if (!categoryNav || !chipRow) return;
-  categoryNav.innerHTML = "";
+  categoryNav.innerHTML = '<a href="/" class="active">Home</a>';
   chipRow.innerHTML = "";
 
   const featured = (featuredOrder || []).filter((c) => categories.includes(c));
