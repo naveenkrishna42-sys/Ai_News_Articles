@@ -37,10 +37,19 @@ export function buildOneSignalPayload(appId, article) {
 
 export function buildTelegramMessage(article) {
   const fullUrl = article.url.startsWith('http') ? article.url : `${SITE_URL}${article.url}`;
-  const isDeal = (article.category || '').toLowerCase().includes('deal') || /deal|sale|price/i.test(article.title);
-  const icon = isDeal ? '🛍️' : '📰';
+  const cat = (article.category || '').toLowerCase();
+  const isDeal = cat.includes('deal') || /deal|sale|price/i.test(article.title);
+  const isFinance = cat.includes('card') || cat.includes('bank') || cat.includes('cashback') || cat.includes('insurance');
+  const icon = isDeal ? '🛍️' : (isFinance ? '💳' : '📰');
   
-  return `${icon} <b>${escapeHtml(article.title)}</b>\n\n${escapeHtml((article.description || '').slice(0, 200))}\n\n👉 <a href="${fullUrl}">Read Full Story</a>`;
+  let extraCta = '';
+  if (isFinance) {
+    extraCta = `\n\n🔥 <b>Exclusive Reward Offer:</b> <a href="https://clnk.in/B5IT">Apply & Claim High-Value Benefits</a>`;
+  } else if (isDeal) {
+    extraCta = `\n\n⚡ <b>Top Deals & Cashback:</b> <a href="https://clnk.in/B5IL">Explore Today's Cashback Offers</a>`;
+  }
+
+  return `${icon} <b>${escapeHtml(article.title)}</b>\n\n${escapeHtml((article.description || '').slice(0, 200))}\n\n👉 <a href="${fullUrl}">Read Full Story</a>${extraCta}`;
 }
 
 function escapeHtml(str) {

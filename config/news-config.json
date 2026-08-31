@@ -1,425 +1,424 @@
 {
-    "site":  {
-                 "name":  "TIVRA News",
-                 "tagline":  "Trusted Insights, Verified Reports \u0026 Alerts",
-                 "url":  "https://tivranews.com"
-             },
-    "volume":  {
-                   "perCategoryPerRun":  3,
-                   "dailyCap":  600,
-                   "concurrency":  5
-               },
-    "newCategoryVolume":  {
-                              "Gadget Comparisons":  4,
-                              "Product Deals \u0026 Offers":  3,
-                              "Credit Cards \u0026 Cashback":  3,
-                              "AI Tips \u0026 Tools":  3,
-                              "Sacred Places":  2
-                          },
-    "retention":  {
-                      "days":  30,
-                      "maxPerCategory":  1000,
-                      "maxTotalLive":  12000,
-                      "registryDays":  90
-                  },
-    "adsense":  {
-                    "publisherId":  "ca-pub-6206818645443465",
-                    "adSlot":  ""
-                },
-    "providers":  [
-                      {
-                          "name":  "pollinations",
-                          "baseUrl":  "https://gen.pollinations.ai/v1",
-                          "model":  "chigwell/llm7-fast",
-                          "envKey":  "POLLINATIONS_API_KEY"
-                      },
-                      {
-                          "name":  "groq",
-                          "baseUrl":  "https://api.groq.com/openai/v1",
-                          "model":  "llama-3.3-70b-versatile",
-                          "envKey":  "GROQ_API_KEY"
-                      },
-                      {
-                          "name":  "gemini",
-                          "baseUrl":  "https://generativelanguage.googleapis.com/v1beta/openai",
-                          "model":  "gemini-2.5-flash",
-                          "envKey":  "GEMINI_API_KEY"
-                      },
-                      {
-                          "name":  "openrouter",
-                          "baseUrl":  "https://openrouter.ai/api/v1",
-                          "model":  "deepseek/deepseek-chat-v3-0324",
-                          "envKey":  "OPENROUTER_API_KEY"
-                      },
-                      {
-                          "name":  "deepseek",
-                          "baseUrl":  "https://api.deepseek.com/v1",
-                          "model":  "deepseek-chat",
-                          "envKey":  "DEEPSEEK_API_KEY"
-                      }
-                  ],
-    "featuredCategories":  [
-                               "Breaking News",
-                               "Top Stories",
-                               "India",
-                               "World",
-                               "Business",
-                               "Sports",
-                               "Entertainment",
-                               "Technology",
-                               "Health",
-                               "Gadget Comparisons",
-                               "Product Deals \u0026 Offers",
-                               "Credit Cards \u0026 Cashback",
-                               "AI Tips \u0026 Tools"
-                           ],
-    "specials":  {
-                     "horoscopesPerDay":  true,
-                     "analysisPerDay":  2,
-                     "weeklyLongform":  2
-                 },
-    "feeds":  [
-                  {
-                      "category":  "Breaking News",
-                      "url":  "https://news.google.com/rss?hl=en-IN\u0026gl=IN\u0026ceid=IN:en",
-                      "maxAgeHours":  4
-                  },
-                  {
-                      "category":  "Top Stories",
-                      "url":  "https://news.google.com/rss?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "India",
-                      "url":  "https://news.google.com/rss/headlines/section/topic/NATION?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "World",
-                      "url":  "https://news.google.com/rss/headlines/section/topic/WORLD?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Business",
-                      "url":  "https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Technology",
-                      "url":  "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Sports",
-                      "url":  "https://news.google.com/rss/headlines/section/topic/SPORTS?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Entertainment",
-                      "url":  "https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Science",
-                      "url":  "https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Health",
-                      "url":  "https://news.google.com/rss/headlines/section/topic/HEALTH?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Politics",
-                      "url":  "https://news.google.com/rss/search?q=india+politics+elections\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Movies",
-                      "url":  "https://news.google.com/rss/search?q=bollywood+film+movies\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Lifestyle",
-                      "url":  "https://news.google.com/rss/search?q=lifestyle+fashion+food+travel+wellness\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Education",
-                      "url":  "https://news.google.com/rss/search?q=education+exams+university+india\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Crime \u0026 Law",
-                      "url":  "https://news.google.com/rss/search?q=crime+court+police+india\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Culture \u0026 Arts",
-                      "url":  "https://news.google.com/rss/search?q=culture+art+heritage+literature+india\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Religion",
-                      "url":  "https://news.google.com/rss/search?q=temple+festival+spiritual+india\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Environment",
-                      "url":  "https://news.google.com/rss/search?q=environment+climate+weather+disaster\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Wars \u0026 Conflicts",
-                      "url":  "https://news.google.com/rss/search?q=war+conflict+military+defence\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Crypto",
-                      "url":  "https://news.google.com/rss/search?q=cryptocurrency+bitcoin\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Markets",
-                      "url":  "https://news.google.com/rss/search?q=stock+market+sensex+nifty\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Banking",
-                      "url":  "https://news.google.com/rss/search?q=banking+finance+rbi\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Space",
-                      "url":  "https://news.google.com/rss/search?q=space+isro+nasa\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Inventions",
-                      "url":  "https://news.google.com/rss/search?q=research+invention+discovery+breakthrough\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Hyderabad",
-                      "url":  "https://news.google.com/rss/headlines/section/geo/Hyderabad?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Chennai",
-                      "url":  "https://news.google.com/rss/headlines/section/geo/Chennai?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Bengaluru",
-                      "url":  "https://news.google.com/rss/headlines/section/geo/Bengaluru?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Mumbai",
-                      "url":  "https://news.google.com/rss/headlines/section/geo/Mumbai?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Delhi",
-                      "url":  "https://news.google.com/rss/headlines/section/geo/Delhi?hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "AI Tips \u0026 Tools",
-                      "url":  "https://news.google.com/rss/search?q=AI+tool+launch+chatgpt+gemini+claude+prompt\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Gadget Comparisons",
-                      "url":  "https://news.google.com/rss/search?q=smartphone%20launch%20review%20specifications\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Gadget Comparisons",
-                      "url":  "https://news.google.com/rss/search?q=smartwatch%20launch%20review%20specifications\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Gadget Comparisons",
-                      "url":  "https://news.google.com/rss/search?q=earbuds%20TWS%20launch%20review%20specifications\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Gadget Comparisons",
-                      "url":  "https://news.google.com/rss/search?q=laptop%20computer%20hardware%20launch%20review%20specifications\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Product Deals \u0026 Offers",
-                      "url":  "https://news.google.com/rss/search?q=amazon+india+deals+discount+offers+price+drop\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Product Deals \u0026 Offers",
-                      "url":  "https://news.google.com/rss/search?q=best+smartphone+earbuds+smartwatch+deals+sale+india\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Credit Cards \u0026 Cashback",
-                      "url":  "https://news.google.com/rss/search?q=best+credit+card+cashback+reward+points+offers+india\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Credit Cards \u0026 Cashback",
-                      "url":  "https://news.google.com/rss/search?q=hdfc+sbi+icici+axis+credit+card+benefits+lounge+access\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Credit Cards \u0026 Cashback",
-                      "url":  "https://news.google.com/rss/search?q=best+health+insurance+term+life+plan+tax+savings+india\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Credit Cards \u0026 Cashback",
-                      "url":  "https://news.google.com/rss/search?q=high+interest+savings+account+fixed+deposit+rates+india\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Sacred Places",
-                      "url":  "https://news.google.com/rss/search?q=sacred%20temple%20pilgrimage%20site%20history\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Sacred Places",
-                      "url":  "https://news.google.com/rss/search?q=Vatican%20Jerusalem%20Christian%20holy%20site\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Sacred Places",
-                      "url":  "https://news.google.com/rss/search?q=ancient%20Egypt%20temple%20pyramid%20history\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  },
-                  {
-                      "category":  "Sacred Places",
-                      "url":  "https://news.google.com/rss/search?q=Scotland%20Iceland%20Norse%20Viking%20sacred%20site%20history\u0026hl=en-IN\u0026gl=IN\u0026ceid=IN:en"
-                  }
-              ],
-    "categoryPriority":  [
-                             "Breaking News",
-                             "Top Stories",
-                             "India",
-                             "World",
-                             "Business",
-                             "Sports",
-                             "Entertainment",
-                             "Technology",
-                             "Health",
-                             "Product Deals \u0026 Offers",
-                             "Credit Cards \u0026 Cashback",
-                             "Gadget Comparisons",
-                             "AI Tips \u0026 Tools",
-                             "Politics",
-                             "Movies",
-                             "Markets",
-                             "Hyderabad",
-                             "Chennai",
-                             "Bengaluru",
-                             "Mumbai",
-                             "Delhi",
-                             "Science",
-                             "Space",
-                             "Crypto",
-                             "Banking",
-                             "Education",
-                             "Crime \u0026 Law",
-                             "Environment",
-                             "Wars \u0026 Conflicts",
-                             "Lifestyle",
-                             "Culture \u0026 Arts",
-                             "Religion",
-                             "Inventions",
-                             "Sacred Places"
-                         ],
-    "fallbackImages":  {
-                           "Breaking News":  [
-                                                 "https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                             ],
-                           "Top Stories":  [
-                                               "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                           ],
-                           "India":  [
-                                         "https://images.pexels.com/photos/1603650/pexels-photo-1603650.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                     ],
-                           "World":  [
-                                         "https://images.pexels.com/photos/41953/earth-blue-planet-globe-planet-41953.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                     ],
-                           "Business":  [
-                                            "https://images.pexels.com/photos/259209/pexels-photo-259209.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                        ],
-                           "Technology":  [
-                                              "https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                          ],
-                           "Sports":  [
-                                          "https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                      ],
-                           "Entertainment":  [
-                                                 "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                             ],
-                           "Science":  [
-                                           "https://images.pexels.com/photos/2280571/pexels-photo-2280571.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                       ],
-                           "Health":  [
-                                          "https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                      ],
-                           "Politics":  [
-                                            "https://images.pexels.com/photos/1550337/pexels-photo-1550337.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                        ],
-                           "Movies":  [
-                                          "https://images.pexels.com/photos/799137/pexels-photo-799137.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                      ],
-                           "Lifestyle":  [
-                                             "https://images.pexels.com/photos/1051838/pexels-photo-1051838.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                         ],
-                           "Education":  [
-                                             "https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                         ],
-                           "Crime \u0026 Law":  [
-                                                    "https://images.pexels.com/photos/5668473/pexels-photo-5668473.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                                ],
-                           "Culture \u0026 Arts":  [
-                                                       "https://images.pexels.com/photos/1839919/pexels-photo-1839919.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                                   ],
-                           "Religion":  [
-                                            "https://images.pexels.com/photos/2161467/pexels-photo-2161467.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                        ],
-                           "Environment":  [
-                                               "https://images.pexels.com/photos/957024/forest-trees-perspective-bright-957024.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                           ],
-                           "Wars \u0026 Conflicts":  [
-                                                         "https://images.pexels.com/photos/78783/submachine-gun-rifle-automatic-weapon-weapon-78783.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                                     ],
-                           "Crypto":  [
-                                          "https://images.pexels.com/photos/844124/pexels-photo-844124.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                      ],
-                           "Markets":  [
-                                           "https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                       ],
-                           "Banking":  [
-                                           "https://images.pexels.com/photos/50987/money-card-business-credit-card-50987.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                       ],
-                           "Space":  [
-                                         "https://images.pexels.com/photos/2159/flight-sky-earth-space.jpg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                     ],
-                           "Inventions":  [
-                                              "https://images.pexels.com/photos/356040/pexels-photo-356040.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                          ],
-                           "Gadget Comparisons":  [
-                                                      "https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                                  ],
-                           "Product Deals \u0026 Offers":  [
-                                                               "https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                                           ],
-                           "Credit Cards \u0026 Cashback":  [
-                                                                "https://images.pexels.com/photos/164501/pexels-photo-164501.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                                            ],
-                           "AI Tips \u0026 Tools":  [
-                                                        "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                                    ],
-                           "Astrology":  [
-                                             "https://images.pexels.com/photos/956981/milky-way-starry-sky-night-sky-star-956981.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                         ],
-                           "Analysis":  [
-                                            "https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                        ],
-                           "Features":  [
-                                            "https://images.pexels.com/photos/261579/pexels-photo-261579.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                        ],
-                           "Hyderabad":  [
-                                             "https://images.pexels.com/photos/11321242/pexels-photo-11321242.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                         ],
-                           "Chennai":  [
-                                           "https://images.pexels.com/photos/775018/pexels-photo-775018.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                       ],
-                           "Bengaluru":  [
-                                             "https://images.pexels.com/photos/739987/pexels-photo-739987.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                         ],
-                           "Mumbai":  [
-                                          "https://images.pexels.com/photos/2409953/pexels-photo-2409953.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                      ],
-                           "Delhi":  [
-                                         "https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                     ],
-                           "_default":  [
-                                            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                        ],
-                           "Sacred Places":  [
-                                                 "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress\u0026cs=tinysrgb\u0026h=500\u0026w=900"
-                                             ]
-                       },
-    "affiliate":  {
-                      "enabled":  true,
-                      "network":  "Amazon Associates \u0026 CashKaro",
-                      "marketplace":  "amazon.in",
-                      "amazonTag":  "sirmohana-21",
-                      "cashkaro":  {
-                                       "enabled":  false,
-                                       "referralUrl":  ""
-                                   },
-                      "products":  {
-
-                                   }
-                  }
+  "site": {
+    "name": "TIVRA News",
+    "tagline": "Trusted Insights, Verified Reports & Alerts",
+    "url": "https://tivranews.com"
+  },
+  "volume": {
+    "perCategoryPerRun": 3,
+    "dailyCap": 600,
+    "concurrency": 5
+  },
+  "newCategoryVolume": {
+    "Gadget Comparisons": 4,
+    "Product Deals & Offers": 3,
+    "Credit Cards & Cashback": 3,
+    "AI Tips & Tools": 3,
+    "Sacred Places": 2
+  },
+  "retention": {
+    "days": 30,
+    "maxPerCategory": 1000,
+    "maxTotalLive": 12000,
+    "registryDays": 90
+  },
+  "adsense": {
+    "publisherId": "ca-pub-6206818645443465",
+    "adSlot": ""
+  },
+  "providers": [
+    {
+      "name": "pollinations",
+      "baseUrl": "https://gen.pollinations.ai/v1",
+      "model": "chigwell/llm7-fast",
+      "envKey": "POLLINATIONS_API_KEY"
+    },
+    {
+      "name": "groq",
+      "baseUrl": "https://api.groq.com/openai/v1",
+      "model": "llama-3.3-70b-versatile",
+      "envKey": "GROQ_API_KEY"
+    },
+    {
+      "name": "gemini",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "model": "gemini-2.5-flash",
+      "envKey": "GEMINI_API_KEY"
+    },
+    {
+      "name": "openrouter",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "model": "deepseek/deepseek-chat-v3-0324",
+      "envKey": "OPENROUTER_API_KEY"
+    },
+    {
+      "name": "deepseek",
+      "baseUrl": "https://api.deepseek.com/v1",
+      "model": "deepseek-chat",
+      "envKey": "DEEPSEEK_API_KEY"
+    }
+  ],
+  "featuredCategories": [
+    "Breaking News",
+    "Top Stories",
+    "India",
+    "World",
+    "Business",
+    "Sports",
+    "Entertainment",
+    "Technology",
+    "Health",
+    "Gadget Comparisons",
+    "Product Deals & Offers",
+    "Credit Cards & Cashback",
+    "AI Tips & Tools"
+  ],
+  "specials": {
+    "horoscopesPerDay": true,
+    "analysisPerDay": 2,
+    "weeklyLongform": 2
+  },
+  "feeds": [
+    {
+      "category": "Breaking News",
+      "url": "https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en",
+      "maxAgeHours": 4
+    },
+    {
+      "category": "Top Stories",
+      "url": "https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "India",
+      "url": "https://news.google.com/rss/headlines/section/topic/NATION?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "World",
+      "url": "https://news.google.com/rss/headlines/section/topic/WORLD?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Business",
+      "url": "https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Technology",
+      "url": "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Sports",
+      "url": "https://news.google.com/rss/headlines/section/topic/SPORTS?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Entertainment",
+      "url": "https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Science",
+      "url": "https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Health",
+      "url": "https://news.google.com/rss/headlines/section/topic/HEALTH?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Politics",
+      "url": "https://news.google.com/rss/search?q=india+politics+elections&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Movies",
+      "url": "https://news.google.com/rss/search?q=bollywood+film+movies&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Lifestyle",
+      "url": "https://news.google.com/rss/search?q=lifestyle+fashion+food+travel+wellness&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Education",
+      "url": "https://news.google.com/rss/search?q=education+exams+university+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Crime & Law",
+      "url": "https://news.google.com/rss/search?q=crime+court+police+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Culture & Arts",
+      "url": "https://news.google.com/rss/search?q=culture+art+heritage+literature+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Religion",
+      "url": "https://news.google.com/rss/search?q=temple+festival+spiritual+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Environment",
+      "url": "https://news.google.com/rss/search?q=environment+climate+weather+disaster&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Wars & Conflicts",
+      "url": "https://news.google.com/rss/search?q=war+conflict+military+defence&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Crypto",
+      "url": "https://news.google.com/rss/search?q=cryptocurrency+bitcoin&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Markets",
+      "url": "https://news.google.com/rss/search?q=stock+market+sensex+nifty&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Banking",
+      "url": "https://news.google.com/rss/search?q=banking+finance+rbi&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Space",
+      "url": "https://news.google.com/rss/search?q=space+isro+nasa&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Inventions",
+      "url": "https://news.google.com/rss/search?q=research+invention+discovery+breakthrough&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Hyderabad",
+      "url": "https://news.google.com/rss/headlines/section/geo/Hyderabad?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Chennai",
+      "url": "https://news.google.com/rss/headlines/section/geo/Chennai?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Bengaluru",
+      "url": "https://news.google.com/rss/headlines/section/geo/Bengaluru?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Mumbai",
+      "url": "https://news.google.com/rss/headlines/section/geo/Mumbai?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Delhi",
+      "url": "https://news.google.com/rss/headlines/section/geo/Delhi?hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "AI Tips & Tools",
+      "url": "https://news.google.com/rss/search?q=AI+tool+launch+chatgpt+gemini+claude+prompt&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Gadget Comparisons",
+      "url": "https://news.google.com/rss/search?q=smartphone%20launch%20review%20specifications&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Gadget Comparisons",
+      "url": "https://news.google.com/rss/search?q=smartwatch%20launch%20review%20specifications&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Gadget Comparisons",
+      "url": "https://news.google.com/rss/search?q=earbuds%20TWS%20launch%20review%20specifications&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Gadget Comparisons",
+      "url": "https://news.google.com/rss/search?q=laptop%20computer%20hardware%20launch%20review%20specifications&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Product Deals & Offers",
+      "url": "https://news.google.com/rss/search?q=amazon+india+deals+discount+offers+price+drop&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Product Deals & Offers",
+      "url": "https://news.google.com/rss/search?q=best+smartphone+earbuds+smartwatch+deals+sale+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Credit Cards & Cashback",
+      "url": "https://news.google.com/rss/search?q=best+credit+card+cashback+reward+points+offers+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Credit Cards & Cashback",
+      "url": "https://news.google.com/rss/search?q=hdfc+sbi+icici+axis+credit+card+benefits+lounge+access&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Credit Cards & Cashback",
+      "url": "https://news.google.com/rss/search?q=best+health+insurance+term+life+plan+tax+savings+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Credit Cards & Cashback",
+      "url": "https://news.google.com/rss/search?q=high+interest+savings+account+fixed+deposit+rates+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Sacred Places",
+      "url": "https://news.google.com/rss/search?q=sacred%20temple%20pilgrimage%20site%20history&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Sacred Places",
+      "url": "https://news.google.com/rss/search?q=Vatican%20Jerusalem%20Christian%20holy%20site&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Sacred Places",
+      "url": "https://news.google.com/rss/search?q=ancient%20Egypt%20temple%20pyramid%20history&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Sacred Places",
+      "url": "https://news.google.com/rss/search?q=Scotland%20Iceland%20Norse%20Viking%20sacred%20site%20history&hl=en-IN&gl=IN&ceid=IN:en"
+    }
+  ],
+  "categoryPriority": [
+    "Breaking News",
+    "Top Stories",
+    "India",
+    "World",
+    "Business",
+    "Sports",
+    "Entertainment",
+    "Technology",
+    "Health",
+    "Product Deals & Offers",
+    "Credit Cards & Cashback",
+    "Gadget Comparisons",
+    "AI Tips & Tools",
+    "Politics",
+    "Movies",
+    "Markets",
+    "Hyderabad",
+    "Chennai",
+    "Bengaluru",
+    "Mumbai",
+    "Delhi",
+    "Science",
+    "Space",
+    "Crypto",
+    "Banking",
+    "Education",
+    "Crime & Law",
+    "Environment",
+    "Wars & Conflicts",
+    "Lifestyle",
+    "Culture & Arts",
+    "Religion",
+    "Inventions",
+    "Sacred Places"
+  ],
+  "fallbackImages": {
+    "Breaking News": [
+      "https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Top Stories": [
+      "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "India": [
+      "https://images.pexels.com/photos/1603650/pexels-photo-1603650.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "World": [
+      "https://images.pexels.com/photos/41953/earth-blue-planet-globe-planet-41953.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Business": [
+      "https://images.pexels.com/photos/259209/pexels-photo-259209.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Technology": [
+      "https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Sports": [
+      "https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Entertainment": [
+      "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Science": [
+      "https://images.pexels.com/photos/2280571/pexels-photo-2280571.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Health": [
+      "https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Politics": [
+      "https://images.pexels.com/photos/1550337/pexels-photo-1550337.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Movies": [
+      "https://images.pexels.com/photos/799137/pexels-photo-799137.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Lifestyle": [
+      "https://images.pexels.com/photos/1051838/pexels-photo-1051838.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Education": [
+      "https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Crime & Law": [
+      "https://images.pexels.com/photos/5668473/pexels-photo-5668473.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Culture & Arts": [
+      "https://images.pexels.com/photos/1839919/pexels-photo-1839919.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Religion": [
+      "https://images.pexels.com/photos/2161467/pexels-photo-2161467.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Environment": [
+      "https://images.pexels.com/photos/957024/forest-trees-perspective-bright-957024.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Wars & Conflicts": [
+      "https://images.pexels.com/photos/78783/submachine-gun-rifle-automatic-weapon-weapon-78783.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Crypto": [
+      "https://images.pexels.com/photos/844124/pexels-photo-844124.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Markets": [
+      "https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Banking": [
+      "https://images.pexels.com/photos/50987/money-card-business-credit-card-50987.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Space": [
+      "https://images.pexels.com/photos/2159/flight-sky-earth-space.jpg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Inventions": [
+      "https://images.pexels.com/photos/356040/pexels-photo-356040.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Gadget Comparisons": [
+      "https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Product Deals & Offers": [
+      "https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Credit Cards & Cashback": [
+      "https://images.pexels.com/photos/164501/pexels-photo-164501.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "AI Tips & Tools": [
+      "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Astrology": [
+      "https://images.pexels.com/photos/956981/milky-way-starry-sky-night-sky-star-956981.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Analysis": [
+      "https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Features": [
+      "https://images.pexels.com/photos/261579/pexels-photo-261579.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Hyderabad": [
+      "https://images.pexels.com/photos/11321242/pexels-photo-11321242.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Chennai": [
+      "https://images.pexels.com/photos/775018/pexels-photo-775018.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Bengaluru": [
+      "https://images.pexels.com/photos/739987/pexels-photo-739987.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Mumbai": [
+      "https://images.pexels.com/photos/2409953/pexels-photo-2409953.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Delhi": [
+      "https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "_default": [
+      "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ],
+    "Sacred Places": [
+      "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress&cs=tinysrgb&h=500&w=900"
+    ]
+  },
+  "affiliate": {
+    "enabled": true,
+    "network": "Amazon Associates & Cuelinks",
+    "marketplace": "amazon.in",
+    "amazonTag": "sirmohana-21",
+    "cuelinks": {
+      "enabled": true,
+      "cpcUrl": "https://clnk.in/B5IL",
+      "megaHighTicketUrl": "https://clnk.in/B5IT"
+    },
+    "products": {}
+  }
 }
