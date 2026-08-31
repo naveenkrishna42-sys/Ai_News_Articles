@@ -34,26 +34,8 @@ const NOT_A_PRODUCT = new Set([
 ]);
 
 /**
- * Buy URL for an eCommerce product on Amazon.
- */
-export function buyUrl(deviceName, config) {
-  const cfg = affiliateConfig(config);
-  if (!cfg || !deviceName || deviceName.trim().length < 3) return "";
-  if (NOT_A_PRODUCT.has(deviceName.trim().toLowerCase())) return "";
-  if (!/\d/.test(deviceName) && deviceName.trim().split(" ").length < 2) return "";
-
-  const cleanName = deviceName.trim();
-  const override = cfg.products[cleanName.toLowerCase()];
-  if (override) {
-    const sep = override.includes("?") ? "&" : "?";
-    return `${override}${sep}tag=${encodeURIComponent(cfg.tag)}`;
-  }
-  return `${cfg.base}/s?k=${encodeURIComponent(cleanName)}&tag=${encodeURIComponent(cfg.tag)}`;
-}
-
-/**
  * The action / buy box shown under articles.
- * Dynamically tailors the UI to Financial vs Physical Direct Products.
+ * Dynamically tailors the UI to Financial, Enterprise SaaS, Fashion, or Physical Gadgets.
  */
 export function renderBuyBox(deviceNames, config, category = "", directUrl = "") {
   const cfg = affiliateConfig(config);
@@ -61,8 +43,10 @@ export function renderBuyBox(deviceNames, config, category = "", directUrl = "")
 
   const catLower = (category || "").toLowerCase();
   const isFinancial = catLower.includes("card") || catLower.includes("cashback") || catLower.includes("bank") || catLower.includes("insurance");
+  const isBusinessOrSaaS = catLower.includes("business") || catLower.includes("startup") || catLower.includes("crypto") || catLower.includes("invention");
+  const isFashion = catLower.includes("lifestyle") || catLower.includes("culture") || (deviceNames && deviceNames.some(d => /ajio|fashion|clothing|dress|shoe|sneaker|kurta|shirt/i.test(d)));
 
-      // 1. FINANCIAL PRODUCTS (Credit Cards, Bank Accounts, Insurance, Loans)
+  // 1. FINANCIAL PRODUCTS (Credit Cards, Bank Accounts, Insurance, Loans)
   if (isFinancial) {
     const cpcUrl = config?.affiliate?.cuelinks?.cpcUrl || "https://clnk.in/B5IL";
     const megaUrl = config?.affiliate?.cuelinks?.megaHighTicketUrl || "https://clnk.in/B5IT";
@@ -82,7 +66,21 @@ export function renderBuyBox(deviceNames, config, category = "", directUrl = "")
 </div>`;
   }
 
-  // 2. PHYSICAL PRODUCTS & GADGETS (Direct Amazon Product / ASIN Deals)
+  // 2. FASHION & LIFESTYLE (Ajio 9% CPS & Brand Deals)
+  if (isFashion && !directUrl) {
+    const ajioUrl = "https://ajo.clnk.in/w0kl";
+    return `<div class="buybox" style="margin:30px 0;padding:20px 22px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+<div style="font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:12px;">Top Fashion Offers & Official Store Deals</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+  <a href="${escapeHtml(ajioUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2c4152;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛍️ Shop Ajio Fashion Sale (Up to 80% Off + 9% Rewards)</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+  </a>
+</div>
+<p style="font-size:.75rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
+</div>`;
+  }
+
+  // 3. PHYSICAL PRODUCTS & GADGETS (Direct Amazon Product / ASIN Deals / Flipkart)
   const amazonButtons = (deviceNames || [])
     .filter((n) => n && n.trim().length > 2)
     .map((name) => {
@@ -99,8 +97,9 @@ export function renderBuyBox(deviceNames, config, category = "", directUrl = "")
       let btnColor = "#e11d48";
       if (url.includes("flipkart.com")) { storeName = "Flipkart"; btnColor = "#2874f0"; }
       else if (url.includes("myntra.com")) { storeName = "Myntra"; btnColor = "#ff3f6c"; }
+      else if (url.includes("ajio") || url.includes("ajo.clnk.in")) { storeName = "Ajio"; btnColor = "#2c4152"; }
       
-      let shortName = displayName.replace(/sale/i, "").replace(/20\d\d/g, "").replace(/flipkart/i, "").replace(/amazon/i, "").trim();
+      let shortName = displayName.replace(/sale/i, "").replace(/20\d\d/g, "").replace(/flipkart/i, "").replace(/amazon/i, "").replace(/ajio/i, "").trim();
       if (!shortName || shortName.length < 3) shortName = "Deal";
       
       return `<a href="${escapeHtml(url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:${btnColor};color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;margin:6px 8px 6px 0;transition:opacity 0.2s;"><span>🛒 Check ${escapeHtml(shortName)} on ${storeName}</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span></a>`;

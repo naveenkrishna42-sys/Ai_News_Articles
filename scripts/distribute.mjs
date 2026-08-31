@@ -38,18 +38,30 @@ export function buildOneSignalPayload(appId, article) {
 export function buildTelegramMessage(article) {
   const fullUrl = article.url.startsWith('http') ? article.url : `${SITE_URL}${article.url}`;
   const cat = (article.category || '').toLowerCase();
-  const isDeal = cat.includes('deal') || /deal|sale|price/i.test(article.title);
+  const title = article.title || '';
+  const isFashion = /ajio|fashion|clothing|shoes|sneaker|kurta|shirt/i.test(title) || cat.includes('lifestyle');
+  const isPayroll = /payroll|remote work|saas|contractor|hiring/i.test(title);
   const isFinance = cat.includes('card') || cat.includes('bank') || cat.includes('cashback') || cat.includes('insurance');
-  const icon = isDeal ? '🛍️' : (isFinance ? '💳' : '📰');
-  
+  const isDeal = cat.includes('deal') || /deal|sale|price drop/i.test(title);
+
+  let icon = '📰';
   let extraCta = '';
-  if (isFinance) {
-    extraCta = `\n\n🔥 <b>Exclusive Reward Offer:</b> <a href="https://clnk.in/B5IT">Apply & Claim High-Value Benefits</a>`;
+
+  if (isPayroll) {
+    icon = '💼';
+    extraCta = `\n\n💼 <b>Global Payroll & Hiring:</b> <a href="https://clnk.in/B5IT">Explore Rise Global Payroll Plans</a>`;
+  } else if (isFashion) {
+    icon = '👗';
+    extraCta = `\n\n🛍️ <b>Ajio Fashion Sale:</b> <a href="https://ajo.clnk.in/w0kl">Shop Top Styles (Up to 80% Off)</a>`;
+  } else if (isFinance) {
+    icon = '💳';
+    extraCta = `\n\n🔥 <b>Exclusive Partner Benefit:</b> <a href="https://clnk.in/B5IT">Apply & Claim High-Value Rewards</a>`;
   } else if (isDeal) {
+    icon = '🛍️';
     extraCta = `\n\n⚡ <b>Top Deals & Cashback:</b> <a href="https://clnk.in/B5IL">Explore Today's Cashback Offers</a>`;
   }
 
-  return `${icon} <b>${escapeHtml(article.title)}</b>\n\n${escapeHtml((article.description || '').slice(0, 200))}\n\n👉 <a href="${fullUrl}">Read Full Story</a>${extraCta}`;
+  return `${icon} <b>${escapeHtml(title)}</b>\n\n${escapeHtml((article.description || '').slice(0, 200))}\n\n👉 <a href="${fullUrl}">Read Full Story</a>${extraCta}`;
 }
 
 function escapeHtml(str) {
