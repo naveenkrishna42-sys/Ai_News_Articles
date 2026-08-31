@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+
+function slugifyCategory(cat) {
+  return String(cat || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
 /**
  * AI News Factory — build-index.mjs
  *
@@ -110,18 +114,27 @@ function resetPublicDir(published) {
     ? `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}" crossorigin="anonymous"></script>`
     : "";
 
+  const featuredCats = CONFIG.categoryPriority || ["Breaking News", "India", "World", "Business", "Sports", "Technology", "Health", "Product Deals & Offers", "Entertainment"];
+  const navLinksHtml = `<a href="/" class="active">Home</a>` + featuredCats.slice(0, 10).map(c => `<a href="/category.html?cat=${encodeURIComponent(slugifyCategory(c))}">${escapeHtml(c)}</a>`).join("");
+
   for (const file of STATIC_FILES) {
     const srcPath = path.join(ROOT, file);
     if (existsSync(srcPath)) {
-      if (hasAds && file.endsWith(".html")) {
+      if (file.endsWith(".html")) {
         let html = readFileSync(srcPath, "utf-8");
-        html = html.replace("</head>", `${adScript}\n</head>`);
+        if (hasAds) {
+          html = html.replace("</head>", `${adScript}\n</head>`);
+        }
+        // Pre-render navigation links so categories are NEVER missing
+        html = html.replace('<nav class="site-nav" id="categoryNav"><a href="/" class="active">Home</a></nav>', `<nav class="site-nav" id="categoryNav">${navLinksHtml}</nav>`);
+        html = html.replace('<nav class="site-nav" id="categoryNav">\n  <a href="/" class="active">Home</a>\n  <!-- featured category links + "More" menu injected by script.js -->\n</nav>', `<nav class="site-nav" id="categoryNav">${navLinksHtml}</nav>`);
+        
         if (file === "index.html") {
-            const topArticles = published.slice(0, 30);
-            const gridHtml = topArticles.map(cardHtml).join("");
-            html = html.replace('<div class="grid" id="articleGrid" aria-live="polite"></div>', `<div class="grid" id="articleGrid" aria-live="polite">${gridHtml}</div>`);
-          }
-          writeFileSync(path.join(PUBLIC_DIR, file), html, "utf-8");
+          const topArticles = published.slice(0, 30);
+          const gridHtml = topArticles.map(cardHtml).join("");
+          html = html.replace('<div class="grid" id="articleGrid" aria-live="polite"></div>', `<div class="grid" id="articleGrid" aria-live="polite">${gridHtml}</div>`);
+        }
+        writeFileSync(path.join(PUBLIC_DIR, file), html, "utf-8");
       } else if (hasAds && file === "ads.txt") {
         let txt = readFileSync(srcPath, "utf-8");
         const cleanPubId = publisherId.replace(/^ca-/, "");
