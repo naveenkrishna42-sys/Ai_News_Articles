@@ -28,7 +28,7 @@ function cardHtml(a) {
   const img = a.image || "https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&h=400&w=600";
   return `
     <article class="card">
-      <a href="${a.url}"><img src="${img}" alt="${escapeHtml(a.title)}" loading="lazy"></a>
+      <a href="${a.url}"><img src="${img}" alt="${escapeHtml(a.title)}" width="400" height="225" loading="lazy"></a>
       <div class="card-body">
         <span class="cat-tag">${escapeHtml(a.category)}</span>
         <h3><a href="${a.url}">${escapeHtml(a.title)}</a></h3>

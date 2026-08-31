@@ -65,7 +65,7 @@ function buildHero(all) {
 
   $("heroTrack").innerHTML = picks.map((a, idx) => `
     <a class="hero-slide" href="${a.url}">
-      <img src="${a.image || FALLBACK_IMG}" alt="${escapeHtml(a.title)}" ${idx === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>
+      <img src="${a.image ? `https://wsrv.nl/?url=${encodeURIComponent(a.image)}&w=1200&output=webp` : FALLBACK_IMG}" alt="${escapeHtml(a.title)}" width="1200" height="675" ${idx === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>
       <div class="hero-overlay"></div>
       <div class="hero-text">
         <span class="cat-pill">${escapeHtml(a.category)}</span>
@@ -178,7 +178,7 @@ function buildCategoryCarousels(all, featuredOrder) {
 function cardHtml(a) {
   return `
     <article class="card">
-      <a href="${a.url}"><img src="${a.image || FALLBACK_IMG}" alt="${escapeHtml(a.title)}" loading="lazy"></a>
+      <a href="${a.url}"><img src="${a.image ? `https://wsrv.nl/?url=${encodeURIComponent(a.image)}&w=400&output=webp` : FALLBACK_IMG}" alt="${escapeHtml(a.title)}" width="400" height="225" loading="lazy"></a>
       <div class="card-body">
         <span class="cat-tag">${escapeHtml(a.category)}</span>
         <h3><a href="${a.url}">${escapeHtml(a.title)}</a></h3>
