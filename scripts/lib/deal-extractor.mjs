@@ -152,7 +152,7 @@ export async function fetchCuelinksUrlFromArticle(articleUrl, timeoutMs = 4500) 
       
       if (apiRes.ok) {
         const data = await apiRes.json();
-        return data.tracking_url || null;
+        return (data.data && data.data.tracking_url) ? data.data.tracking_url : (data.tracking_url || null);
       }
     }
   } catch {

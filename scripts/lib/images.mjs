@@ -47,7 +47,7 @@ export async function searchPexels(query) {
     // Random pick among top matches so same-category stories don't all
     // land on an identical photo.
     const photo = pick(data?.photos || []);
-    return photo ? `${photo.src.landscape}` : null;
+    return photo ? `${photo.src.original}?auto=compress&cs=tinysrgb&w=1200&h=675&fit=crop` : null;
   } catch {
     return null;
   }
