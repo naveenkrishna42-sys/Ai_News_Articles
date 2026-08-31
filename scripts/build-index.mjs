@@ -84,6 +84,7 @@ const STATIC_FILES = [
   "ads.txt",
   "googlef491165cc2b344ea.html",
   "BingSiteAuth.xml",
+  "OneSignalSDKWorker.js",
 ];
 
 function copyDir(src, dest) {

@@ -313,12 +313,9 @@ footer.site a:hover{color:#e2e8f0}
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
-    if (window.ONESIGNAL_APP_ID) {
-      await OneSignal.init({
-        appId: window.ONESIGNAL_APP_ID,
-        notifyButton: { enable: false }
-      });
-    }
+    await OneSignal.init({
+      appId: "1b5c7d03-1d30-4fd4-89d2-3421c9bbf457",
+    });
   });
 </script>
 
