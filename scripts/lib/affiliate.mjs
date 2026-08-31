@@ -19,12 +19,12 @@ function affiliateConfig(config) {
   const a = config?.affiliate || {};
   if (!a.enabled) return null;
   const base = MARKETPLACES[a.marketplace] || MARKETPLACES["amazon.in"];
-  const bankingUrl = "https://cashkaro.com/category/banking-finance-offers?r=22926292&fname=Naveen+Maheswaram";
+  // Removed broken CashKaro URL
   return {
     base,
     tag: a.amazonTag || "sirmohana-21",
     products: a.products || {},
-    bankingUrl,
+    
   };
 }
 
@@ -62,19 +62,20 @@ export function renderBuyBox(deviceNames, config, category = "", directUrl = "")
   const catLower = (category || "").toLowerCase();
   const isFinancial = catLower.includes("card") || catLower.includes("cashback") || catLower.includes("bank") || catLower.includes("insurance");
 
-  // 1. FINANCIAL PRODUCTS (Credit Cards, Bank Accounts, Insurance)
+    // 1. FINANCIAL PRODUCTS (Credit Cards, Bank Accounts, Insurance)
   if (isFinancial) {
-    let productName = (deviceNames && deviceNames[0]) || "This Card / Financial Offer";
+    if (!directUrl) return ""; // Do not inject broken generic links if no direct deal link exists
+    let productName = (deviceNames && deviceNames[0]) || "This Financial Offer";
     if (productName.includes(":")) productName = productName.split(":")[0].trim();
     if (productName.includes(" — ")) productName = productName.split(" — ")[0].trim();
     if (productName.includes(" - ")) productName = productName.split(" - ")[0].trim();
     if (productName.length > 45) productName = productName.slice(0, 45).trim();
 
     return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #059669;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-<div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#047857;margin-bottom:12px;">Verified Application & Exclusive Cashback Offer</div>
+<div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#047857;margin-bottom:12px;">Verified Offer & Application Details</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
-  <a href="${escapeHtml(cfg.bankingUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#059669;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
-    <span>💳 Apply Online & Claim Extra Joining Bonus / Cashback</span>
+  <a href="${escapeHtml(directUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#059669;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
+    <span>💳 View Verified Offer & Apply Online</span>
   </a>
 </div>
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
