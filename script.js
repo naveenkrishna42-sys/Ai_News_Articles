@@ -25,7 +25,7 @@ function getHeroUrl(url) {
 // Reads edge feed / static feed and renders: breaking ticker, auto-rotating hero slider,
 // auto-scrolling category rails, mobile infinite scroll & smart search. No heavy frameworks.
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 48;
 const HERO_COUNT = 5;
 const HERO_INTERVAL = 5000;
 const RAIL_INTERVAL = 4200;

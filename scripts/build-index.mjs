@@ -130,7 +130,7 @@ function resetPublicDir(published) {
         html = html.replace('<nav class="site-nav" id="categoryNav">\n  <a href="/" class="active">Home</a>\n  <!-- featured category links + "More" menu injected by script.js -->\n</nav>', `<nav class="site-nav" id="categoryNav">${navLinksHtml}</nav>`);
         
         if (file === "index.html") {
-          const topArticles = published.slice(0, 30);
+          const topArticles = published.slice(0, 48);
           const gridHtml = topArticles.map(cardHtml).join("");
           html = html.replace('<div class="grid" id="articleGrid" aria-live="polite"></div>', `<div class="grid" id="articleGrid" aria-live="polite">${gridHtml}</div>`);
         }
