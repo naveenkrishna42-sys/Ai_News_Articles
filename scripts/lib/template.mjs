@@ -317,6 +317,7 @@ footer.site a:hover{color:#e2e8f0}
       appId: "1b5c7d03-1d30-4fd4-89d2-3421c9bbf457",
     });
     OneSignal.Slidedown.promptPush();
+    try { await OneSignal.Notifications.requestPermission(); } catch(e) {}
   });
 </script>
 
