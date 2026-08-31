@@ -1,3 +1,27 @@
+
+const FALLBACK_IMG = "/fallback.jpg"; // or whatever the fallback is
+function getThumbnailUrl(url) {
+  if (!url) return FALLBACK_IMG;
+  url = url.replace(/&amp;/g, '&');
+  if (url.includes('images.pexels.com') || url.includes('images.unsplash.com')) {
+    return url.replace(/w=[0-9]+/, 'w=400').replace(/h=[0-9]+/, 'h=225');
+  }
+  if (url.includes('upload.wikimedia.org')) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=400&output=webp`;
+  }
+  return url;
+}
+function getHeroUrl(url) {
+  if (!url) return FALLBACK_IMG;
+  url = url.replace(/&amp;/g, '&');
+  if (url.includes('images.pexels.com') || url.includes('images.unsplash.com')) {
+    return url.replace(/w=[0-9]+/, 'w=1200').replace(/h=[0-9]+/, 'h=675');
+  }
+  if (url.includes('upload.wikimedia.org')) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=1200&output=webp`;
+  }
+  return url;
+}
 // AI News Factory - category page
 // Reads ?cat=<slug> from the URL and shows every recent article whose
 // category slugifies to the same value (so "World News" and "world-news"

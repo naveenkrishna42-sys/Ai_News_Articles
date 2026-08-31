@@ -115,7 +115,12 @@ function resetPublicDir(published) {
       if (hasAds && file.endsWith(".html")) {
         let html = readFileSync(srcPath, "utf-8");
         html = html.replace("</head>", `${adScript}\n</head>`);
-        writeFileSync(path.join(PUBLIC_DIR, file), html, "utf-8");
+        if (file === "index.html") {
+            const topArticles = published.slice(0, 30);
+            const gridHtml = topArticles.map(cardHtml).join("");
+            html = html.replace('<div class="grid" id="articleGrid" aria-live="polite"></div>', `<div class="grid" id="articleGrid" aria-live="polite">${gridHtml}</div>`);
+          }
+          writeFileSync(path.join(PUBLIC_DIR, file), html, "utf-8");
       } else if (hasAds && file === "ads.txt") {
         let txt = readFileSync(srcPath, "utf-8");
         const cleanPubId = publisherId.replace(/^ca-/, "");
@@ -153,6 +158,31 @@ function decodeEntities(str) {
     .replace(/&gt;/g, ">");
 }
 
+
+
+const FALLBACK_IMG = "/fallback.jpg"; // or whatever the fallback is
+function getThumbnailUrl(url) {
+  if (!url) return FALLBACK_IMG;
+  url = url.replace(/&amp;/g, '&');
+  if (url.includes('images.pexels.com') || url.includes('images.unsplash.com')) {
+    return url.replace(/w=[0-9]+/, 'w=400').replace(/h=[0-9]+/, 'h=225');
+  }
+  if (url.includes('upload.wikimedia.org')) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=400&output=webp`;
+  }
+  return url;
+}
+function getHeroUrl(url) {
+  if (!url) return FALLBACK_IMG;
+  url = url.replace(/&amp;/g, '&');
+  if (url.includes('images.pexels.com') || url.includes('images.unsplash.com')) {
+    return url.replace(/w=[0-9]+/, 'w=1200').replace(/h=[0-9]+/, 'h=675');
+  }
+  if (url.includes('upload.wikimedia.org')) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=1200&output=webp`;
+  }
+  return url;
+}
 
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, (c) => ({
