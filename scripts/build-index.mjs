@@ -414,6 +414,39 @@ function main() {
   // (Workers static assets don't support _redirects rewrites reliably).
   writeFileSync(path.join(PUBLIC_DIR, "sitemap.xml"), sitemapIndexXml);
 
+  // ---- RSS 2.0 & Atom Feed Generation ----
+  const rssItems = published.slice(0, 50).map((a) => {
+    const pubDate = new Date(a.date).toUTCString();
+    const itemUrl = `${SITE_URL}${a.url}`;
+    const imageTag = a.image ? `<enclosure url="${escapeHtml(a.image)}" type="image/jpeg" length="0" />` : "";
+    return `    <item>
+      <title>${escapeHtml(a.title)}</title>
+      <link>${itemUrl}</link>
+      <guid isPermaLink="true">${itemUrl}</guid>
+      <description>${escapeHtml(a.description || a.title)}</description>
+      <category>${escapeHtml(a.category)}</category>
+      <pubDate>${pubDate}</pubDate>
+      ${imageTag}
+    </item>`;
+  }).join("\n");
+
+  const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>${escapeHtml(CONFIG.site?.name || "TIVRA News")}</title>
+    <link>${SITE_URL}</link>
+    <description>${escapeHtml(CONFIG.site?.tagline || "Trusted Insights, Verified Reports & Alerts")}</description>
+    <language>en-US</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml" />
+${rssItems}
+  </channel>
+</rss>`;
+
+  writeFileSync(path.join(PUBLIC_DIR, "feed.xml"), rssXml);
+  writeFileSync(path.join(PUBLIC_DIR, "rss.xml"), rssXml);
+
+
   // robots.txt with an absolute sitemap URL (generated, not copied).
   writeFileSync(
     path.join(PUBLIC_DIR, "robots.txt"),
