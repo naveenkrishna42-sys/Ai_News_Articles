@@ -304,6 +304,8 @@ footer.site{background:#0b1220;color:#94a3b8;text-align:center;padding:26px 18px
 footer.site a{color:#64748b;text-decoration:none;margin:0 9px}
 footer.site a:hover{color:#e2e8f0}
 </style>
+<link rel="preconnect" href="https://images.pexels.com">
+<link rel="preconnect" href="https://images.unsplash.com">
 </head>
 <body>
 <header class="masthead">

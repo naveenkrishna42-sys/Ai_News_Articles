@@ -9,9 +9,11 @@
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <!-- Ezoic Integration -->
-<script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
+<script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js" defer></script>
 <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
 <script> window.ezstandalone = window.ezstandalone || {}; ezstandalone.cmd = ezstandalone.cmd || []; </script>
+<link rel="preconnect" href="https://images.pexels.com">
+<link rel="preconnect" href="https://images.unsplash.com">
 </head>
 <body>
 <header class="site-header">
@@ -24,7 +26,7 @@
   <a href="/">Home</a>
 </nav>
 
-<div class="container">
+<main class="container">
   <div class="breadcrumb"><a href="/">Home</a> &rsaquo; <span id="breadcrumbCat">Category</span></div>
   <h1 class="page-title" id="categoryTitle">Category</h1>
   <p class="page-sub" id="categorySub">Latest stories in this category.</p>
