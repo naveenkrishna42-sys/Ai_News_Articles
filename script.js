@@ -1,4 +1,4 @@
-
+const FALLBACK_IMG = "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress&cs=tinysrgb&h=400&w=600";
 function getThumbnailUrl(url) {
   if (!url) return FALLBACK_IMG;
   url = url.replace(/&amp;/g, '&');
@@ -64,7 +64,7 @@ function timeAgo(dateStr) {
   if (days < 30) return `${days}d ago`;
   return dateStr;
 }
-const FALLBACK_IMG = "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress&cs=tinysrgb&h=400&w=600";
+
 
 /* ---------- Breaking ticker ---------- */
 function buildTicker(all) {
