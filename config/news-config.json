@@ -255,6 +255,18 @@
     {
       "category": "Sacred Places",
       "url": "https://news.google.com/rss/search?q=Scotland%20Iceland%20Norse%20Viking%20sacred%20site%20history&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Product Deals & Offers",
+      "url": "https://news.google.com/rss/search?q=ajio+sale+fashion+clothing+discount+offers+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Product Deals & Offers",
+      "url": "https://news.google.com/rss/search?q=sneakers+footwear+shoes+sale+deals+india&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Business",
+      "url": "https://news.google.com/rss/search?q=global+payroll+remote+work+hiring+saas+startups&hl=en-IN&gl=IN&ceid=IN:en"
     }
   ],
   "categoryPriority": [
@@ -417,7 +429,9 @@
     "cuelinks": {
       "enabled": true,
       "cpcUrl": "https://clnk.in/B5IL",
-      "megaHighTicketUrl": "https://clnk.in/B5IT"
+      "megaHighTicketUrl": "https://clnk.in/B5IT",
+      "b2bGrowthUrl": "https://clnk.in/BV9q",
+      "ajioFashionUrl": "https://ajo.clnk.in/w0kl"
     },
     "products": {}
   }
