@@ -16,9 +16,11 @@
 <meta property="og:description" content="TIVRA News provides fast, source-linked coverage of India and the world: breaking news, business, sports, technology, health, and more.">
 <meta name="twitter:card" content="summary">
 <!-- Ezoic Integration -->
-<script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
+<script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js" defer></script>
 <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
 <script> window.ezstandalone = window.ezstandalone || {}; ezstandalone.cmd = ezstandalone.cmd || []; </script>
+<link rel="preconnect" href="https://images.pexels.com">
+<link rel="preconnect" href="https://images.unsplash.com">
 </head>
 <body>
 <h1 style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">TIVRA News &mdash; Trusted Insights, Verified Reports &amp; Alerts</h1>
@@ -43,7 +45,7 @@
   <div class="ticker-viewport"><div class="ticker-track" id="tickerTrack"></div></div>
 </div>
 
-<div class="container">
+<main class="container">
 
   <section class="hero" id="hero" hidden aria-label="Top stories">
     <div class="hero-track" id="heroTrack"></div>
@@ -69,7 +71,7 @@
   <p class="empty-state" id="emptyState" hidden>No articles match your search.</p>
 
   <button class="load-more" id="loadMoreBtn" hidden>Load more stories</button>
-</div>
+</main>
 
 <footer class="site-footer">
   <div style="margin-bottom:10px;">

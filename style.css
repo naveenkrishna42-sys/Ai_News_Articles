@@ -28,7 +28,7 @@ img{max-width:100%}
 header.site-header{background:var(--ink);color:#fff;padding:12px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 header.site-header a.brand{display:inline-flex;align-items:center;text-decoration:none;color:#fff;font-weight:800;font-size:1.15rem;letter-spacing:-0.3px}
 header.site-header a.brand img{display:block}
-header.site-header .tagline{color:#8b98ad;font-size:0.72rem;display:block;font-weight:500;letter-spacing:0.6px;text-transform:uppercase;margin-top:2px}
+header.site-header .tagline{color:#cbd5e1;font-size:0.72rem;display:block;font-weight:500;letter-spacing:0.6px;text-transform:uppercase;margin-top:2px}
 header.site-header .head-right{display:flex;align-items:center;gap:14px;color:#8b98ad;font-size:0.8rem}
 header.site-header .live-dot{display:inline-flex;align-items:center;gap:6px;color:#fda4af;font-weight:700;font-size:0.72rem;letter-spacing:1px;text-transform:uppercase}
 header.site-header .live-dot::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.6s ease-in-out infinite}
@@ -39,7 +39,7 @@ header.site-header a.back:hover{color:#fff}
 /* ---------- Category nav ---------- */
 nav.site-nav{background:var(--ink-2);padding:0 14px;display:flex;gap:2px;overflow-x:auto;white-space:nowrap;position:sticky;top:0;z-index:50;scrollbar-width:none}
 nav.site-nav::-webkit-scrollbar{display:none}
-nav.site-nav a,nav.site-nav summary{color:#9aa7bc;text-decoration:none;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;padding:12px 12px;display:inline-block;border-bottom:3px solid transparent;cursor:pointer;list-style:none}
+nav.site-nav a,nav.site-nav summary{color:#9aa7bc;text-decoration:none;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;padding:16px 14px;display:inline-block;border-bottom:3px solid transparent;cursor:pointer;list-style:none}
 nav.site-nav a:hover,nav.site-nav a.active{color:#fff;border-bottom-color:var(--accent)}
 nav.site-nav details.more{position:relative;display:inline-block}
 nav.site-nav details.more summary::-webkit-details-marker{display:none}
@@ -149,9 +149,9 @@ h1.page-title{font-size:1.7rem;font-weight:800;color:var(--ink);margin-bottom:8p
 
 /* ---------- Footer ---------- */
 footer.site-footer{background:var(--ink);color:#8b98ad;text-align:center;padding:34px 20px 28px;margin-top:54px;font-size:0.85rem}
-footer.site-footer a{color:#9aa7bc;text-decoration:none;margin:0 10px}
+footer.site-footer a{color:#cbd5e1;text-decoration:none;margin:0 5px;padding:12px;}
 footer.site-footer a:hover{color:#fff}
-footer.site-footer .disclaimer{margin-top:10px;font-size:0.74rem;color:#64748b;max-width:760px;margin-left:auto;margin-right:auto}
+footer.site-footer .disclaimer{margin-top:10px;font-size:0.74rem;color:#94a3b8;max-width:760px;margin-left:auto;margin-right:auto}
 
 /* ---------- Contact form ---------- */
 .contact-form{display:flex;flex-direction:column;gap:14px;max-width:520px;margin-top:8px}
