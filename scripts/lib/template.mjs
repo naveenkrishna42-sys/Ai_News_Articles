@@ -330,7 +330,7 @@ footer.site a:hover{color:#e2e8f0}
     <span>📂 ${escapeHtml(category)}</span>
     ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">Original source &#8599;</a>` : ""}
   </div>
-  ${heroImage ? `<figure class="hero"><img src="${escapeHtml(heroImage)}" alt="${safeTitle}">${credit}</figure>` : ""}
+  ${heroImage ? `<figure class="hero"><img src="https://wsrv.nl/?url=${encodeURIComponent(heroImage)}&w=1200&output=webp" alt="${safeTitle}" width="1200" height="675">${credit}</figure>` : ""}
   ${keyPointsHtml}
   <div class="body">
 ${bodyHtml}
