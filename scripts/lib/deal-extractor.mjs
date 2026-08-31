@@ -8,7 +8,25 @@
  * If not found, falls back to targeted product search on Amazon India.
  */
 
-const ASIN_REGEX = /amazon\.in\/(?:dp|gp\/product|d)\/([A-Z0-9]{10})/i;
+
+const ASIN_REGEXES = [
+  /amazon\.(?:in|com)\/(?:dp|gp\/(?:product|aw\/d)|d)\/([A-Z0-9]{10})/i,
+  /data-asin=["']([A-Z0-9]{10})["']/i,
+  /["']asin["']\s*:\s*["']([A-Z0-9]{10})["']/i,
+  /\/product\/([A-Z0-9]{10})/i
+];
+
+export function extractAsinFromHtml(html) {
+  if (!html || typeof html !== 'string') return null;
+  for (const regex of ASIN_REGEXES) {
+    const match = html.match(regex);
+    if (match && match[1] && match[1].length === 10) {
+      return match[1].toUpperCase();
+    }
+  }
+  return null;
+}
+
 const CLEAN_NAME_REGEX = /^(.*?)(?:\s*[:â€”â€“-]\s*(?:price|specs|launch|deal|discount|sale|review|unveil|offers|buy).*$)/i;
 
 /**
@@ -96,10 +114,8 @@ export async function fetchAsinFromArticle(articleUrl, timeoutMs = 3500) {
     if (!res.ok) return null;
     const html = await res.text();
 
-    const match = html.match(ASIN_REGEX);
-    if (match && match[1] && match[1].length === 10) {
-      return match[1].toUpperCase();
-    }
+    const asin = extractAsinFromHtml(html);
+    if (asin) return asin;
   } catch {
     // Network / timeout fallback
   } finally {
