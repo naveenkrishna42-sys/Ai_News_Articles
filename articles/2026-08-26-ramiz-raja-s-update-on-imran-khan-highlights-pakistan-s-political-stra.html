@@ -66,6 +66,31 @@ footer.site a:hover{color:#e2e8f0}
 <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
 <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
 <script> window.ezstandalone = window.ezstandalone || {}; ezstandalone.cmd = ezstandalone.cmd || []; </script>
+<!-- Google Reader Revenue Manager -->
+<script async type="application/javascript" src="https://news.google.com/swg/js/v1/swg-basic.js"></script>
+<script>
+  (self.SWG_BASIC = self.SWG_BASIC || []).push( basicSubscriptions => {
+    basicSubscriptions.init({
+      type: "NewsArticle",
+      isPartOfType: ["Product"],
+      isPartOfProductId: "CAow3tjHDA:openaccess",
+      clientOptions: { theme: "light", lang: "en" },
+    });
+  });
+</script>
+<!-- OneSignal Web Push Notification SDK -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "1b5c7d03-1d30-4fd4-89d2-3421c9bbf457",
+      allowLocalhostAsSecureOrigin: true
+    });
+    OneSignal.Slidedown.promptPush();
+    try { await OneSignal.Notifications.requestPermission(); } catch(e) {}
+  });
+</script>
 </head>
 <body>
 <header class="masthead">
