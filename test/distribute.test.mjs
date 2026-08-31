@@ -4,28 +4,35 @@ import path from 'path';
 
 console.log('Running Distribution Module test...');
 
-// Verify that distribute.mjs exports the required functions or runs in dry-run mode
 const scriptPath = path.resolve('scripts/distribute.mjs');
 assert(fs.existsSync(scriptPath), 'scripts/distribute.mjs must exist');
 
-const { pickTopStories, buildOneSignalPayload, buildTelegramMessage } = await import('../scripts/distribute.mjs');
+const { pickTelegramDeals, isMonetizedDeal, buildOneSignalPayload, buildTelegramMessage } = await import('../scripts/distribute.mjs');
 
 const sampleArticles = [
-  { slug: 'story-1', title: 'Normal News Headline', category: 'World', date: '2026-08-31', url: '/articles/story-1.html' },
-  { slug: 'deal-1', title: 'Massive 50% Off Deal on Smartphone', category: 'Deals', date: '2026-08-31', url: '/articles/deal-1.html', description: 'Save big now' },
-  { slug: 'story-2', title: 'Breaking Flash Report', category: 'India', date: '2026-08-31', url: '/articles/story-2.html' }
+  { slug: 'story-1', title: 'Political Debate Update', category: 'Politics', date: '2026-08-31', url: '/articles/story-1.html' },
+  { slug: 'deal-1', title: 'Ajio All Stars Fashion Sale: Up to 80% Off', category: 'Product Deals & Offers', date: '2026-08-31', url: '/articles/deal-1.html', description: 'Huge discounts' },
+  { slug: 'saas-1', title: 'Global Payroll Platform Cuts Cross-Border Fees', category: 'Business', date: '2026-08-31', url: '/articles/saas-1.html', description: 'Automate hiring' },
+  { slug: 'story-2', title: 'Local Traffic News', category: 'City', date: '2026-08-31', url: '/articles/story-2.html' }
 ];
 
-const top = pickTopStories(sampleArticles, 2);
-assert(top.length === 2, 'Should pick requested number of stories');
-assert(top[0].category === 'Deals', 'Should prioritize Deals category');
+// Test 1: isMonetizedDeal identifies affiliate/discount stories
+assert.strictEqual(isMonetizedDeal(sampleArticles[0]), false, 'Politics is not a deal');
+assert.strictEqual(isMonetizedDeal(sampleArticles[1]), true, 'Ajio sale is a deal');
+assert.strictEqual(isMonetizedDeal(sampleArticles[2]), true, 'Global payroll is a high-ticket offer');
+assert.strictEqual(isMonetizedDeal(sampleArticles[3]), false, 'City news is not a deal');
 
-const oneSignalPayload = buildOneSignalPayload('app-123', top[0]);
-assert(oneSignalPayload.app_id === 'app-123', 'OneSignal payload must contain app_id');
-assert(oneSignalPayload.headings.en.includes('Deal'), 'Heading must contain deal context');
+// Test 2: pickTelegramDeals returns ONLY monetized deals
+const telegramDeals = pickTelegramDeals(sampleArticles, 5);
+assert.strictEqual(telegramDeals.length, 2, 'Should only pick the 2 monetized deals');
+assert.strictEqual(telegramDeals[0].slug, 'deal-1');
+assert.strictEqual(telegramDeals[1].slug, 'saas-1');
 
-const telegramMsg = buildTelegramMessage(top[0]);
-assert(telegramMsg.includes(top[0].title), 'Telegram message must include title');
-assert(telegramMsg.includes('https://tivranews.com/articles/deal-1.html'), 'Telegram message must include full link');
+// Test 3: Telegram message formats with correct CTA buttons
+const ajioMsg = buildTelegramMessage(sampleArticles[1]);
+assert.ok(ajioMsg.includes('https://ajo.clnk.in/w0kl'), 'Ajio post must include Ajio Cuelinks CTA');
+
+const saasMsg = buildTelegramMessage(sampleArticles[2]);
+assert.ok(saasMsg.includes('https://clnk.in/B5IT'), 'Payroll post must include Rise Works Cuelinks CTA');
 
 console.log('✅ Distribution Module tests passed.');

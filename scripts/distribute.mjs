@@ -4,19 +4,34 @@ import path from 'path';
 const SITE_URL = 'https://tivranews.com';
 const DISPATCHED_FILE = path.resolve('data/dispatched.json');
 
+export function isMonetizedDeal(article) {
+  if (!article) return false;
+  const cat = (article.category || '').toLowerCase();
+  const title = (article.title || '').toLowerCase();
+  
+  return (
+    cat.includes('deal') ||
+    cat.includes('offer') ||
+    cat.includes('cashback') ||
+    cat.includes('card') ||
+    cat.includes('gadget') ||
+    /deal|sale|discount|price drop|cashback|loot|coupon|off|ajio|amazon|flipkart|myntra|payroll|saas|b2b/i.test(title)
+  );
+}
+
+export function pickTelegramDeals(articles, limit = 4) {
+  if (!Array.isArray(articles) || articles.length === 0) return [];
+  // Exclusively filter for monetized deals, offers, discounts, and high-ticket reward stories
+  const dealsOnly = articles.filter(isMonetizedDeal);
+  
+  // Newest deals first
+  dealsOnly.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  return dealsOnly.slice(0, limit);
+}
+
 export function pickTopStories(articles, limit = 3) {
   if (!Array.isArray(articles) || articles.length === 0) return [];
-  
-  // Sort priority: Deals first, then recent items
-  const sorted = [...articles].sort((a, b) => {
-    const isDealA = (a.category || '').toLowerCase().includes('deal') || /deal|sale|discount|price drop/i.test(a.title);
-    const isDealB = (b.category || '').toLowerCase().includes('deal') || /deal|sale|discount|price drop/i.test(b.title);
-    if (isDealA && !isDealB) return -1;
-    if (!isDealA && isDealB) return 1;
-    return (b.date || '').localeCompare(a.date || '');
-  });
-
-  return sorted.slice(0, limit);
+  return [...articles].slice(0, limit);
 }
 
 export function buildOneSignalPayload(appId, article) {
@@ -219,14 +234,25 @@ export async function main() {
 
   console.log(`Found ${topPicks.length} fresh top stories to distribute.`);
 
-  for (const article of topPicks) {
-    console.log(`-> Distributing: "${article.title}"`);
+  // 1. OneSignal Web Push: Top 2 stories (Deals or Breaking News)
+  for (const article of topPicks.slice(0, 2)) {
+    console.log(`-> OneSignal Push: "${article.title}"`);
     await sendOneSignal(article, isDryRun);
-    await sendTelegram(article, isDryRun);
-    
-    if (!isDryRun) {
-      dispatched.push(article.slug || article.url);
+  }
+
+  // 2. Telegram Broadcast: STRICTLY Deals, Offers, Discounts & Monetized Affiliate Posts
+  const telegramDeals = pickTelegramDeals(candidates, 4);
+  if (telegramDeals.length > 0) {
+    console.log(`Found ${telegramDeals.length} fresh monetized deals to broadcast to Telegram.`);
+    for (const deal of telegramDeals) {
+      console.log(`-> Telegram Deal Post: "${deal.title}"`);
+      await sendTelegram(deal, isDryRun);
+      if (!isDryRun) {
+        dispatched.push(deal.slug || deal.url);
+      }
     }
+  } else {
+    console.log('No fresh deal/discount articles in this run for Telegram (skipping generic news to keep Telegram 100% Deals-focused).');
   }
 
   if (!isDryRun) {
