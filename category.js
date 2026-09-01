@@ -95,29 +95,50 @@ searchInput.addEventListener("input", (e) => {
 });
 loadMoreBtn.addEventListener("click", renderNextPage);
 
-fetch("/articles.json", { cache: "no-store" })
+function normalizeSlug(s) {
+  return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function processArticles(all) {
+  const targetSlug = normalizeSlug(catSlug);
+  const matching = all.filter((a) => {
+    const s = normalizeSlug(a.category);
+    return s === targetSlug || s.replace(/-and-/g, "-") === targetSlug.replace(/-and-/g, "-");
+  });
+  state.matching = matching;
+
+  const label = matching[0] ? matching[0].category : catSlug.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+  document.title = `${label} News - TIVRA News`;
+  const descEl = document.getElementById("pageDescription");
+  if (descEl) descEl.setAttribute("content", `Latest ${label} news and updates - TIVRA News.`);
+  document.getElementById("categoryTitle").textContent = `${label} News`;
+  document.getElementById("breadcrumbCat").textContent = label;
+  document.getElementById("categorySub").textContent =
+    matching.length > 0
+      ? `${matching.length} recent ${label} ${matching.length === 1 ? "story" : "stories"}.`
+      : `No recent ${label} stories yet - check back soon.`;
+
+  state.shown = 0;
+  renderNextPage();
+}
+
+// 1. Fast initial feed for instant category paint
+fetch("/feed-latest.json")
   .then((r) => r.json())
   .then((data) => {
-    const all = data.articles || [];
-    const matching = all.filter((a) => slugifyCategory(a.category) === catSlug);
-    state.matching = matching;
-
-    const label = matching[0] ? matching[0].category : catSlug.replace(/-/g, " ");
-    document.title = `${label} News - TIVRA News`;
-    document.getElementById("pageDescription").setAttribute(
-      "content",
-      `Latest ${label} news, updated automatically - AI News Factory.`
-    );
-    document.getElementById("categoryTitle").textContent = `${label} News`;
-    document.getElementById("breadcrumbCat").textContent = label;
-    document.getElementById("categorySub").textContent =
-      matching.length > 0
-        ? `${matching.length} recent ${label} ${matching.length === 1 ? "story" : "stories"}.`
-        : `No recent ${label} stories yet - check back soon.`;
-
-    renderNextPage();
+    processArticles(data.articles || []);
+    // 2. Fetch full index in background to populate all historical articles
+    fetch("/articles.json")
+      .then((r) => r.json())
+      .then((data) => processArticles(data.articles || []))
+      .catch(() => {});
   })
   .catch(() => {
-    emptyState.textContent = "Couldn't load this category right now - please refresh.";
-    emptyState.hidden = false;
+    fetch("/articles.json")
+      .then((r) => r.json())
+      .then((data) => processArticles(data.articles || []))
+      .catch(() => {
+        emptyState.textContent = "Couldn't load this category right now - please refresh.";
+        emptyState.hidden = false;
+      });
   });

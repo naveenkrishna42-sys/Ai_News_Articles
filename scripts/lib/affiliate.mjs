@@ -22,7 +22,7 @@ function cuelinksRedirect(targetUrl) {
  */
 const KNOWN_MERCHANTS = [
   {
-    pattern: /reliance|jiomart|digital\s*discount/i,
+    pattern: /reliance|jiomart/i,
     name: "Reliance Digital",
     url: cuelinksRedirect("https://www.reliancedigital.in"),
     color: "#e42529",
@@ -70,7 +70,7 @@ const KNOWN_MERCHANTS = [
     cta: "Shop Sale on Myntra"
   },
   {
-    pattern: /firstcry|baby/i,
+    pattern: /firstcry|\bbaby\b/i,
     name: "FirstCry",
     url: cuelinksRedirect("https://www.firstcry.com"),
     color: "#ff7043",
@@ -78,7 +78,7 @@ const KNOWN_MERCHANTS = [
     cta: "Shop Baby Essentials on FirstCry"
   },
   {
-    pattern: /makemytrip|flight|hotel|travel\s*deal/i,
+    pattern: /makemytrip|\bflight\b|\bhotel\b|travel\s*deal/i,
     name: "MakeMyTrip",
     url: cuelinksRedirect("https://www.makemytrip.com"),
     color: "#eb2026",
@@ -94,7 +94,7 @@ const KNOWN_MERCHANTS = [
     cta: "Book Verified Lab Test on 1mg"
   },
   {
-    pattern: /payroll|rise\s*works|contractor|remote\s*hiring|saas/i,
+    pattern: /payroll|rise\s*works|contractor|remote\s*hiring/i,
     name: "Rise Works",
     url: "https://clnk.in/B5IT",
     color: "#059669",
@@ -143,28 +143,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   const catLower = (category || "").toLowerCase();
   const textContext = `${title} ${category} ${(deviceNames || []).join(" ")}`.toLowerCase();
 
-  // 1. FINANCIAL PRODUCTS (Credit Cards, Bank Accounts, Insurance, Loans)
-  const isFinancial = catLower.includes("card") || catLower.includes("cashback") || catLower.includes("bank") || catLower.includes("insurance");
-  if (isFinancial) {
-    const cpcUrl = config?.affiliate?.cuelinks?.cpcUrl || "https://clnk.in/B5IL";
-    const megaUrl = config?.affiliate?.cuelinks?.megaHighTicketUrl || "https://clnk.in/B5IT";
-    const targetUrl = directUrl || megaUrl;
-
-    return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #059669;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-<div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#047857;margin-bottom:12px;">Verified Partner Offer & High-Value Rewards</div>
-<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
-  <a href="${escapeHtml(targetUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#059669;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
-    <span>💳 Apply Online & Claim Premium Card / Account Benefits</span>
-  </a>
-  <a href="${escapeHtml(cpcUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#0284c7;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
-    <span>⚡ Check Today's Top Financial Deals & Cashback</span>
-  </a>
-</div>
-<p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
-</div>`;
-  }
-
-  // 2. EXPLICIT DIRECT URL (if crawler found an exact product page)
+  // 1. EXPLICIT DIRECT URL (if crawler found an exact product page)
   if (directUrl) {
     let storeName = "Merchant Store";
     let btnColor = "#e11d48";
@@ -186,7 +165,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
 </div>`;
   }
 
-  // 3. BRAND-SPECIFIC MERCHANT DETECTION (Reliance Digital, Croma, Ajio, Tata Cliq, etc.)
+  // 2. BRAND-SPECIFIC MERCHANT DETECTION (Tata Cliq, Reliance Digital, Croma, Ajio, Myntra, etc.)
   for (const merchant of KNOWN_MERCHANTS) {
     if (merchant.pattern.test(textContext)) {
       return `<div class="buybox" style="margin:30px 0;padding:20px 22px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid ${merchant.color};border-radius:0 12px 12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
@@ -199,6 +178,53 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
 <p style="font-size:.75rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
 </div>`;
     }
+  }
+
+  // 3. CONTEXTUAL FINANCIAL PRODUCTS (Fixed Deposits vs Credit Cards vs Loans)
+  const isFdOrSavings = /fixed deposit|\bfd\b|senior citizen|interest rate|deposit scheme|savings account/i.test(textContext);
+  const isCreditCard = /credit card|cashback card|reward card|lounge access card/i.test(textContext) || catLower.includes("credit card");
+  const isLoanOrMortgage = /home loan|personal loan|car loan|mortgage|\bemi\b/i.test(textContext);
+  const isFinancial = isFdOrSavings || isCreditCard || isLoanOrMortgage || /\bbank\b|\bbanking\b|\bfinance\b/i.test(catLower);
+
+  if (isFinancial) {
+    const cpcUrl = config?.affiliate?.cuelinks?.cpcUrl || "https://clnk.in/B5IL";
+
+    // 3A. Fixed Deposits & Senior Citizen Schemes -> 100% Banking / FD Comparison
+    if (isFdOrSavings) {
+      return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #059669;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+<div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#047857;margin-bottom:12px;">Verified Banking & High-Interest Rates</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+  <a href="${escapeHtml(cpcUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#059669;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
+    <span>🏦 Compare Verified Bank FD Rates & Schemes</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+  </a>
+</div>
+<p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
+</div>`;
+    }
+
+    // 3B. Credit Cards & Cashback
+    if (isCreditCard) {
+      return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #0284c7;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+<div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#0369a1;margin-bottom:12px;">Top Credit Card Offers & Cashback Rewards</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+  <a href="${escapeHtml(cpcUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#0284c7;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
+    <span>💳 Apply for Top Cashback & Lifetime Free Cards</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+  </a>
+</div>
+<p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
+</div>`;
+    }
+
+    // 3C. Loans & General Finance
+    return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #059669;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+<div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#047857;margin-bottom:12px;">Verified Partner Offers & Financial Tools</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+  <a href="${escapeHtml(cpcUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#059669;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
+    <span>⚡ Check Today's Top Financial Rates & Cashback</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+  </a>
+</div>
+<p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
+</div>`;
   }
 
   // 4. GENERIC CONSUMER GADGETS & ELECTRONICS (Dual Store Price Comparison: Amazon + Flipkart)
