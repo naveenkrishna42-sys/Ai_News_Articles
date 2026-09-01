@@ -69,7 +69,7 @@ function formatDate(dateStr) {
 /* ---------- Breaking ticker ---------- */
 function buildTicker(all) {
   if (!$("tickerTrack") || !$("ticker")) return;
-  const items = all.slice(0, 12);
+  const items = all.slice(0, 25);
   if (!items.length) return;
   const links = items.map((a) => `<a href="${a.url}">${escapeHtml(a.title)}</a>`).join("");
   $("tickerTrack").innerHTML = links + links; // seamless loop
