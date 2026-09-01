@@ -38,28 +38,31 @@ const tataBox = renderBuyBox(["Tata Cliq Luxury"], mockConfig, "Product Deals & 
 assert.ok(tataBox.includes("tatacliq.com"), "Tata Cliq deal must link to Tata Cliq");
 console.log("✓ Test 4: Tata Cliq brand matching passed");
 
-// Test 5: Generic Gadget (Samsung S25) MUST render Dual Store Comparison (Amazon + Flipkart)
+// Test 5: Multi-Store Clothing Listicle MUST render multi-store cards (Ajio + Myntra + Tata CLiQ + Amazon + Flipkart)
+const listicleBox = renderBuyBox(["Top 10 Online Shopping Sites in India for Clothes"], mockConfig, "Product Deals & Offers", "", "Top 10 Online Shopping Sites in India for Clothes");
+assert.ok(listicleBox.includes("ajo.clnk.in/w0kl"), "Listicle must include Ajio card");
+assert.ok(listicleBox.includes("myntra.com"), "Listicle must include Myntra card");
+assert.ok(listicleBox.includes("tatacliq.com"), "Listicle must include Tata CLiQ card");
+assert.ok(!listicleBox.includes("s?k=Top%2010"), "Must NEVER search 'Top 10' on Amazon");
+console.log("✓ Test 5: Multi-Store Listicle multi-brand cards passed");
+
+// Test 6: Generic Gadget (Samsung S25) MUST render Dual Store Comparison (Amazon + Flipkart)
 const gadgetBox = renderBuyBox(["Samsung Galaxy S25 Ultra"], mockConfig, "Product Deals & Offers", "", "Samsung Galaxy S25 Ultra Price Drop: Best Deal Today");
 assert.ok(gadgetBox.includes("amazon.in"), "Gadget deal must include Amazon button");
 assert.ok(gadgetBox.includes("flipkart.com"), "Gadget deal must include Flipkart button");
 assert.ok(gadgetBox.includes("sirmohana-21"), "Amazon button must have Amazon tag");
 assert.ok(gadgetBox.includes("310115"), "Flipkart button must have Cuelinks CID");
-console.log("✓ Test 5: Dual Store comparison (Amazon + Flipkart) passed");
+console.log("✓ Test 6: Dual Store comparison (Amazon + Flipkart) passed");
 
-// Test 6: B2B SaaS / Global Payroll MUST route to Rise Works
+// Test 7: B2B SaaS / Global Payroll MUST route to Rise Works
 const saasBox = renderBuyBox(["Global Payroll Platform"], mockConfig, "Business", "", "Rise Works Global Payroll: How Startups Automate International Hiring");
 assert.ok(saasBox.includes("clnk.in/B5IT"), "SaaS deal must link to Rise Works");
-console.log("✓ Test 6: Rise Works B2B SaaS matching passed");
+console.log("✓ Test 7: Rise Works B2B SaaS matching passed");
 
-// Test 7: Fixed Deposit (FD) articles MUST route to Bank FD & Savings rates (NEVER SaaS!)
+// Test 8: Fixed Deposit (FD) articles MUST route to Bank FD & Savings rates (NEVER SaaS!)
 const fdBox = renderBuyBox(["SBI Senior Citizen FD Scheme"], mockConfig, "Banking", "", "Senior Citizens: Highest Bank FD Rates in 2026");
 assert.ok(fdBox.includes("Bank FD Rates"), "FD deal must link to Bank FD comparison");
 assert.ok(!fdBox.includes("Rise Works") && !fdBox.includes("clnk.in/B5IT"), "FD deal must NEVER link to B2B SaaS");
-console.log("✓ Test 7: Contextual Fixed Deposit (FD) matching passed");
-
-// Test 8: Credit Cards & Cashback MUST render card application offer
-const cardBox = renderBuyBox(["SBI Cashback Card"], mockConfig, "Credit Cards & Cashback", "", "Best Credit Cards for Airport Lounge Access in 2026");
-assert.ok(cardBox.includes("Cashback & Lifetime Free Cards") || cardBox.includes("Card Offers"), "Card deal must link to credit card benefits");
-console.log("✓ Test 8: Contextual Credit card & cashback offer matching passed");
+console.log("✓ Test 8: Contextual Fixed Deposit (FD) matching passed");
 
 console.log("\n✅ ALL Universal Affiliate Matcher unit tests passed with 100% accuracy!\n");

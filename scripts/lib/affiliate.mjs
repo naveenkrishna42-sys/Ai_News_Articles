@@ -1,9 +1,9 @@
-// TIVRA News — Universal Multi-Merchant Affiliate Routing Engine (Cuelinks V3 & Amazon Associates).
+// TIVRA News — Universal Multi-Merchant Affiliate & Listicle Engine (Cuelinks V3 & Amazon Associates).
 //
-// Automatically detects the merchant brand (Reliance Digital, Croma, Ajio, Flipkart, Tata Cliq,
-// Myntra, FirstCry, MakeMyTrip, 1mg, Rise Works, or Amazon) from article content/title/device.
-// Converts merchant links through Cuelinks V3 API (cid=310115) and Amazon Associates (sirmohana-21).
-// Zero incorrect cross-merchant fallbacks (e.g. Never puts Amazon on a Reliance/Croma deal).
+// 1. Multi-Store Listicles: Renders direct official merchant cards (Ajio, Myntra, Tata CLiQ, Amazon, Flipkart).
+// 2. Single Products: Strict entity sanitizer prevents junk queries like "Top 10..." from searching Amazon.
+// 3. Financial Products: Contextual routing for FDs vs Credit Cards vs Loans.
+// 4. Pre-Publish Quality Gate: Zero broken keyword searches across all articles.
 
 import { escapeHtml } from "./template.mjs";
 
@@ -18,7 +18,7 @@ function cuelinksRedirect(targetUrl) {
 }
 
 /**
- * Known merchant store profiles across India and Global campaigns
+ * Known merchant store profiles
  */
 const KNOWN_MERCHANTS = [
   {
@@ -112,18 +112,24 @@ const KNOWN_MERCHANTS = [
 ];
 
 /**
- * Cleans extracted product names of junk/filler terms
+ * Strict product name sanitizer.
+ * Discards junk, headlines, and non-product phrases.
  */
-function cleanProductName(name) {
+function sanitizeProductName(name) {
   if (!name) return "";
   let clean = name.trim();
   if (clean.includes(":")) clean = clean.split(":")[0].trim();
   if (clean.includes(" — ")) clean = clean.split(" — ")[0].trim();
   if (clean.includes(" - ")) clean = clean.split(" - ")[0].trim();
-  clean = clean
-    .replace(/discounts?|schemes?|savings?|republic day|deals?|offers?|sales?|price drops?/gi, "")
-    .trim();
-  return clean.length > 40 ? clean.slice(0, 40).trim() : clean;
+
+  // If the string contains listicle / broad article phrases, it is NOT a valid single product query
+  const junkPattern = /top\s*\d+|best\s*\d+|shopping\s*sites|sites\s*in\s*india|clothes|fashion|apps|ecommerce|discounts?|schemes?|savings?|republic\s*day|deals?|offers?|sales?|price\s*drops?|worth\s*checking|how\s*to|why/gi;
+  if (junkPattern.test(clean) && clean.split(/\s+/).length > 3) {
+    return ""; // Invalidate junk queries
+  }
+
+  clean = clean.replace(junkPattern, "").trim();
+  return (clean.length >= 3 && clean.length <= 35) ? clean : "";
 }
 
 /**
@@ -131,19 +137,52 @@ function cleanProductName(name) {
  */
 export function buyUrl(cleanName, config) {
   const tag = config?.affiliate?.amazonTag || AMAZON_TAG;
-  const query = cleanName || "deals";
-  return `https://www.amazon.in/s?k=${encodeURIComponent(query)}&tag=${encodeURIComponent(tag)}`;
+  if (!cleanName || cleanName.length < 3) {
+    return `https://www.amazon.in/deals?tag=${encodeURIComponent(tag)}`;
+  }
+  return `https://www.amazon.in/s?k=${encodeURIComponent(cleanName)}&tag=${encodeURIComponent(tag)}`;
 }
 
 /**
- * The action / buy box shown under articles.
- * Dynamically tailors the UI to Financial, Enterprise SaaS, Fashion, or Specific Merchant Stores.
+ * Main Buy Box & Multi-Store Action Box Generator
  */
 export function renderBuyBox(deviceNames = [], config = {}, category = "", directUrl = "", title = "") {
   const catLower = (category || "").toLowerCase();
   const textContext = `${title} ${category} ${(deviceNames || []).join(" ")}`.toLowerCase();
 
-  // 1. EXPLICIT DIRECT URL (if crawler found an exact product page)
+  // 1. MULTI-STORE CLOTHING & SHOPPING LISTICLES (e.g. "Top 10 Online Shopping Sites for Clothes")
+  const isClothingListicle = /top\s*\d+.*(shopping|cloth|fashion|apparel)|best.*(shopping sites|clothing sites|fashion sites)/i.test(textContext);
+  if (isClothingListicle) {
+    const ajioUrl = "https://ajo.clnk.in/w0kl";
+    const myntraUrl = cuelinksRedirect("https://www.myntra.com");
+    const tataUrl = cuelinksRedirect("https://www.tatacliq.com");
+    const amazonFashionUrl = buyUrl("clothing fashion", config);
+    const flipkartFashionUrl = cuelinksRedirect("https://www.flipkart.com/clothing-and-accessories");
+
+    return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+<div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:14px;">Official Fashion Stores & Verified Deals</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+  <a href="${escapeHtml(ajioUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2c4152;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛍️ Shop on Ajio (Up to 80% Off + 9% Rewards)</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+  </a>
+  <a href="${escapeHtml(myntraUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#ff3f6c;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛍️ Shop on Myntra (Official Deals)</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+  </a>
+  <a href="${escapeHtml(tataUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#da1c5c;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛍️ Shop on Tata CLiQ Luxury</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+  </a>
+  <a href="${escapeHtml(amazonFashionUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛒 Shop Amazon Fashion (Prime Offers)</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+  </a>
+  <a href="${escapeHtml(flipkartFashionUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2874f0;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛒 Shop Flipkart Fashion</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+  </a>
+</div>
+<p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
+</div>`;
+  }
+
+  // 2. EXPLICIT DIRECT URL
   if (directUrl) {
     let storeName = "Merchant Store";
     let btnColor = "#e11d48";
@@ -165,7 +204,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
 </div>`;
   }
 
-  // 2. BRAND-SPECIFIC MERCHANT DETECTION (Tata Cliq, Reliance Digital, Croma, Ajio, Myntra, etc.)
+  // 3. BRAND-SPECIFIC MERCHANT DETECTION (Reliance Digital, Croma, Ajio, Tata Cliq, etc.)
   for (const merchant of KNOWN_MERCHANTS) {
     if (merchant.pattern.test(textContext)) {
       return `<div class="buybox" style="margin:30px 0;padding:20px 22px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid ${merchant.color};border-radius:0 12px 12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
@@ -180,7 +219,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
     }
   }
 
-  // 3. CONTEXTUAL FINANCIAL PRODUCTS (Fixed Deposits vs Credit Cards vs Loans)
+  // 4. CONTEXTUAL FINANCIAL PRODUCTS (Fixed Deposits vs Credit Cards vs Loans)
   const isFdOrSavings = /fixed deposit|\bfd\b|senior citizen|interest rate|deposit scheme|savings account/i.test(textContext);
   const isCreditCard = /credit card|cashback card|reward card|lounge access card/i.test(textContext) || catLower.includes("credit card");
   const isLoanOrMortgage = /home loan|personal loan|car loan|mortgage|\bemi\b/i.test(textContext);
@@ -189,7 +228,6 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   if (isFinancial) {
     const cpcUrl = config?.affiliate?.cuelinks?.cpcUrl || "https://clnk.in/B5IL";
 
-    // 3A. Fixed Deposits & Senior Citizen Schemes -> 100% Banking / FD Comparison
     if (isFdOrSavings) {
       return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #059669;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#047857;margin-bottom:12px;">Verified Banking & High-Interest Rates</div>
@@ -202,7 +240,6 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
 </div>`;
     }
 
-    // 3B. Credit Cards & Cashback
     if (isCreditCard) {
       return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #0284c7;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#0369a1;margin-bottom:12px;">Top Credit Card Offers & Cashback Rewards</div>
@@ -215,7 +252,6 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
 </div>`;
     }
 
-    // 3C. Loans & General Finance
     return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #059669;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#047857;margin-bottom:12px;">Verified Partner Offers & Financial Tools</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
@@ -227,20 +263,23 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
 </div>`;
   }
 
-  // 4. GENERIC CONSUMER GADGETS & ELECTRONICS (Dual Store Price Comparison: Amazon + Flipkart)
-  const rawProduct = (deviceNames && deviceNames[0]) || cleanProductName(title) || "Trending Gadget Deals";
-  const cleanProd = cleanProductName(rawProduct);
-  
-  if (!cleanProd || cleanProd.length < 3) return "";
+  // 5. GENERIC PHYSICAL GADGETS (Dual Store Comparison: Amazon + Flipkart)
+  const candidateName = (deviceNames && deviceNames[0]) || title || "";
+  const cleanProd = sanitizeProductName(candidateName);
 
-  const amazonUrl = buyUrl(cleanProd, config);
-  const flipkartUrl = cuelinksRedirect(`https://www.flipkart.com/search?q=${encodeURIComponent(cleanProd)}`);
+  // If query was junk/unresolvable, route to official Amazon Deals Hub instead of broken search query!
+  const amazonUrl = cleanProd ? buyUrl(cleanProd, config) : `https://www.amazon.in/deals?tag=${AMAZON_TAG}`;
+  const flipkartUrl = cleanProd
+    ? cuelinksRedirect(`https://www.flipkart.com/search?q=${encodeURIComponent(cleanProd)}`)
+    : cuelinksRedirect("https://www.flipkart.com/offers-store");
+
+  const displayLabel = cleanProd || "Trending Electronics & Gadgets";
 
   return `<div class="buybox" style="margin:30px 0;padding:20px 22px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
 <div style="font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:12px;">Compare Prices & Where to Buy</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
   <a href="${escapeHtml(amazonUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>🛒 Check ${escapeHtml(cleanProd)} on Amazon</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+    <span>🛒 Check ${escapeHtml(displayLabel)} on Amazon</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
   </a>
   <a href="${escapeHtml(flipkartUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2874f0;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛍️ Check on Flipkart</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
