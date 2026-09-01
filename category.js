@@ -1,5 +1,5 @@
 
-const FALLBACK_IMG = "/fallback.jpg"; // or whatever the fallback is
+const FALLBACK_IMG = "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress&cs=tinysrgb&h=400&w=600";
 function getThumbnailUrl(url) {
   if (!url) return FALLBACK_IMG;
   url = url.replace(/&amp;/g, '&');
@@ -22,12 +22,12 @@ function getHeroUrl(url) {
   }
   return url;
 }
-// AI News Factory - category page
+// TIVRA News - category page
 // Reads ?cat=<slug> from the URL and shows every recent article whose
 // category slugifies to the same value (so "World News" and "world-news"
 // both match cleanly regardless of exact casing/spacing in the source).
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 36;
 
 function slugifyCategory(cat) {
   return cat.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -39,17 +39,18 @@ function escapeHtml(str) {
   }[c]));
 }
 
-function timeAgo(dateStr) {
-  const then = new Date(dateStr + "T00:00:00Z").getTime();
-  const days = Math.floor((Date.now() - then) / 86400000);
-  if (days <= 0) return "Today";
-  if (days === 1) return "Yesterday";
-  if (days < 30) return `${days}d ago`;
-  return dateStr;
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if (parts.length !== 3) return dateStr;
+  const [y, m, d] = parts;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthName = months[parseInt(m, 10) - 1] || m;
+  return `${monthName} ${parseInt(d, 10)}, ${y}`;
 }
 
 function cardHtml(a) {
-  const img = a.image || "https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&h=400&w=600";
+  const img = getThumbnailUrl(a.image);
   return `
     <article class="card">
       <a href="${a.url}"><img src="${img}" alt="${escapeHtml(a.title)}" width="400" height="225" loading="lazy"></a>
@@ -57,7 +58,7 @@ function cardHtml(a) {
         <span class="cat-tag">${escapeHtml(a.category)}</span>
         <h3><a href="${a.url}">${escapeHtml(a.title)}</a></h3>
         <p class="excerpt">${escapeHtml((a.description || "").slice(0, 110))}${a.description && a.description.length > 110 ? "..." : ""}</p>
-        <div class="card-meta"><span>${timeAgo(a.date)}</span></div>
+        <div class="card-meta"><span>${formatDate(a.date)}</span></div>
       </div>
     </article>`;
 }
@@ -102,7 +103,7 @@ fetch("/articles.json", { cache: "no-store" })
     state.matching = matching;
 
     const label = matching[0] ? matching[0].category : catSlug.replace(/-/g, " ");
-    document.title = `${label} News - AI News Factory`;
+    document.title = `${label} News - TIVRA News`;
     document.getElementById("pageDescription").setAttribute(
       "content",
       `Latest ${label} news, updated automatically - AI News Factory.`

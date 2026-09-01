@@ -55,14 +55,14 @@ function escapeHtml(str) {
 function slugifyCategory(cat) {
   return String(cat || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
-function timeAgo(dateStr) {
+function formatDate(dateStr) {
   if (!dateStr) return "";
-  const then = new Date(dateStr + "T00:00:00Z").getTime();
-  const days = Math.floor((Date.now() - then) / 86400000);
-  if (days <= 0) return "Today";
-  if (days === 1) return "Yesterday";
-  if (days < 30) return `${days}d ago`;
-  return dateStr;
+  const parts = dateStr.split("-");
+  if (parts.length !== 3) return dateStr;
+  const [y, m, d] = parts;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthName = months[parseInt(m, 10) - 1] || m;
+  return `${monthName} ${parseInt(d, 10)}, ${y}`;
 }
 
 
@@ -93,7 +93,7 @@ function buildHero(all) {
       <div class="hero-text">
         <span class="cat-pill">${escapeHtml(a.category)}</span>
         <h2>${escapeHtml(a.title)}</h2>
-        <div class="hero-meta">${timeAgo(a.date)} · ${escapeHtml((a.description || "").slice(0, 90))}${(a.description || "").length > 90 ? "..." : ""}</div>
+        <div class="hero-meta">${formatDate(a.date)} · ${escapeHtml((a.description || "").slice(0, 90))}${(a.description || "").length > 90 ? "..." : ""}</div>
       </div>
     </a>`).join("");
 
@@ -150,7 +150,7 @@ function carouselCardHtml(a) {
       <img src="${a.image || FALLBACK_IMG}" alt="${escapeHtml(a.title)}" loading="lazy">
       <div class="cc-body">
         <h3>${escapeHtml(a.title)}</h3>
-        <div class="cc-meta">${timeAgo(a.date)}</div>
+        <div class="cc-meta">${formatDate(a.date)}</div>
       </div>
     </a>`;
 }
@@ -206,7 +206,7 @@ function cardHtml(a) {
         <span class="cat-tag">${escapeHtml(a.category)}</span>
         <h3><a href="${a.url}">${escapeHtml(a.title)}</a></h3>
         <p class="excerpt">${escapeHtml((a.description || "").slice(0, 110))}${a.description && a.description.length > 110 ? "..." : ""}</p>
-        <div class="card-meta"><span>${timeAgo(a.date)}</span></div>
+        <div class="card-meta"><span>${formatDate(a.date)}</span></div>
       </div>
     </article>`;
 }
