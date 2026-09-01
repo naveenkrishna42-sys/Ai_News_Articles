@@ -38,7 +38,7 @@ export function pickTopStories(articles, limit = 3) {
 }
 
 export function buildOneSignalPayload(appId, article) {
-  const fullUrl = article.url.startsWith('http') ? article.url : `${SITE_URL}${article.url}`;
+  const fullUrl = (article.url && article.url.startsWith("http")) ? article.url : `${SITE_URL}/articles/${article.slug}.html`;
   const isDeal = (article.category || '').toLowerCase().includes('deal') || /deal|sale|price/i.test(article.title);
   const heading = isDeal ? `🔥 Top Deal: ${article.title}` : `⚡ Breaking: ${article.title}`;
 
@@ -54,7 +54,7 @@ export function buildOneSignalPayload(appId, article) {
 }
 
 export function buildTelegramMessage(article) {
-  const fullUrl = article.url.startsWith('http') ? article.url : `${SITE_URL}${article.url}`;
+  const fullUrl = (article.url && article.url.startsWith("http")) ? article.url : `${SITE_URL}/articles/${article.slug}.html`;
   const cat = (article.category || '').toLowerCase();
   const title = article.title || '';
   const isFashion = /ajio|fashion|clothing|shoes|sneaker|kurta|shirt/i.test(title) || cat.includes('lifestyle');
@@ -144,7 +144,7 @@ async function sendOneSignal(article, isDryRun) {
 
 async function sendTelegram(article, isDryRun) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const channelId = process.env.TELEGRAM_CHANNEL_ID;
+  const channelId = process.env.TELEGRAM_CHANNEL_ID || "@tivranews_official";
 
   if (!token || !channelId) {
     console.log('[Telegram] Credentials not set in environment (skipping Telegram post).');
