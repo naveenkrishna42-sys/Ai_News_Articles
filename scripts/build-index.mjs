@@ -174,7 +174,7 @@ function decodeEntities(str) {
 
 
 
-const FALLBACK_IMG = "/fallback.jpg"; // or whatever the fallback is
+const FALLBACK_IMG = "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?auto=compress&cs=tinysrgb&h=400&w=600";
 function getThumbnailUrl(url) {
   if (!url) return FALLBACK_IMG;
   url = url.replace(/&amp;/g, '&');
@@ -204,17 +204,18 @@ function escapeHtml(str) {
   }[c]));
 }
 
-function timeAgo(dateStr) {
-  const then = new Date(dateStr + "T00:00:00Z").getTime();
-  const days = Math.floor((Date.now() - then) / 86400000);
-  if (days <= 0) return "Today";
-  if (days === 1) return "Yesterday";
-  if (days < 30) return `${days}d ago`;
-  return dateStr;
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if (parts.length !== 3) return dateStr;
+  const [y, m, d] = parts;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthName = months[parseInt(m, 10) - 1] || m;
+  return `${monthName} ${parseInt(d, 10)}, ${y}`;
 }
 
 function cardHtml(a) {
-  const imgUrl = a.image ? `https://wsrv.nl/?url=${encodeURIComponent(a.image)}&w=400&output=webp` : "";
+  const imgUrl = getThumbnailUrl(a.image);
   return `
     <article class="card">
       <a href="${a.url}"><img src="${imgUrl}" alt="${escapeHtml(a.title)}" width="400" height="225" loading="lazy"></a>
@@ -222,7 +223,7 @@ function cardHtml(a) {
         <span class="cat-tag">${escapeHtml(a.category)}</span>
         <h3><a href="${a.url}">${escapeHtml(a.title)}</a></h3>
         <p class="excerpt">${escapeHtml((a.description || "").slice(0, 110))}${a.description && a.description.length > 110 ? "..." : ""}</p>
-        <div class="card-meta"><span>${timeAgo(a.date)}</span></div>
+        <div class="card-meta"><span>${formatDate(a.date)}</span></div>
       </div>
     </article>`;
 }
