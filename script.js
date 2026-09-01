@@ -155,6 +155,52 @@ function carouselCardHtml(a) {
     </a>`;
 }
 
+function initRailListeners() {
+  document.querySelectorAll("[data-rail]").forEach((rail, idx) => {
+    if (rail.dataset.initialized === "true") return;
+    rail.dataset.initialized = "true";
+
+    let paused = false;
+    rail.addEventListener("mouseenter", () => (paused = true));
+    rail.addEventListener("mouseleave", () => (paused = false));
+    rail.addEventListener("touchstart", () => (paused = true), { passive: true });
+    rail.addEventListener("touchend", () => (paused = false), { passive: true });
+
+    // Auto-scroll loop
+    setInterval(() => {
+      if (paused || document.hidden) return;
+      const nearEnd = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 20;
+      if (nearEnd) rail.scrollTo({ left: 0, behavior: "smooth" });
+      else rail.scrollBy({ left: 288, behavior: "smooth" });
+    }, RAIL_INTERVAL + (idx % 3) * 600);
+  });
+
+  // Interactive Prev / Next Arrow buttons
+  document.querySelectorAll("[data-rail-prev]").forEach((btn) => {
+    if (btn.dataset.bound === "true") return;
+    btn.dataset.bound = "true";
+    btn.addEventListener("click", () => {
+      const idx = btn.getAttribute("data-rail-prev");
+      const rail = document.getElementById("rail-" + idx) || btn.closest(".category-section")?.querySelector("[data-rail]");
+      if (rail) rail.scrollBy({ left: -300, behavior: "smooth" });
+    });
+  });
+
+  document.querySelectorAll("[data-rail-next]").forEach((btn) => {
+    if (btn.dataset.bound === "true") return;
+    btn.dataset.bound = "true";
+    btn.addEventListener("click", () => {
+      const idx = btn.getAttribute("data-rail-next");
+      const rail = document.getElementById("rail-" + idx) || btn.closest(".category-section")?.querySelector("[data-rail]");
+      if (rail) {
+        const nearEnd = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 20;
+        if (nearEnd) rail.scrollTo({ left: 0, behavior: "smooth" });
+        else rail.scrollBy({ left: 300, behavior: "smooth" });
+      }
+    });
+  });
+}
+
 function buildCategoryCarousels(all, featuredOrder) {
   const el = $("categoryCarousels");
   if (!el) return;
@@ -170,31 +216,28 @@ function buildCategoryCarousels(all, featuredOrder) {
     .sort((a, b) => (byCategory.get(a)[0].date < byCategory.get(b)[0].date ? 1 : -1));
   const ordered = [...featuredPresent, ...rest.slice(0, Math.max(0, 12 - featuredPresent.length))];
 
-  el.innerHTML = ordered.map((cat) => {
-    const items = byCategory.get(cat).slice(0, 10);
+  el.innerHTML = ordered.map((cat, idx) => {
+    let items = (byCategory.get(cat) || []).slice(0, 12);
+    if (items.length < 6) {
+      const extra = all.filter(a => a.category !== cat && !items.some(it => it.slug === a.slug)).slice(0, 8 - items.length);
+      items = [...items, ...extra];
+    }
     const slug = slugifyCategory(cat);
     return `
-      <section class="category-section">
+      <section class="category-section" data-section="${idx}">
         <div class="category-section-head">
           <h2>${escapeHtml(cat)}</h2>
-          <a href="/category.html?cat=${encodeURIComponent(slug)}">View all →</a>
+          <div class="category-controls">
+            <a href="/category.html?cat=${encodeURIComponent(slug)}">View all →</a>
+            <button class="rail-btn prev" data-rail-prev="${idx}" aria-label="Scroll left">&lsaquo;</button>
+            <button class="rail-btn next" data-rail-next="${idx}" aria-label="Scroll right">&rsaquo;</button>
+          </div>
         </div>
-        <div class="carousel-track" data-rail>${items.map(carouselCardHtml).join("")}</div>
+        <div class="carousel-track" data-rail id="rail-${idx}">${items.map(carouselCardHtml).join("")}</div>
       </section>`;
   }).join("");
 
-  document.querySelectorAll("[data-rail]").forEach((rail, idx) => {
-    let paused = false;
-    rail.addEventListener("mouseenter", () => (paused = true));
-    rail.addEventListener("mouseleave", () => (paused = false));
-    rail.addEventListener("touchstart", () => (paused = true), { passive: true });
-    setInterval(() => {
-      if (paused || document.hidden) return;
-      const nearEnd = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 20;
-      if (nearEnd) rail.scrollTo({ left: 0, behavior: "smooth" });
-      else rail.scrollBy({ left: 266, behavior: "smooth" });
-    }, RAIL_INTERVAL + (idx % 3) * 700);
-  });
+  initRailListeners();
 }
 
 /* ---------- Latest grid + search ---------- */
@@ -348,3 +391,7 @@ fetch("/feed-latest.json")
         }
       });
   });
+
+// Initialize pre-rendered rails immediately on load
+document.addEventListener("DOMContentLoaded", initRailListeners);
+initRailListeners();
