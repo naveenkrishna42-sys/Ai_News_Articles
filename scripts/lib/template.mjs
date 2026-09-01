@@ -258,7 +258,7 @@ ${extraJsonLdHtml}`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="cuelinks-verification" content="VERIFY-CL-RMCNURET">
+<meta name="cuelinks-verification" content="VERIFY-CL-DVXQNX8G">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${safeTitle}</title>
