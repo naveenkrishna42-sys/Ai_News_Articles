@@ -22,6 +22,30 @@ export function cuelinksRedirect(targetUrl) {
  */
 export const KNOWN_MERCHANTS = [
   {
+    pattern: /choice\s*hotels|choice\s*privileges/i,
+    name: "Choice Hotels",
+    url: cuelinksRedirect("https://www.choicehotels.com"),
+    color: "#d97706",
+    icon: "🏨",
+    cta: "Check Exclusive Room Rates & Perks on Choice Hotels"
+  },
+  {
+    pattern: /norwegian\s*cruise|virgin\s*voyages|cruise\s*vacation|cruise\s*deal/i,
+    name: "Norwegian Cruise Line",
+    url: cuelinksRedirect("https://www.ncl.com"),
+    color: "#0284c7",
+    icon: "🚢",
+    cta: "Explore Norwegian Cruise Line Deals & Upgrades"
+  },
+  {
+    pattern: /verpex|web\s*hosting|cloud\s*hosting|hostinger|bluehost/i,
+    name: "Verpex Cloud Hosting",
+    url: cuelinksRedirect("https://verpex.com"),
+    color: "#4f46e5",
+    icon: "⚡",
+    cta: "Get Up to 70% Off Fast Cloud Web Hosting"
+  },
+  {
     pattern: /reliance|jiomart/i,
     name: "Reliance Digital",
     url: cuelinksRedirect("https://www.reliancedigital.in"),
