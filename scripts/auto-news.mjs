@@ -246,7 +246,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
 
   let finalBodyHtml = bodyHtml;
   if (item.category === "Product Deals & Offers" || item.category === "Credit Cards & Cashback") {
-    const buyBoxHtml = renderBuyBox([title], config, item.category);
+    const buyBoxHtml = renderBuyBox([title], config, item.category, "", title);
     if (buyBoxHtml) finalBodyHtml += `\n${buyBoxHtml}`;
   }
 
@@ -325,7 +325,7 @@ ${cons.length ? `<div style="flex:1;min-width:220px;"><strong style="color:#be12
   // model is confident it's sold on Amazon — a link next to an unreleased or
   // Amazon-unavailable product is a false, actionable claim.
   const canBuy = parsed.isLaunched !== false && parsed.amazonAvailable !== false;
-  const buyBoxHtml = canBuy ? renderBuyBox([deviceName], config) : "";
+  const buyBoxHtml = canBuy ? renderBuyBox([deviceName], config, item.category, "", title) : "";
   const bodyHtml = `${whyNowHtml}\n${tableHtml}\n${receptionHtml}\n${prosConsHtml}\n${verdictHtml}\n${buyBoxHtml}`;
 
   const articleWords = countWords(`${whyNowHtml}\n${receptionHtml}\n${prosConsHtml}\n${verdictHtml}`);
@@ -607,7 +607,7 @@ async function writeDealStory(item) {
     </ul>
   </div>`;
   const verdictHtml = parsed.verdict ? `<h3>Final Buying Verdict</h3><p>${escapeHtml(parsed.verdict)}</p>` : "";
-  const buyBoxHtml = renderBuyBox([productName], config, item.category, directUrl);
+  const buyBoxHtml = renderBuyBox([productName], config, item.category, directUrl, title);
 
   const bodyHtml = `${ratingBadge}\n${ratingText}\n${parsed.articleBody}\n${prosConsBox}\n${verdictHtml}\n${buyBoxHtml}`;
 
