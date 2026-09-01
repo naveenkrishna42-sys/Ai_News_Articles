@@ -1,9 +1,9 @@
-// TIVRA News — Universal Multi-Merchant Affiliate & Listicle Engine (Cuelinks V3 & Amazon Associates).
+// TIVRA News — Content-Aware Multi-Merchant Value Matrix & Universal Monetization Engine
 //
-// 1. Multi-Store Listicles: Renders direct official merchant cards (Ajio, Myntra, Tata CLiQ, Amazon, Flipkart).
-// 2. Single Products: Strict entity sanitizer prevents junk queries like "Top 10..." from searching Amazon.
-// 3. Financial Products: Contextual routing for FDs vs Credit Cards vs Loans.
-// 4. Pre-Publish Quality Gate: Zero broken keyword searches across all articles.
+// 1. Multi-Store Value Matrix: Dynamically renders side-by-side comparison cards (Amazon + Flipkart + Reliance Digital + Croma + Ajio + Tata CLiQ).
+// 2. Multi-Store Listicles: Renders direct official merchant cards for roundups and multi-brand reviews.
+// 3. Contextual Financial Routing: Separate verified hubs for Fixed Deposits, Credit Cards, and Loans.
+// 4. Pre-Publish Quality Gate: Sanitizes search queries and eliminates broken/junk search URLs.
 
 import { escapeHtml } from "./template.mjs";
 
@@ -13,14 +13,14 @@ const AMAZON_TAG = "sirmohana-21";
 export const DISCLOSURE =
   "As an affiliate and partner, TIVRA News earns from qualifying purchases and verified partner referrals. Prices, discounts, and availability are subject to change.";
 
-function cuelinksRedirect(targetUrl) {
+export function cuelinksRedirect(targetUrl) {
   return `https://linksredirect.com/?cid=${CUELINKS_CID}&source=api&url=${encodeURIComponent(targetUrl)}`;
 }
 
 /**
- * Known merchant store profiles
+ * Known merchant store profiles across India and Global campaigns
  */
-const KNOWN_MERCHANTS = [
+export const KNOWN_MERCHANTS = [
   {
     pattern: /reliance|jiomart/i,
     name: "Reliance Digital",
@@ -115,7 +115,7 @@ const KNOWN_MERCHANTS = [
  * Strict product name sanitizer.
  * Discards junk, headlines, and non-product phrases.
  */
-function sanitizeProductName(name) {
+export function sanitizeProductName(name) {
   if (!name) return "";
   let clean = name.trim();
   if (clean.includes(":")) clean = clean.split(":")[0].trim();
@@ -150,7 +150,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   const catLower = (category || "").toLowerCase();
   const textContext = `${title} ${category} ${(deviceNames || []).join(" ")}`.toLowerCase();
 
-  // 1. MULTI-STORE CLOTHING & SHOPPING LISTICLES (e.g. "Top 10 Online Shopping Sites for Clothes")
+  // 1. MULTI-STORE CLOTHING & FASHION LISTICLES (e.g. "Top 10 Online Shopping Sites for Clothes")
   const isClothingListicle = /top\s*\d+.*(shopping|cloth|fashion|apparel)|best.*(shopping sites|clothing sites|fashion sites)/i.test(textContext);
   if (isClothingListicle) {
     const ajioUrl = "https://ajo.clnk.in/w0kl";
@@ -182,7 +182,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
 </div>`;
   }
 
-  // 2. EXPLICIT DIRECT URL
+  // 2. EXPLICIT DIRECT URL (if crawler found an exact product page)
   if (directUrl) {
     let storeName = "Merchant Store";
     let btnColor = "#e11d48";
@@ -204,7 +204,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
 </div>`;
   }
 
-  // 3. BRAND-SPECIFIC MERCHANT DETECTION (Reliance Digital, Croma, Ajio, Tata Cliq, etc.)
+  // 3. BRAND-SPECIFIC SINGLE MERCHANT DETECTION (Reliance Digital, Croma, Ajio, Tata Cliq, 1mg, MakeMyTrip)
   for (const merchant of KNOWN_MERCHANTS) {
     if (merchant.pattern.test(textContext)) {
       return `<div class="buybox" style="margin:30px 0;padding:20px 22px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid ${merchant.color};border-radius:0 12px 12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
@@ -263,20 +263,21 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
 </div>`;
   }
 
-  // 5. GENERIC PHYSICAL GADGETS (Dual Store Comparison: Amazon + Flipkart)
+  // 5. UNIVERSAL MULTI-SOURCE VALUE MATRIX (Electronics, EVs, Gadgets, Lifestyle)
   const candidateName = (deviceNames && deviceNames[0]) || title || "";
   const cleanProd = sanitizeProductName(candidateName);
 
-  // If query was junk/unresolvable, route to official Amazon Deals Hub instead of broken search query!
   const amazonUrl = cleanProd ? buyUrl(cleanProd, config) : `https://www.amazon.in/deals?tag=${AMAZON_TAG}`;
   const flipkartUrl = cleanProd
     ? cuelinksRedirect(`https://www.flipkart.com/search?q=${encodeURIComponent(cleanProd)}`)
     : cuelinksRedirect("https://www.flipkart.com/offers-store");
+  const cromaUrl = cuelinksRedirect(`https://www.croma.com/searchB?q=${encodeURIComponent(cleanProd || "deals")}`);
+  const relianceUrl = cuelinksRedirect("https://www.reliancedigital.in");
 
   const displayLabel = cleanProd || "Trending Electronics & Gadgets";
 
-  return `<div class="buybox" style="margin:30px 0;padding:20px 22px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-<div style="font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:12px;">Compare Prices & Where to Buy</div>
+  return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+<div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:14px;">Compare Prices & Best Value Deals</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
   <a href="${escapeHtml(amazonUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛒 Check ${escapeHtml(displayLabel)} on Amazon</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
@@ -284,7 +285,13 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   <a href="${escapeHtml(flipkartUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2874f0;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛍️ Check on Flipkart</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
   </a>
+  <a href="${escapeHtml(cromaUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#00796b;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🏬 Check Offers on Croma</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+  </a>
+  <a href="${escapeHtml(relianceUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e42529;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛒 Check on Reliance Digital</span> <span style="font-weight:400;font-size:0.75rem;opacity:.9;">(Paid link)</span>
+  </a>
 </div>
-<p style="font-size:.75rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
+<p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
 </div>`;
 }
