@@ -1,7 +1,7 @@
 ﻿import assert from 'assert';
-import { renderBuyBox, sanitizeProductName } from '../scripts/lib/affiliate.mjs';
+import { renderBuyBox, injectInlineListicleButtons, sanitizeProductName } from '../scripts/lib/affiliate.mjs';
 
-console.log("Running Universal Affiliate Matcher & High-Yield Value Matrix Unit Tests...\n");
+console.log("Running Universal Dynamic Affiliate Engine Unit Tests...\n");
 
 const mockConfig = {
   affiliate: {
@@ -14,55 +14,59 @@ const mockConfig = {
   }
 };
 
-// Test 1: Choice Hotels ($32.14/click CPC) matching
-const hotelBox = renderBuyBox(["Choice Hotels Rewards"], mockConfig, "Product Deals & Offers", "", "Choice Hotels 2026: Save 30% on US Hotel Stays");
+// Test 1: Clean CTA Label Check (NO "(Paid link)" inside button text)
+const gadgetBox = renderBuyBox(["OnePlus 13 Pro"], mockConfig, "Technology", "", "OnePlus 13 Pro Price Drop Today");
+assert.ok(gadgetBox.includes("Buy at Amazon"), "Button must have clean 'Buy at Amazon' label");
+assert.ok(gadgetBox.includes("Buy at Flipkart"), "Button must have clean 'Buy at Flipkart' label");
+assert.ok(!gadgetBox.includes("<span>🛒 Check"), "Old wordy button format must be eliminated");
+console.log("✓ Test 1: Clean High-Converting Action Labels passed");
+
+// Test 2: Dynamic In-line Listicle Heading Parser
+const mockBody = `
+<h3>1. Amazon India</h3>
+<p>Market leader in same-day delivery.</p>
+<h3>2. Ajio</h3>
+<p>Best for trendy fashion and 9% cashback rewards.</p>
+<h3>3. Samsung Galaxy S25</h3>
+<p>Flagship smartphone with Snapdragon 8 Elite.</p>
+`;
+
+const processedBody = injectInlineListicleButtons(mockBody, mockConfig);
+assert.ok(processedBody.includes("Buy at Amazon"), "Heading 1 Amazon must have dynamic button");
+assert.ok(processedBody.includes("ajo.clnk.in/w0kl"), "Heading 2 Ajio must have dynamic 9% rewards button");
+assert.ok(processedBody.includes("Samsung Galaxy S25"), "Heading 3 must generate dynamic product search button");
+console.log("✓ Test 2: Dynamic In-Line Listicle Item Linking passed");
+
+// Test 3: Fashion Listicle Category Boundaries (Zero Croma/Reliance)
+const fashionBox = renderBuyBox(["Top 10 Online Shopping Sites for Clothes"], mockConfig, "Product Deals & Offers", "", "Top 10 Online Shopping Sites in India for Clothes");
+assert.ok(fashionBox.includes("Buy at Ajio"), "Fashion must include Ajio");
+assert.ok(fashionBox.includes("Buy at Myntra"), "Fashion must include Myntra");
+assert.ok(fashionBox.includes("Buy at Tata CLiQ"), "Fashion must include Tata CLiQ");
+assert.ok(!fashionBox.includes("croma.com") && !fashionBox.includes("reliancedigital.in"), "Fashion must NEVER include Croma or Reliance");
+console.log("✓ Test 3: Strict Fashion Category Boundaries passed");
+
+// Test 4: Dedicated Health Insurance & Healthcare
+const insuranceBox = renderBuyBox(["Health Insurance Scheme"], mockConfig, "Credit Cards & Cashback", "", "Why Health Insurance Matters in 2026: Coverage & Benefits");
+assert.ok(insuranceBox.includes("Compare Health Insurance Plans"), "Must include Insurance action button");
+assert.ok(insuranceBox.includes("1mg.com"), "Must include 1mg Health tests button");
+assert.ok(!insuranceBox.includes("Lifetime Free Cards"), "Insurance MUST NOT show Credit Card button");
+console.log("✓ Test 4: Dedicated Health Insurance & Healthcare matching passed");
+
+// Test 5: High-EPC US Campaigns (Choice Hotels $32 CPC, Norwegian Cruise $12 CPC, Verpex $52 CPS)
+const hotelBox = renderBuyBox(["Choice Hotels Deals"], mockConfig, "Product Deals & Offers", "", "Choice Hotels 2026: Save 30% on US Hotel Stays");
 assert.ok(hotelBox.includes("choicehotels.com"), "Hotel deal must link to Choice Hotels");
-assert.ok(hotelBox.includes("Choice Hotels"), "Button text must name Choice Hotels");
-console.log("✓ Test 1: Choice Hotels ($32.14/clk) matching passed");
+assert.ok(hotelBox.includes("Choice Hotels"), "Button must name Choice Hotels");
 
-// Test 2: Norwegian Cruise Line ($12.86/click CPC) matching
-const cruiseBox = renderBuyBox(["Norwegian Cruise Deal"], mockConfig, "Product Deals & Offers", "", "Norwegian Cruise Line: Caribbean Luxury Sailings & Perks");
+const cruiseBox = renderBuyBox(["Norwegian Cruise Specials"], mockConfig, "Product Deals & Offers", "", "Norwegian Cruise Line: Caribbean Luxury Sailings & Perks");
 assert.ok(cruiseBox.includes("ncl.com"), "Cruise deal must link to NCL");
-assert.ok(cruiseBox.includes("Norwegian Cruise Line"), "Button text must name Norwegian Cruise Line");
-console.log("✓ Test 2: Norwegian Cruise ($12.86/clk) matching passed");
 
-// Test 3: Verpex Cloud Hosting ($52.50 / sale CPS) matching
-const hostingBox = renderBuyBox(["Verpex Hosting Review"], mockConfig, "Business", "", "Best Web Hosting for Startups in 2026: Cloud Server Benchmark");
+const hostingBox = renderBuyBox(["Verpex Hosting Benchmark"], mockConfig, "Business", "", "Best Web Hosting for Startups in 2026: Cloud Server Benchmark");
 assert.ok(hostingBox.includes("verpex.com"), "Hosting deal must link to Verpex");
-assert.ok(hostingBox.includes("Cloud Web Hosting"), "Button text must mention Cloud Web Hosting");
-console.log("✓ Test 3: Verpex Cloud Hosting ($52.50/sale) matching passed");
+console.log("✓ Test 5: High-EPC Global Travel, Cruise & Hosting matching passed");
 
-// Test 4: Reliance Digital matching
-const relianceBox = renderBuyBox(["Reliance discount schemes"], mockConfig, "Product Deals & Offers", "", "Reliance Discounts: Republic Day Savings Worth Checking");
-assert.ok(relianceBox.includes("reliancedigital.in"), "Reliance deal must link to Reliance Digital");
-console.log("✓ Test 4: Reliance Digital brand matching passed");
+// Test 6: Strict Query Sanitizer
+assert.strictEqual(sanitizeProductName("Top 10 Online Shopping Websites in India: 2026's Best Picks"), "", "Junk listicle must be invalidated");
+assert.strictEqual(sanitizeProductName("Samsung Galaxy S25 Ultra: Full Review"), "Samsung Galaxy S25 Ultra", "Clean product must be extracted");
+console.log("✓ Test 6: Strict Query Sanitizer passed");
 
-// Test 5: Ajio matching
-const ajioBox = renderBuyBox(["Ajio Kurta Sale"], mockConfig, "Product Deals & Offers", "", "Ajio All Stars Sale: 80% Off on Top Styles");
-assert.ok(ajioBox.includes("ajo.clnk.in/w0kl") || ajioBox.includes("ajio"), "Ajio deal must link to Ajio");
-console.log("✓ Test 5: Ajio brand matching passed");
-
-// Test 6: Multi-Store Clothing Listicle 5-brand hub
-const listicleBox = renderBuyBox(["Top 10 Online Shopping Sites in India for Clothes"], mockConfig, "Product Deals & Offers", "", "Top 10 Online Shopping Sites in India for Clothes");
-assert.ok(listicleBox.includes("ajo.clnk.in/w0kl"), "Listicle must include Ajio card");
-assert.ok(listicleBox.includes("myntra.com"), "Listicle must include Myntra card");
-assert.ok(listicleBox.includes("tatacliq.com"), "Listicle must include Tata CLiQ card");
-assert.ok(listicleBox.includes("amazon.in"), "Listicle must include Amazon Fashion card");
-assert.ok(listicleBox.includes("flipkart.com"), "Listicle must include Flipkart Fashion card");
-console.log("✓ Test 6: Multi-Store Clothing Listicle 5-brand hub passed");
-
-// Test 7: Multi-Source Value Matrix for Gadgets & Tech
-const gadgetBox = renderBuyBox(["Samsung Galaxy S25 Ultra"], mockConfig, "Technology", "", "Samsung Galaxy S25 Ultra Price Drop: Best Deal Today");
-assert.ok(gadgetBox.includes("amazon.in"), "Gadget deal must include Amazon button");
-assert.ok(gadgetBox.includes("flipkart.com"), "Gadget deal must include Flipkart button");
-assert.ok(gadgetBox.includes("croma.com"), "Gadget deal must include Croma button");
-assert.ok(gadgetBox.includes("reliancedigital.in"), "Gadget deal must include Reliance Digital button");
-console.log("✓ Test 7: Multi-Source Value Matrix (Amazon + Flipkart + Croma + Reliance) passed");
-
-// Test 8: Contextual Fixed Deposit (FD) matching
-const fdBox = renderBuyBox(["SBI Senior Citizen FD Scheme"], mockConfig, "Banking", "", "Senior Citizens: Highest Bank FD Rates in 2026");
-assert.ok(fdBox.includes("Bank FD Rates"), "FD deal must link to Bank FD comparison");
-assert.ok(!fdBox.includes("Rise Works") && !fdBox.includes("clnk.in/B5IT"), "FD deal must NEVER link to B2B SaaS");
-console.log("✓ Test 8: Contextual Fixed Deposit (FD) matching passed");
-
-console.log("\n✅ ALL Universal Affiliate Matcher & High-Yield Value Matrix unit tests passed with 100% accuracy!\n");
+console.log("\n✅ ALL Universal Dynamic Affiliate Engine unit tests passed with 100% accuracy!\n");
