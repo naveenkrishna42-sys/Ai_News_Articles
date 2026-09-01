@@ -243,26 +243,31 @@ function parseArticle(filename) {
 
   const image = extract(html, /<img[^>]+src=["']([^"']+)["']/i, "");
 
-  // Date is written in the meta row as: <span>📅 2026-07-11</span>
-  const dateRaw = extract(html, /📅\s*([0-9]{4}-[0-9]{2}-[0-9]{2})/, "");
-
-  // Category is written as: <span>📂 World</span>
-  const categoryRaw = decodeEntities(
-    stripTags(extract(html, /<span class="cat-pill">([^<]+)<\/span>/, "General"))
-  );
-
   const dateObj = new Date();
   const today = dateObj.toISOString().slice(0, 10);
   dateObj.setUTCDate(dateObj.getUTCDate() + 1);
   const tomorrow = dateObj.toISOString().slice(0, 10);
-  const scheduled = dateRaw ? dateRaw > tomorrow : false;
+
+  // Multi-layer date extractor: Filename -> Meta tag -> JSON-LD -> Span -> fallback
+  const filenameDate = filename.match(/^([0-9]{4}-[0-9]{2}-[0-9]{2})/)?.[1] || "";
+  const metaDate = extract(html, /<meta\s+property=["']article:published_time["']\s+content=["']([0-9]{4}-[0-9]{2}-[0-9]{2})["']/i, "");
+  const jsonLdDate = extract(html, /"datePublished":\s*"([0-9]{4}-[0-9]{2}-[0-9]{2})"/i, "");
+  const spanDate = extract(html, /([0-9]{4}-[0-9]{2}-[0-9]{2})/, "");
+  const date = filenameDate || metaDate || jsonLdDate || spanDate || today;
+
+  // Category is written as: <span class="cat-pill">World</span>
+  const categoryRaw = decodeEntities(
+    stripTags(extract(html, /<span class="cat-pill">([^<]+)<\/span>/, "General"))
+  );
+
+  const scheduled = date ? date > tomorrow : false;
 
   return {
     slug,
     title,
     description,
     image,
-    date: dateRaw || today,
+    date,
     category: categoryRaw.trim() || "General",
     url: `/articles/${slug}.html`,
     scheduled,
