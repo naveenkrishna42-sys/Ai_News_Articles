@@ -281,16 +281,25 @@ function buildCategoryCarouselsHtml(all, featuredOrder) {
     .sort((a, b) => (byCategory.get(a)[0].date < byCategory.get(b)[0].date ? 1 : -1));
   const ordered = [...featuredPresent, ...rest.slice(0, Math.max(0, 12 - featuredPresent.length))];
 
-  return ordered.map((cat) => {
-    const items = byCategory.get(cat).slice(0, 10);
+  return ordered.map((cat, idx) => {
+    let items = (byCategory.get(cat) || []).slice(0, 12);
+    // Backfill from top items if category has fewer than 6 items
+    if (items.length < 6) {
+      const extra = all.filter(a => a.category !== cat && !items.some(it => it.slug === a.slug)).slice(0, 8 - items.length);
+      items = [...items, ...extra];
+    }
     const slug = slugifyCategory(cat);
     return `
-      <section class="category-section">
+      <section class="category-section" data-section="${idx}">
         <div class="category-section-head">
           <h2>${escapeHtml(cat)}</h2>
-          <a href="/category.html?cat=${encodeURIComponent(slug)}">View all →</a>
+          <div class="category-controls">
+            <a href="/category.html?cat=${encodeURIComponent(slug)}">View all →</a>
+            <button class="rail-btn prev" data-rail-prev="${idx}" aria-label="Scroll left">&lsaquo;</button>
+            <button class="rail-btn next" data-rail-next="${idx}" aria-label="Scroll right">&rsaquo;</button>
+          </div>
         </div>
-        <div class="carousel-track" data-rail>${items.map(carouselCardHtml).join("")}</div>
+        <div class="carousel-track" data-rail id="rail-${idx}">${items.map(carouselCardHtml).join("")}</div>
       </section>`;
   }).join("");
 }
