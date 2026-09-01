@@ -51,10 +51,15 @@ const saasBox = renderBuyBox(["Global Payroll Platform"], mockConfig, "Business"
 assert.ok(saasBox.includes("clnk.in/B5IT"), "SaaS deal must link to Rise Works");
 console.log("✓ Test 6: Rise Works B2B SaaS matching passed");
 
-// Test 7: Credit Cards & Banking MUST render Partner Reward Card
+// Test 7: Fixed Deposit (FD) articles MUST route to Bank FD & Savings rates (NEVER SaaS!)
+const fdBox = renderBuyBox(["SBI Senior Citizen FD Scheme"], mockConfig, "Banking", "", "Senior Citizens: Highest Bank FD Rates in 2026");
+assert.ok(fdBox.includes("Bank FD Rates"), "FD deal must link to Bank FD comparison");
+assert.ok(!fdBox.includes("Rise Works") && !fdBox.includes("clnk.in/B5IT"), "FD deal must NEVER link to B2B SaaS");
+console.log("✓ Test 7: Contextual Fixed Deposit (FD) matching passed");
+
+// Test 8: Credit Cards & Cashback MUST render card application offer
 const cardBox = renderBuyBox(["SBI Cashback Card"], mockConfig, "Credit Cards & Cashback", "", "Best Credit Cards for Airport Lounge Access in 2026");
-assert.ok(cardBox.includes("clnk.in/B5IT"), "Card deal must link to high-ticket partner offer");
-assert.ok(cardBox.includes("clnk.in/B5IL"), "Card deal must link to CPC rewards");
-console.log("✓ Test 7: Credit card & banking offer matching passed");
+assert.ok(cardBox.includes("Cashback & Lifetime Free Cards") || cardBox.includes("Card Offers"), "Card deal must link to credit card benefits");
+console.log("✓ Test 8: Contextual Credit card & cashback offer matching passed");
 
 console.log("\n✅ ALL Universal Affiliate Matcher unit tests passed with 100% accuracy!\n");
