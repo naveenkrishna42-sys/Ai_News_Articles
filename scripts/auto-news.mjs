@@ -36,7 +36,7 @@ import { fetchAllFeeds, storyKey, significantWords, titlesOverlap } from "./lib/
 import { findImage, findYouTubeVideo, mediaPreflight, findWikipediaPortrait } from "./lib/images.mjs";
 import { findDeviceImage } from "./lib/images/index.mjs";
 import { renderArticlePage, renderComparisonTable, specTableHasData, buildAwaitingSpecsNotice, slugify, escapeHtml } from "./lib/template.mjs";
-import { renderBuyBox } from "./lib/affiliate.mjs";
+import { renderBuyBox, injectInlineListicleButtons } from "./lib/affiliate.mjs";
 import { buildComparisonSystemPrompt, buildRankingSystemPrompt, buildReviewSystemPrompt, buildNichePrompt } from "./lib/gadget-prompts.mjs";
 import { getBestMonetizedUrl, extractCleanProductName } from "./lib/deal-extractor.mjs";
 import { generateAndValidateDealArticle } from "./lib/deal-validator.mjs";
@@ -244,7 +244,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
     filename = `${today}-${slug}-${n++}.html`;
   }
 
-  let finalBodyHtml = bodyHtml;
+  let finalBodyHtml = injectInlineListicleButtons(bodyHtml, config);
   const isCommercialTopic = /deal|offer|cashback|card|smartphone|phone|camera|laptop|watch|earbuds|tablet|oppo|samsung|apple|iphone|xiaomi|oneplus|vivo|realme|hosting|software|saas|hotels|resort|flight/i.test(title + " " + item.category);
   const commercialCats = new Set(["Product Deals & Offers", "Credit Cards & Cashback", "Gadget Comparisons", "AI Tips & Tools", "Technology", "Business"]);
   
