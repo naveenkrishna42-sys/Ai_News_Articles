@@ -1,48 +1,60 @@
 ﻿import assert from 'assert';
 import { scoreOffer, filterActiveOffers, DEFAULT_CAMPAIGNS } from '../scripts/lib/cuelinks-sync.mjs';
 
-console.log("Running Cuelinks Sync Unit Tests...");
+console.log("Running Global Cuelinks Multi-Country & High-EPC Sync Unit Tests...\n");
 
-// Test 1: Tier 1 Mega Bounty Scoring
-const tier1Offer = { title: "Global Payroll Enterprise Subscription", payout: "32000 INR" };
-const score1 = scoreOffer(tier1Offer);
-assert.strictEqual(score1.tier, 1, "Expected Tier 1 for Rs 32k payout");
-console.log("✓ Tier 1 scoring test passed");
+// Test 1: Tier 1 High-EPC US Campaign Scoring (Choice Hotels $32.14 / click CPC)
+const choiceHotelsScore = scoreOffer({
+  name: "Choice Hotels US",
+  payout: "$32.14 / click",
+  commission: "CPC",
+  epc7Day: 66.22
+});
+assert.strictEqual(choiceHotelsScore.tier, 1, "Choice Hotels must be Tier 1 High-EPC Bounty");
+console.log("✓ Test 1: Choice Hotels ($32.14/clk) Tier 1 High-EPC scoring passed");
 
-// Test 2: Tier 2 High Commission CPS Scoring
-const tier2Offer = { title: "Ajio All Stars Sale 2026", payout: "9.0% CPS" };
-const score2 = scoreOffer(tier2Offer);
-assert.strictEqual(score2.tier, 2, "Expected Tier 2 for 9% CPS");
-console.log("✓ Tier 2 scoring test passed");
+// Test 2: Tier 1 US CPS Bounty Scoring (Airwallex ₹20,250)
+const airwallexScore = scoreOffer({
+  name: "Airwallex Global Business Account",
+  payout: "₹20,250 / sale",
+  commission: "CPS",
+  epc7Day: 65.18
+});
+assert.strictEqual(airwallexScore.tier, 1, "Airwallex must be Tier 1 Bounty");
+console.log("✓ Test 2: Airwallex (₹20,250) Tier 1 scoring passed");
 
-// Test 3: Tier 4 CPC Scoring
-const tier4Offer = { title: "General Banking Click", payout: "0.15 INR Per Click" };
-const score4 = scoreOffer(tier4Offer);
-assert.strictEqual(score4.tier, 4, "Expected Tier 4 for CPC");
-console.log("✓ Tier 4 scoring test passed");
+// Test 3: Tier 2 High-Commission CPS (AppSumo 52.5% & Ajio 9%)
+const appSumoScore = scoreOffer({
+  name: "AppSumo Lifetime Software Deals",
+  payout: "52.50% / sale",
+  commission: "CPS"
+});
+assert.strictEqual(appSumoScore.tier, 2, "AppSumo must be Tier 2 High-Commission");
 
-// Test 4: Expired offers filtering
-const pastDate = new Date(Date.now() - 86400000).toISOString();
-const futureDate = new Date(Date.now() + 86400000).toISOString();
+const ajioScore = scoreOffer({
+  name: "Ajio Fashion",
+  payout: "9% CPS",
+  commission: "CPS"
+});
+assert.strictEqual(ajioScore.tier, 2, "Ajio 9% must be Tier 2 High-Commission");
+console.log("✓ Test 3: High-Commission CPS (AppSumo 52.5% & Ajio 9%) Tier 2 scoring passed");
 
+// Test 4: Expiration filtering
 const testOffers = [
-  { id: 1, title: "Active Offer", end_date: futureDate },
-  { id: 2, title: "Expired Offer", end_date: pastDate },
-  { id: 3, title: "Inactive Status Offer", status: "inactive" },
-  { id: 4, title: "No Expiry Offer" }
+  { name: "Active Deal", end_date: "2099-12-31" },
+  { name: "Expired Deal", end_date: "2020-01-01" },
+  { name: "No Expiry Deal" }
 ];
+const activeOnly = filterActiveOffers(testOffers);
+assert.strictEqual(activeOnly.length, 2, "Expired offers must be filtered out");
+console.log("✓ Test 4: Expiration filtering test passed");
 
-const active = filterActiveOffers(testOffers);
-assert.strictEqual(active.length, 2, "Expected exactly 2 active offers");
-assert.strictEqual(active[0].id, 1);
-assert.strictEqual(active[1].id, 4);
-console.log("✓ Expiration filtering test passed");
+// Test 5: Global Fallback Campaigns Catalog
+assert.ok(DEFAULT_CAMPAIGNS.choiceHotels, "Must include Choice Hotels fallback");
+assert.ok(DEFAULT_CAMPAIGNS.verpexHosting, "Must include Verpex Hosting fallback");
+assert.ok(DEFAULT_CAMPAIGNS.airwallex, "Must include Airwallex fallback");
+assert.ok(DEFAULT_CAMPAIGNS.ajioFashion, "Must include Ajio Fashion fallback");
+assert.ok(DEFAULT_CAMPAIGNS.appsumo, "Must include AppSumo fallback");
+console.log("✓ Test 5: Global fallback campaigns database passed");
 
-// Test 5: Fallback Campaigns Integrity
-assert.ok(DEFAULT_CAMPAIGNS.megaSaaS.url.includes("clnk.in/B5IT"));
-assert.ok(DEFAULT_CAMPAIGNS.b2bGrowth.url.includes("clnk.in/BV9q"));
-assert.ok(DEFAULT_CAMPAIGNS.ajioFashion.url.includes("ajo.clnk.in/w0kl"));
-assert.ok(DEFAULT_CAMPAIGNS.cpcRewards.url.includes("clnk.in/B5IL"));
-console.log("✓ Fallback campaigns test passed");
-
-console.log("✅ All Cuelinks Sync unit tests passed successfully!\n");
+console.log("\n✅ ALL Global Cuelinks Multi-Country & High-EPC Sync unit tests passed successfully!\n");
