@@ -9,14 +9,17 @@ export function isMonetizedDeal(article) {
   const cat = (article.category || '').toLowerCase();
   const title = (article.title || '').toLowerCase();
   
-  return (
-    cat.includes('deal') ||
-    cat.includes('offer') ||
-    cat.includes('cashback') ||
-    cat.includes('card') ||
-    cat.includes('gadget') ||
-    /deal|sale|discount|price drop|cashback|loot|coupon|off|ajio|amazon|flipkart|myntra|payroll|saas|b2b/i.test(title)
-  );
+  // Exclude non-commercial / political categories
+  const nonCommercialCats = ['world', 'india', 'politics', 'wars & conflicts', 'crime & law', 'hyderabad', 'chennai', 'bengaluru', 'delhi', 'mumbai', 'sports'];
+  if (nonCommercialCats.includes(cat)) return false;
+
+  // Strict commercial categories
+  if (cat.includes('deal') || cat.includes('offer') || cat.includes('cashback') || cat.includes('card') || cat.includes('gadget')) {
+    return true;
+  }
+  
+  // Strict commercial shopping brands & keywords
+  return /\b(discount|discounts|price drop|cashback|loot|coupon|coupons|ajio|myntra|reliance digital|croma|tata cliq|amazon|flipkart|payroll|b2b saas)\b|\b\d+%\s*off\b/i.test(title);
 }
 
 export function pickTelegramDeals(articles, limit = 4) {
