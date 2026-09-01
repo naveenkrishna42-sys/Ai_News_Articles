@@ -245,7 +245,10 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
   }
 
   let finalBodyHtml = bodyHtml;
-  if (item.category === "Product Deals & Offers" || item.category === "Credit Cards & Cashback") {
+  const isCommercialTopic = /deal|offer|cashback|card|smartphone|phone|camera|laptop|watch|earbuds|tablet|oppo|samsung|apple|iphone|xiaomi|oneplus|vivo|realme|hosting|software|saas|hotels|resort|flight/i.test(title + " " + item.category);
+  const commercialCats = new Set(["Product Deals & Offers", "Credit Cards & Cashback", "Gadget Comparisons", "AI Tips & Tools", "Technology", "Business"]);
+  
+  if (commercialCats.has(item.category) || isCommercialTopic) {
     const buyBoxHtml = renderBuyBox([title], config, item.category, "", title);
     if (buyBoxHtml) finalBodyHtml += `\n${buyBoxHtml}`;
   }
