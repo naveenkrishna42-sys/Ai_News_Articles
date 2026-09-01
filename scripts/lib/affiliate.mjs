@@ -146,13 +146,6 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   // 1. FINANCIAL PRODUCTS (Credit Cards, Bank Accounts, Insurance, Loans)
   const isFinancial = catLower.includes("card") || catLower.includes("cashback") || catLower.includes("bank") || catLower.includes("insurance");
   if (isFinancial) {
-    const isFDOrMacro = textContext.includes("fd") || textContext.includes("fixed deposit") || textContext.includes("savings rate") || textContext.includes("mclr") || textContext.includes("repo rate") || textContext.includes("inflation");
-    
-    // Keep FD and macro banking articles clean from mismatched credit card / web hosting CTAs
-    if (isFDOrMacro && !textContext.includes("credit card")) {
-      return "";
-    }
-
     const cpcUrl = config?.affiliate?.cuelinks?.cpcUrl || "https://clnk.in/B5IL";
     const megaUrl = config?.affiliate?.cuelinks?.megaHighTicketUrl || "https://clnk.in/B5IT";
     const targetUrl = directUrl || megaUrl;
