@@ -267,6 +267,22 @@
     {
       "category": "Business",
       "url": "https://news.google.com/rss/search?q=global+payroll+remote+work+hiring+saas+startups&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Product Deals & Offers",
+      "url": "https://news.google.com/rss/search?q=hotel+discounts+resort+booking+deals+flight+travel&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Product Deals & Offers",
+      "url": "https://news.google.com/rss/search?q=cruise+vacation+deals+luxury+ship+travel+discounts&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Business",
+      "url": "https://news.google.com/rss/search?q=web+hosting+cloud+deals+wordpress+server+discounts&hl=en-IN&gl=IN&ceid=IN:en"
+    },
+    {
+      "category": "Product Deals & Offers",
+      "url": "https://news.google.com/rss/search?q=electric+scooter+ev+car+discount+price+drop+deals+india&hl=en-IN&gl=IN&ceid=IN:en"
     }
   ],
   "categoryPriority": [
