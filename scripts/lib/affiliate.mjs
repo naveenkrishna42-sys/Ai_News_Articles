@@ -118,7 +118,7 @@ export const KNOWN_MERCHANTS = [
     cta: "Book Verified Lab Test on 1mg"
   },
   {
-    pattern: /payroll|rise\s*works|contractor|remote\s*hiring/i,
+    pattern: /payroll|hr\s*saas|workforce|remote\s*hiring|contractor|rise\s*works|keka/i,
     name: "Rise Works",
     url: "https://clnk.in/B5IT",
     color: "#059669",
