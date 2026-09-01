@@ -385,6 +385,17 @@ ${bodyHtml}
   <div>&copy; ${year} TIVRA News &mdash; Trusted Insights, Verified Reports &amp; Alerts.</div>
 </footer>
 <script src="/related.js" defer></script>
+<script type="text/javascript">
+    var cId = "316413";
+
+    (function(d, t) {
+      var s = document.createElement("script");
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = (document.location.protocol == "https:" ? "https://cdn0.cuelinks.com/js/" : "http://cdn0.cuelinks.com/js/") + "cuelinksv2.js";
+      document.getElementsByTagName("body")[0].appendChild(s);
+    }());
+</script>
 </body>
 </html>`;
 }

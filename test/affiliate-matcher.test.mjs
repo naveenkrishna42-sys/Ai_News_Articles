@@ -55,7 +55,7 @@ assert.ok(gadgetBox.includes("flipkart.com"), "Gadget deal must include Flipkart
 assert.ok(gadgetBox.includes("croma.com"), "Gadget deal must include Croma button");
 assert.ok(gadgetBox.includes("reliancedigital.in"), "Gadget deal must include Reliance Digital button");
 assert.ok(gadgetBox.includes("sirmohana-21"), "Amazon button must carry Amazon tag");
-assert.ok(gadgetBox.includes("310115"), "Cuelinks buttons must carry CID");
+assert.ok(gadgetBox.includes("316413"), "Cuelinks buttons must carry CID");
 console.log("✓ Test 6: Multi-Source Value Matrix (Amazon + Flipkart + Croma + Reliance) passed");
 
 // Test 7: B2B SaaS / Global Payroll MUST route to Rise Works

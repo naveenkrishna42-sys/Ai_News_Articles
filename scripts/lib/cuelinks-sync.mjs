@@ -28,7 +28,7 @@ export const DEFAULT_CAMPAIGNS = {
     epc7Day: 157.43,
     country: "US",
     category: "Web Hosting & Cloud",
-    url: "https://linksredirect.com/?cid=310115&source=api&url=https%3A%2F%2Fverpex.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fverpex.com",
     tier: 1,
   },
   choiceHotels: {
@@ -38,7 +38,7 @@ export const DEFAULT_CAMPAIGNS = {
     epc7Day: 66.22,
     country: "US",
     category: "Travel & Hotels",
-    url: "https://linksredirect.com/?cid=310115&source=api&url=https%3A%2F%2Fwww.choicehotels.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.choicehotels.com",
     tier: 1,
   },
   airwallex: {
@@ -58,7 +58,7 @@ export const DEFAULT_CAMPAIGNS = {
     epc7Day: 55.49,
     country: "US",
     category: "Travel & Cruises",
-    url: "https://linksredirect.com/?cid=310115&source=api&url=https%3A%2F%2Fwww.ncl.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.ncl.com",
     tier: 1,
   },
   virginVoyages: {
@@ -68,7 +68,7 @@ export const DEFAULT_CAMPAIGNS = {
     epc7Day: 45.56,
     country: "US",
     category: "Travel & Cruises",
-    url: "https://linksredirect.com/?cid=310115&source=api&url=https%3A%2F%2Fwww.virginvoyages.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.virginvoyages.com",
     tier: 1,
   },
   appsumo: {
@@ -78,7 +78,7 @@ export const DEFAULT_CAMPAIGNS = {
     epc7Day: 22.97,
     country: "Global",
     category: "Software & AI Tools",
-    url: "https://linksredirect.com/?cid=310115&source=api&url=https%3A%2F%2Fappsumo.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fappsumo.com",
     tier: 2,
   },
   amazonUs: {
@@ -88,7 +88,7 @@ export const DEFAULT_CAMPAIGNS = {
     epc7Day: 8.43,
     country: "US",
     category: "Shopping & Gadgets",
-    url: "https://linksredirect.com/?cid=310115&source=api&url=https%3A%2F%2Fwww.amazon.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.amazon.com",
     tier: 2,
   },
 
@@ -117,7 +117,7 @@ export const DEFAULT_CAMPAIGNS = {
     commission: "CPS",
     country: "Global",
     category: "Web Hosting & Cloud",
-    url: "https://linksredirect.com/?cid=310115&source=api&url=https%3A%2F%2Fwww.hostinger.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.hostinger.com",
     tier: 2,
   },
   bluehost: {
@@ -126,7 +126,7 @@ export const DEFAULT_CAMPAIGNS = {
     commission: "CPS",
     country: "Global",
     category: "Web Hosting & Cloud",
-    url: "https://linksredirect.com/?cid=310115&source=api&url=https%3A%2F%2Fwww.bluehost.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.bluehost.com",
     tier: 2,
   },
   wondershare: {
@@ -135,7 +135,7 @@ export const DEFAULT_CAMPAIGNS = {
     commission: "CPS",
     country: "Global",
     category: "Software & AI Tools",
-    url: "https://linksredirect.com/?cid=310115&source=api&url=https%3A%2F%2Fwww.wondershare.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.wondershare.com",
     tier: 2,
   },
   hostelworld: {
@@ -144,7 +144,7 @@ export const DEFAULT_CAMPAIGNS = {
     commission: "CPS",
     country: "Global",
     category: "Travel & Hotels",
-    url: "https://linksredirect.com/?cid=310115&source=api&url=https%3A%2F%2Fwww.hostelworld.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.hostelworld.com",
     tier: 2,
   },
   cpcRewards: {

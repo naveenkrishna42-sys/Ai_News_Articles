@@ -7,7 +7,7 @@
 
 import { escapeHtml } from "./template.mjs";
 
-const CUELINKS_CID = "310115";
+const CUELINKS_CID = "316413";
 const AMAZON_TAG = "sirmohana-21";
 
 export const DISCLOSURE =
