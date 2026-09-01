@@ -63,8 +63,33 @@ function cardHtml(a) {
     </article>`;
 }
 
+const ALIASES = {
+  "credit-cards": "credit-cards-cashback",
+  "credit-cards-and-cashback": "credit-cards-cashback",
+  "creditcards": "credit-cards-cashback",
+  "cashback": "credit-cards-cashback",
+  "deals": "product-deals-offers",
+  "offers": "product-deals-offers",
+  "product-deals": "product-deals-offers",
+  "product-deals-and-offers": "product-deals-offers",
+  "gadgets": "gadget-comparisons",
+  "gadget-comparison": "gadget-comparisons",
+  "ai-tools": "ai-tips-tools",
+  "ai": "ai-tips-tools",
+  "breaking": "breaking-news",
+  "top": "top-stories",
+  "crime": "crime-law"
+};
+
+function normalizeSlug(s) {
+  if (!s) return "";
+  const cleaned = s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  return ALIASES[cleaned] || cleaned;
+}
+
 const params = new URLSearchParams(window.location.search);
 const catSlug = params.get("cat") || "";
+const targetSlug = normalizeSlug(catSlug);
 
 const grid = document.getElementById("articleGrid");
 const emptyState = document.getElementById("emptyState");
@@ -99,7 +124,10 @@ fetch("/articles.json", { cache: "no-store" })
   .then((r) => r.json())
   .then((data) => {
     const all = data.articles || [];
-    const matching = all.filter((a) => slugifyCategory(a.category) === catSlug);
+    const matching = all.filter((a) => {
+      const aSlug = normalizeSlug(slugifyCategory(a.category));
+      return aSlug === targetSlug || aSlug.includes(targetSlug) || targetSlug.includes(aSlug);
+    });
     state.matching = matching;
 
     const label = matching[0] ? matching[0].category : catSlug.replace(/-/g, " ");
