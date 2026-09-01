@@ -132,7 +132,36 @@ function resetPublicDir(published) {
         if (file === "index.html") {
           const topArticles = published.slice(0, 48);
           const gridHtml = topArticles.map(cardHtml).join("");
-          html = html.replace('<div class="grid" id="articleGrid" aria-live="polite"></div>', `<div class="grid" id="articleGrid" aria-live="polite">${gridHtml}</div>`);
+          const tickerTrackHtml = buildTickerHtml(published);
+          const heroInnerHtml = buildHeroHtml(published);
+          const carouselsHtml = buildCategoryCarouselsHtml(published, featuredCats);
+
+          // 1. Pre-render Ticker (25 breaking stories)
+          html = html.replace(
+            '<div class="ticker" id="ticker" hidden>',
+            '<div class="ticker" id="ticker">'
+          ).replace(
+            '<div class="ticker-track" id="tickerTrack"></div>',
+            `<div class="ticker-track" id="tickerTrack">${tickerTrackHtml}</div>`
+          );
+
+          // 2. Pre-render Hero Slider
+          html = html.replace(
+            '<section class="hero" id="hero" hidden aria-label="Top stories">\n    <div class="hero-track" id="heroTrack"></div>\n    <button class="hero-arrow prev" id="heroPrev" aria-label="Previous story">&lsaquo;</button>\n    <button class="hero-arrow next" id="heroNext" aria-label="Next story">&rsaquo;</button>\n    <div class="hero-dots" id="heroDots"></div>\n  </section>',
+            `<section class="hero" id="hero" aria-label="Top stories">${heroInnerHtml}</section>`
+          );
+
+          // 3. Pre-render Category Carousels
+          html = html.replace(
+            '<div id="categoryCarousels"><!-- one auto-scrolling rail per featured category --></div>',
+            `<div id="categoryCarousels">${carouselsHtml}</div>`
+          );
+
+          // 4. Pre-render Latest Grid
+          html = html.replace(
+            '<div class="grid" id="articleGrid" aria-live="polite"></div>',
+            `<div class="grid" id="articleGrid" aria-live="polite">${gridHtml}</div>`
+          );
         }
         writeFileSync(path.join(PUBLIC_DIR, file), html, "utf-8");
       } else if (hasAds && file === "ads.txt") {
@@ -226,6 +255,77 @@ function cardHtml(a) {
         <div class="card-meta"><span>${formatDate(a.date)}</span></div>
       </div>
     </article>`;
+}
+
+
+function carouselCardHtml(a) {
+  return `
+    <a class="carousel-card" href="${a.url}">
+      <img src="${a.image || FALLBACK_IMG}" alt="${escapeHtml(a.title)}" loading="lazy">
+      <div class="cc-body">
+        <h3>${escapeHtml(a.title)}</h3>
+        <div class="cc-meta">${formatDate(a.date)}</div>
+      </div>
+    </a>`;
+}
+
+function buildCategoryCarouselsHtml(all, featuredOrder) {
+  const byCategory = new Map();
+  for (const a of all) {
+    if (!byCategory.has(a.category)) byCategory.set(a.category, []);
+    byCategory.get(a.category).push(a);
+  }
+
+  const featuredPresent = (featuredOrder || []).filter((c) => byCategory.has(c));
+  const rest = [...byCategory.keys()].filter((c) => !featuredPresent.includes(c))
+    .sort((a, b) => (byCategory.get(a)[0].date < byCategory.get(b)[0].date ? 1 : -1));
+  const ordered = [...featuredPresent, ...rest.slice(0, Math.max(0, 12 - featuredPresent.length))];
+
+  return ordered.map((cat) => {
+    const items = byCategory.get(cat).slice(0, 10);
+    const slug = slugifyCategory(cat);
+    return `
+      <section class="category-section">
+        <div class="category-section-head">
+          <h2>${escapeHtml(cat)}</h2>
+          <a href="/category.html?cat=${encodeURIComponent(slug)}">View all →</a>
+        </div>
+        <div class="carousel-track" data-rail>${items.map(carouselCardHtml).join("")}</div>
+      </section>`;
+  }).join("");
+}
+
+function buildHeroHtml(all) {
+  const withImages = all.filter((a) => a.image);
+  const picks = (withImages.length >= 5 ? withImages : all).slice(0, 5);
+  if (!picks.length) return "";
+
+  const slides = picks.map((a, idx) => `
+    <a class="hero-slide" href="${a.url}">
+      <img src="${getHeroUrl(a.image)}" alt="${escapeHtml(a.title)}" width="1200" height="675" ${idx === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>
+      <div class="hero-overlay"></div>
+      <div class="hero-text">
+        <span class="cat-pill">${escapeHtml(a.category)}</span>
+        <h2>${escapeHtml(a.title)}</h2>
+        <div class="hero-meta">${formatDate(a.date)} · ${escapeHtml((a.description || "").slice(0, 90))}${(a.description || "").length > 90 ? "..." : ""}</div>
+      </div>
+    </a>`).join("");
+
+  const dots = picks.map((_, i) =>
+    `<button data-i="${i}" class="${i === 0 ? "active" : ""}" aria-label="Go to story ${i + 1}"></button>`).join("");
+
+  return `
+    <div class="hero-track" id="heroTrack">${slides}</div>
+    <button class="hero-arrow prev" id="heroPrev" aria-label="Previous story">&lsaquo;</button>
+    <button class="hero-arrow next" id="heroNext" aria-label="Next story">&rsaquo;</button>
+    <div class="hero-dots" id="heroDots">${dots}</div>`;
+}
+
+function buildTickerHtml(all) {
+  const items = all.slice(0, 25);
+  if (!items.length) return "";
+  const links = items.map((a) => `<a href="${a.url}">${escapeHtml(a.title)}</a>`).join("");
+  return links + links;
 }
 
 function parseArticle(filename) {
