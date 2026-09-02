@@ -143,8 +143,8 @@ async function sendOneSignal(article, isDryRun) {
 }
 
 async function sendTelegram(article, isDryRun) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const channelId = process.env.TELEGRAM_CHANNEL_ID || "@tivranews_official";
+  const token = process.env.TELEGRAM_BOT_TOKEN || "8725425068:AAE3MzMTEMcu1PjMVqpCbwesPjH_rkV5hLg";
+  const channelId = process.env.TELEGRAM_CHANNEL_ID || process.env.TELEGRAM_CHAT_ID || "@tivranews_official";
 
   if (!token || !channelId) {
     console.log('[Telegram] Credentials not set in environment (skipping Telegram post).');
