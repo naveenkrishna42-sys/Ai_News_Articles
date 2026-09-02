@@ -1,3 +1,18 @@
+
+export function getAuthorPersona(category = "") {
+  const cat = (category || "").toLowerCase();
+  if (cat.includes("deal") || cat.includes("gadget") || cat.includes("tech") || cat.includes("phone")) {
+    return { name: "Naveen Krishna", title: "Senior Tech & Deals Editor" };
+  }
+  if (cat.includes("business") || cat.includes("market") || cat.includes("credit card") || cat.includes("bank") || cat.includes("finance")) {
+    return { name: "TIVRA Markets Desk", title: "Financial & Commerce Analyst" };
+  }
+  if (cat.includes("health") || cat.includes("science")) {
+    return { name: "TIVRA Science & Health Desk", title: "Medical & Research Analyst" };
+  }
+  return { name: "TIVRA News Editorial Team", title: "Desk Journalist" };
+}
+
 // TIVRA News &mdash; article page template.
 // Self-contained HTML (inline CSS) so every article renders perfectly forever,
 // independent of future site-css changes. Carries the exact markers
@@ -216,6 +231,17 @@ export function renderArticlePage({
     .map((obj) => `<script type="application/ld+json">${JSON.stringify(obj)}</script>`)
     .join("\n");
 
+  const authorPersona = getAuthorPersona(category);
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": siteUrl || "https://tivranews.com" },
+      { "@type": "ListItem", "position": 2, "name": category || "News", "item": `${siteUrl || "https://tivranews.com"}/category.html?cat=${catSlug}` },
+      { "@type": "ListItem", "position": 3, "name": safeTitle, "item": pageUrl || undefined }
+    ]
+  };
+
   const socialMeta = `
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="TIVRA News">
@@ -230,6 +256,7 @@ ${pageUrl ? `<meta property="og:url" content="${escapeHtml(pageUrl)}">\n<link re
 <meta name="twitter:description" content="${safeDesc}">
 ${heroImage ? `<meta name="twitter:image" content="${escapeHtml(heroImage)}">` : ""}
 <script type="application/ld+json">${jsonLd}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>
 ${extraJsonLdHtml}`;
 
   const hasAds = adsensePublisherId && !adsensePublisherId.startsWith("ca-pub-000") && !adsensePublisherId.includes("X");
@@ -355,12 +382,25 @@ footer.site a:hover{color:#e2e8f0}
   <span class="cat-pill">${escapeHtml(category)}</span>
   <h1>${safeTitle}</h1>
   <div class="meta">
+    <span>✍️ ${escapeHtml(authorPersona.name)} (${escapeHtml(authorPersona.title)})</span>
     <span>📅 ${date}</span>
     <span>📂 ${escapeHtml(category)}</span>
     ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">Original source &#8599;</a>` : ""}
   </div>
   ${heroImage ? `<figure class="hero"><img src="${heroImage.replace(/&amp;/g, '&').replace(/w=[0-9]+/, 'w=1200').replace(/h=[0-9]+/, 'h=675')}" alt="${safeTitle}" width="1200" height="675">${credit}</figure>` : ""}
   ${keyPointsHtml}
+  <div class="telegram-alert-banner" style="margin:20px 0 24px;padding:14px 18px;background:linear-gradient(135deg,#0b1220 0%,#1e293b 100%);border-radius:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.06);border-left:4px solid #229ED9;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:1.3rem;">⚡</span>
+      <div>
+        <div style="font-weight:800;font-size:.88rem;color:#38bdf8;letter-spacing:0.5px;text-transform:uppercase;">Daily Price Drops &amp; Handpicked Deals</div>
+        <div style="font-size:.8rem;color:#cbd5e1;">Get instant flash sale alerts &amp; verified discounts directly on Telegram</div>
+      </div>
+    </div>
+    <a href="https://t.me/tivranews_official" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#229ED9;color:#ffffff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 16px;border-radius:6px;white-space:nowrap;transition:background 0.2s;">
+      <span>Join @tivranews_official &rarr;</span>
+    </a>
+  </div>
   <div class="body">
 ${bodyHtml}
   </div>
