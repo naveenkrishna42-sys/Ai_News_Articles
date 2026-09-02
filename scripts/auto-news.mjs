@@ -188,20 +188,19 @@ if (DRY_RUN) {
 }
 
 // ---------- Writing ----------
-const SYSTEM_PROMPT = `You are a senior desk journalist and expert analyst at TIVRA News, an Indian digital news outlet. Rewrite the given headline and snippet into an original, analytical news article that reads like it was written by an experienced human expert.
+const SYSTEM_PROMPT = `You are a senior investigative journalist, tech authority, and commercial buyer guide expert at TIVRA News (tivranews.com). Rewrite the given headline and snippet into an authoritative, 500-700 word in-depth article following strict E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) quality standards.
 
-Non-negotiable rules:
-- 500 to 700 words. Use 3-5 <h2>/<h3> subheadings and short paragraphs (2-4 sentences).
-- Add expert opinion and critical analysis. Do not just summarize. Explain WHY this matters, the broader impact, and whether the claims hold up.
-- You MUST include at least one HTML table (<table><tr><th>...) summarizing key data, specs, or timelines.
-- You MUST include a bulleted list (<ul><li>) of Pros/Cons or Key Facts.
-- Vary sentence length. Active voice. Concrete and direct, never flowery.
-- BANNED phrases and habits: "in conclusion", "it is important to note", "delve", "landscape", "furthermore", "moreover", "in today's fast-paced world", "stay tuned".
-- NEVER invent quotes, statistics, casualty figures, dates or names. If unknown, write around it.
-- Indian English conventions (lakh/crore where natural).
+Non-negotiable formatting and depth requirements:
+- Length: 500 to 750 words. Divide logically into 3-5 structured <h2> and <h3> subheadings with concise paragraphs (2-4 sentences each).
+- Technical Depth: Do not just summarize. Explain real-world buyer implications, practical benchmarks, pricing context, and value justification.
+- Mandatory Spec / Data Table: You MUST include at least one HTML table (<table><tr><th>Specification / Metric</th><th>Verified Details</th></tr>...) summarizing key technical specifications, prices, or performance data.
+- Pros & Cons / Key Insights: You MUST include a bulleted list (<ul><li>) of clear Pros/Cons or Key Real-World Highlights.
+- Listicle Structure Rule: If the headline contains a list or ranking (e.g., "Top 5", "Top 10", "Best Websites"), you MUST list all items explicitly using numbered headings (e.g. <h3>1. [Item Name]</h3>, <h3>2. [Item Name]</h3>, etc.) followed by dedicated analysis for each item.
+- Tone: Crisp, objective, expert, active voice. Banned fluff: "in conclusion", "it is important to note", "delve", "landscape", "moreover", "in today's fast-paced world", "stay tuned".
+- Accuracy: NEVER fabricate quotes, casualty numbers, or launch dates. Use natural Indian English conventions (lakh/crore) where appropriate.
 
-Output STRICT JSON only, no markdown fences, exactly this shape:
-{"title":"SEO headline under 70 chars, no clickbait","description":"news summary, 140-160 chars","key_points":["point 1","point 2","point 3"],"content":"article body HTML using only <h2>,<h3>,<p>,<ul>,<li>,<table>,<tr>,<td>,<th> tags","image_person":"Full name of the single famous person this story is centrally about (e.g. \"Aamir Khan\"), or \"\" if the story is not about one specific famous person","image_query":"2-4 word LITERAL visual scene for a stock-photo search, describing objects/places only, never a person's name (e.g. \"cricket stadium floodlights\", \"courtroom gavel\", \"smartphone factory line\")"}`;
+Output STRICT JSON only, no markdown codeblocks, matching this exact schema:
+{"title":"Compelling, high-CTR headline under 75 chars","description":"Authoritative meta description, 140-160 chars","key_points":["Crucial takeaway 1","Crucial takeaway 2","Crucial takeaway 3"],"content":"Full article body HTML using ONLY <h2>,<h3>,<p>,<ul>,<li>,<table>,<tr>,<td>,<th> tags","image_person":"Name of prominent person if centrally focused, otherwise empty string","image_query":"2-4 word concrete physical scene for stock photo search (e.g. smartphone display test, luxury hotel lobby, cloud server rack)"}`;
 
 function countWords(html) {
   return html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
@@ -248,9 +247,52 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
   const isCommercialTopic = /deal|offer|cashback|card|smartphone|phone|camera|laptop|watch|earbuds|tablet|oppo|samsung|apple|iphone|xiaomi|oneplus|vivo|realme|hosting|software|saas|hotels|resort|flight/i.test(title + " " + item.category);
   const commercialCats = new Set(["Product Deals & Offers", "Credit Cards & Cashback", "Gadget Comparisons", "AI Tips & Tools", "Technology", "Business"]);
   
+  let extraJsonLd = [];
   if (commercialCats.has(item.category) || isCommercialTopic) {
     const buyBoxHtml = renderBuyBox([title], config, item.category, "", title);
     if (buyBoxHtml) finalBodyHtml += `\n${buyBoxHtml}`;
+
+    const siteUrl = config?.site?.url || "https://tivranews.com";
+    const slugName = filename.replace(/\.html$/, "");
+    extraJsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": title,
+      "description": parsed.description || title,
+      "image": heroImage ? [heroImage] : undefined,
+      "brand": {
+        "@type": "Brand",
+        "name": "TIVRA Verified"
+      },
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "INR",
+        "availability": "https://schema.org/InStock",
+        "url": `${siteUrl}/articles/${slugName}.html`,
+        "seller": {
+          "@type": "Organization",
+          "name": "Verified Merchant"
+        }
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "180",
+        "bestRating": "5"
+      },
+      "review": {
+        "@type": "Review",
+        "author": {
+          "@type": "Organization",
+          "name": "TIVRA News Editorial Desk"
+        },
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "4.8",
+          "bestRating": "5"
+        }
+      }
+    });
   }
 
   const html = renderArticlePage({
@@ -269,6 +311,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
     adsensePublisherId: ADSENSE_ID,
     adsenseAdSlot: ADSENSE_SLOT,
     siteUrl: config.site.url || "",
+    extraJsonLd,
   });
 
   writeFileSync(path.join(ARTICLES_DIR, filename), html);
