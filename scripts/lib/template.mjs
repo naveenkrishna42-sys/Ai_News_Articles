@@ -2,15 +2,15 @@
 export function getAuthorPersona(category = "") {
   const cat = (category || "").toLowerCase();
   if (cat.includes("deal") || cat.includes("gadget") || cat.includes("tech") || cat.includes("phone")) {
-    return { name: "Naveen Krishna", title: "Senior Tech & Deals Editor" };
+    return { name: "TIVRA News Tech & Gadgets Desk", title: "Product Research & Analysis" };
   }
   if (cat.includes("business") || cat.includes("market") || cat.includes("credit card") || cat.includes("bank") || cat.includes("finance")) {
-    return { name: "TIVRA Markets Desk", title: "Financial & Commerce Analyst" };
+    return { name: "TIVRA News Markets & Finance Desk", title: "Financial & Economic Insights" };
   }
   if (cat.includes("health") || cat.includes("science")) {
-    return { name: "TIVRA Science & Health Desk", title: "Medical & Research Analyst" };
+    return { name: "TIVRA News Science & Health Desk", title: "Medical & Environmental Research" };
   }
-  return { name: "TIVRA News Editorial Team", title: "Desk Journalist" };
+  return { name: "TIVRA News Editorial Team", title: "Verified Newsroom" };
 }
 
 // TIVRA News &mdash; article page template.
@@ -382,7 +382,7 @@ footer.site a:hover{color:#e2e8f0}
   <span class="cat-pill">${escapeHtml(category)}</span>
   <h1>${safeTitle}</h1>
   <div class="meta">
-    <span>✍️ ${escapeHtml(authorPersona.name)} (${escapeHtml(authorPersona.title)})</span>
+    <span>✍️ By ${escapeHtml(authorPersona.name)}</span>
     <span>📅 ${date}</span>
     <span>📂 ${escapeHtml(category)}</span>
     ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">Original source &#8599;</a>` : ""}
