@@ -461,6 +461,36 @@ function main() {
     JSON.stringify({ ...meta, articles: published })
   );
 
+  // Dedicated ultralight feed for related stories widget (~10KB vs 3.7MB articles.json)
+  const relatedMap = {};
+  for (const a of published) {
+    const cSlug = slugifyCategory(a.category);
+    if (!relatedMap[cSlug]) relatedMap[cSlug] = [];
+    if (relatedMap[cSlug].length < 6) {
+      relatedMap[cSlug].push({
+        title: a.title,
+        url: a.url,
+        image: a.image,
+        date: a.date,
+        category: a.category,
+        slug: a.slug
+      });
+    }
+  }
+  relatedMap["all"] = published.slice(0, 8).map(a => ({
+    title: a.title,
+    url: a.url,
+    image: a.image,
+    date: a.date,
+    category: a.category,
+    slug: a.slug
+  }));
+
+  writeFileSync(
+    path.join(PUBLIC_DIR, "related-feed.json"),
+    JSON.stringify(relatedMap)
+  );
+
   // ---- Group by month (archive JSONs + sitemaps) ----
   const byMonth = new Map();
   for (const a of published) {
@@ -507,8 +537,7 @@ function main() {
     "cookie-policy.html",
     "dmca.html",
   ];
-  const slugifyCategory = (cat) =>
-    cat.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  // uses global slugifyCategory(cat)
   const categorySlugs = [...new Set(published.map((a) => slugifyCategory(a.category)))];
   const categoryUrls = categorySlugs.map((slug) => `${SITE_URL}/category.html?cat=${slug}`);
 
