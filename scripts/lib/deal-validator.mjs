@@ -28,7 +28,7 @@ export function buildDealPrompt(item, directUrl) {
 Write a comprehensive, professional, authoritative buyer's analysis and product review for the featured item following Google's Search Quality E-E-A-T standards.
 
 OUTPUT RULES (STRICT & MANDATORY):
-1. Return ONLY a single valid JSON object without markdown code fences (```json) or extra text.
+1. Return ONLY a single valid JSON object without markdown code fences or extra text.
 2. Every field in the schema below is REQUIRED and MUST be non-empty.
 3. "rating" must be a numeric float between 1.0 and 5.0 representing price-to-performance ratio.
 4. "pros" must be an array of 3 to 4 specific technical strengths.
@@ -56,14 +56,11 @@ REQUIRED JSON SCHEMA:
 }`,
     user: `Headline: ${item.title}
 Category: ${item.category}
-Source: ${item.sourceName || "TIVRA News Tech Desk"}
-Snippet: ${item.summary || item.title}`,
-  };
-}`,
-    user: `Headline: ${item.title}
-Category: ${item.category}
-Source: ${item.sourceName || "Tech Desk"}
-Snippet: ${item.summary || item.title}`,
+Product/Merchant: ${item.merchant || item.productName || cleanProduct}
+${item.couponCode ? `Coupon/Promo Code: ${item.couponCode}` : ""}
+${item.validUntil ? `Offer Validity: Through ${item.validUntil}` : ""}
+Source: ${item.sourceName || "TIVRA News Commerce Desk"}
+Deal Details & Terms: ${item.summary || item.title}`,
   };
 }
 

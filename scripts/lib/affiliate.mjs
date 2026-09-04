@@ -66,10 +66,10 @@ export const KNOWN_MERCHANTS = [
   {
     pattern: /ajio/i,
     name: "Ajio",
-    url: "https://ajo.clnk.in/w0kl",
+    url: cuelinksRedirect("https://www.ajio.com"),
     color: "#2c4152",
     icon: "👗",
-    cta: "Buy at Ajio (Up to 80% Off + 9% Rewards)"
+    cta: "Buy at Ajio (Official Store Deals)"
   },
   {
     pattern: /myntra/i,
@@ -206,10 +206,25 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   const catLower = (category || "").toLowerCase();
   const textContext = `${title} ${category} ${(deviceNames || []).join(" ")}`.toLowerCase();
 
+  // 0. VERIFIED DIRECT PRODUCT / DEAL URL (Product-First Commercial Engine)
+  if (directUrl && typeof directUrl === "string" && directUrl.startsWith("http")) {
+    const candidateName = (deviceNames && deviceNames[0]) || title || "Featured Offer";
+    const cleanProd = sanitizeProductName(candidateName) || candidateName;
+    return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+<div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:14px;">Verified Direct Deal & Official Store Offer</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+  <a href="${escapeHtml(directUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#e11d48;color:#fff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 24px;border-radius:8px;transition:opacity 0.2s;">
+    <span>⚡ Claim Verified Deal (${escapeHtml(cleanProd.slice(0, 45))}) &rarr;</span>
+  </a>
+</div>
+<p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
+</div>`;
+  }
+
   // 1. CLOTHING, FASHION & FOOTWEAR LISTICLES
   const isClothingListicle = /top\s*\d+.*(shopping|cloth|fashion|apparel|shoe|sneaker)|best.*(shopping sites|clothing sites|fashion sites|sneakers)/i.test(textContext);
   if (isClothingListicle) {
-    const ajioUrl = "https://ajo.clnk.in/w0kl";
+    const ajioUrl = cuelinksRedirect("https://www.ajio.com");
     const myntraUrl = cuelinksRedirect("https://www.myntra.com");
     const tataUrl = cuelinksRedirect("https://www.tatacliq.com");
     const amazonFashionUrl = buyUrl("clothing fashion", config);
@@ -219,7 +234,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:14px;">Official Fashion Stores & Verified Deals</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
   <a href="${escapeHtml(ajioUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2c4152;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>👗 Buy at Ajio (9% Rewards)</span>
+    <span>👗 Buy at Ajio</span>
   </a>
   <a href="${escapeHtml(myntraUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#ff3f6c;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛍️ Buy at Myntra</span>
@@ -250,8 +265,8 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   <a href="${escapeHtml(cuelinksRedirect("https://www.flipkart.com/offers-store"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2874f0;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛍️ Buy at Flipkart Offers</span>
   </a>
-  <a href="https://ajo.clnk.in/w0kl" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2c4152;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>👗 Buy at Ajio (9% Rewards)</span>
+  <a href="${escapeHtml(cuelinksRedirect("https://www.ajio.com"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2c4152;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>👗 Buy at Ajio</span>
   </a>
   <a href="${escapeHtml(cuelinksRedirect("https://www.myntra.com"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#ff3f6c;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛍️ Buy at Myntra</span>
@@ -291,13 +306,14 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   const isFinancial = isFdOrSavings || isCreditCard || /\bbank\b|\bbanking\b|\bfinance\b/i.test(catLower);
 
   if (isFinancial) {
-    const cpcUrl = config?.affiliate?.cuelinks?.cpcUrl || "https://clnk.in/B5IL";
+    const cpcUrl = config?.affiliate?.cuelinks?.cpcUrl || cuelinksRedirect("https://www.bankbazaar.com/credit-card.html");
+    const cpcFdUrl = cuelinksRedirect("https://www.bankbazaar.com/fixed-deposit-rate.html");
 
     if (isFdOrSavings) {
       return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #059669;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#047857;margin-bottom:12px;">Verified Banking & High-Interest Rates</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
-  <a href="${escapeHtml(cpcCardUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#059669;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
+  <a href="${escapeHtml(cpcFdUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#059669;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
     <span>🏦 Compare Bank FD Rates & Schemes</span>
   </a>
 </div>

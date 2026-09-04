@@ -1,4 +1,4 @@
-﻿import fs from 'fs';
+import fs from 'fs';
 import path from 'path';
 
 const SITE_URL = 'https://tivranews.com';
@@ -9,8 +9,8 @@ export function isMonetizedDeal(article) {
   const cat = (article.category || '').toLowerCase();
   const title = (article.title || '').toLowerCase();
   
-  // Exclude non-commercial / political categories
-  const nonCommercialCats = ['world', 'india', 'politics', 'wars & conflicts', 'crime & law', 'hyderabad', 'chennai', 'bengaluru', 'delhi', 'mumbai', 'sports'];
+  // Exclude non-commercial / sensitive categories
+  const nonCommercialCats = ['world', 'india', 'politics', 'wars & conflicts', 'crime & law', 'sacred places', 'religion', 'culture', 'environment', 'hyderabad', 'chennai', 'bengaluru', 'delhi', 'mumbai', 'sports', 'astrology'];
   if (nonCommercialCats.includes(cat)) return false;
 
   // Strict commercial categories

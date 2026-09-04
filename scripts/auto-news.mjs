@@ -40,6 +40,7 @@ import { renderBuyBox, injectInlineListicleButtons } from "./lib/affiliate.mjs";
 import { buildComparisonSystemPrompt, buildRankingSystemPrompt, buildReviewSystemPrompt, buildNichePrompt } from "./lib/gadget-prompts.mjs";
 import { getBestMonetizedUrl, extractCleanProductName } from "./lib/deal-extractor.mjs";
 import { generateAndValidateDealArticle } from "./lib/deal-validator.mjs";
+import { getVerifiedProductDeals } from "./lib/cuelinks-sync.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -147,6 +148,18 @@ const byCategory = await fetchAllFeeds(feedList);
 let fetchedTotal = 0;
 for (const items of byCategory.values()) fetchedTotal += items.length;
 console.log(`Fetched ${fetchedTotal} raw stories across ${byCategory.size} categories.`);
+
+// Product-First Commercial Engine: Prepend verified real-time merchant deals & active campaigns
+try {
+  const verifiedDeals = await getVerifiedProductDeals(today);
+  if (verifiedDeals.length > 0) {
+    const existingDeals = byCategory.get("Product Deals & Offers") || [];
+    byCategory.set("Product Deals & Offers", [...verifiedDeals, ...existingDeals]);
+    console.log(`Injected ${verifiedDeals.length} verified product-first deals into Product Deals & Offers.`);
+  }
+} catch (e) {
+  console.warn(`[Deals Engine] Could not pre-fetch live Cuelinks deals: ${e.message}`);
+}
 
 const priority = config.categoryPriority.filter((c) => byCategory.has(c));
 for (const c of byCategory.keys()) if (!priority.includes(c)) priority.push(c);
@@ -693,7 +706,7 @@ async function runQueue(items, worker) {
 }
 
 async function writeDealStory(item) {
-  const directUrl = await getBestMonetizedUrl(
+  const directUrl = item.directUrl || await getBestMonetizedUrl(
     item,
     item.title,
     config.affiliate?.amazonTag || "sirmohana-21",
