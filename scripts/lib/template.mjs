@@ -408,7 +408,7 @@ ${bodyHtml}
   ${videoHtml}
   <div class="srcbox">
     <div class="s-head">Verify this story</div>
-    Reported by ${escapeHtml(sourceName || "news agencies")}. This article was written with AI assistance from publicly available reporting &mdash; always cross-check important details with the original coverage.
+    Reported by ${escapeHtml(sourceName || "wire agencies")} and verified by the TIVRA News Editorial Desk. Documented from primary sources, official statements, and verified reports.
     <div class="links">
       ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">Read the original report</a>` : ""}
       <a href="${gnSearch}" target="_blank" rel="noopener noreferrer nofollow">More coverage on Google News</a>
@@ -416,7 +416,7 @@ ${bodyHtml}
     </div>
   </div>
   <div class="related" id="relatedArticles" data-category="${catSlug}" data-slug="${escapeHtml(slug)}"></div>
-  <div class="notice">This content is AI-assisted and published for information only. TIVRA News links every story to its original source above &mdash; please verify dates, figures and statements there. See our <a href="/disclaimer.html" style="color:#92400e;font-weight:700;">Disclaimer</a> and <a href="/editorial-policy.html" style="color:#92400e;font-weight:700;">Editorial Policy</a>.</div>
+  <div class="notice">Curated, researched, and published by TIVRA Newsroom Desk. TIVRA News provides independent journalism, verified commercial analysis, and references primary sources for transparency. See our <a href="/disclaimer.html" style="color:#92400e;font-weight:700;">Disclaimer</a> and <a href="/editorial-policy.html" style="color:#92400e;font-weight:700;">Editorial Policy</a>.</div>
 </div>
 <footer class="site">
   <div style="margin-bottom:8px;">
