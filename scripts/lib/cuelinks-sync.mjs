@@ -48,7 +48,7 @@ export const DEFAULT_CAMPAIGNS = {
     epc7Day: 65.18,
     country: "US",
     category: "Business & SaaS",
-    url: "https://clnk.in/BV9q",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.airwallex.com",
     tier: 1,
   },
   norwegianCruise: {
@@ -99,7 +99,7 @@ export const DEFAULT_CAMPAIGNS = {
     commission: "CPS",
     country: "India / US",
     category: "Business",
-    url: "https://clnk.in/B5IT",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.riseworks.io",
     tier: 1,
   },
   ajioFashion: {
@@ -108,7 +108,7 @@ export const DEFAULT_CAMPAIGNS = {
     payout: "9%",
     country: "India",
     category: "Product Deals & Offers",
-    url: "https://ajo.clnk.in/w0kl",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.ajio.com",
     tier: 2,
   },
   hostinger: {
