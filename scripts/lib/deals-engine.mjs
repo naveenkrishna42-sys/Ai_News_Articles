@@ -19,7 +19,6 @@
 
 import { fetchLiveOffers } from "./cuelinks-sync.mjs";
 
-const AMAZON_TAG = "sirmohana-21";
 const CUELINKS_CID = "316413";
 
 /**
@@ -30,10 +29,10 @@ export function buildMerchantRedirect(targetUrl) {
 }
 
 /**
- * Builds bullet-proof Amazon search URL guaranteed never to 404
+ * Builds bullet-proof Amazon search URL monetized via Cuelinks (Zero personal ID leakage)
  */
 export function buildAmazonSearchUrl(query) {
-  return `https://www.amazon.in/s?k=${encodeURIComponent(query)}&tag=${AMAZON_TAG}`;
+  return buildMerchantRedirect(`https://www.amazon.in/s?k=${encodeURIComponent(query)}`);
 }
 
 /**
@@ -213,7 +212,7 @@ export const CURATED_PRODUCT_DEALS = [
       "Up to 30-hour battery life with quick charge (3 mins = 3 hours)",
       "Ultra-comfortable lightweight design with soft fit leather"
     ],
-    buyUrl: "https://www.amazon.in/dp/B09XS7JWHH?tag=sirmohana-21"
+    buyUrl: buildMerchantRedirect("https://www.amazon.in/dp/B09XS7JWHH")
   },
   {
     id: "prod-apple-airpods-pro-2-usbc",

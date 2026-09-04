@@ -709,7 +709,7 @@ async function writeDealStory(item) {
   const directUrl = item.directUrl || await getBestMonetizedUrl(
     item,
     item.title,
-    config.affiliate?.amazonTag || "sirmohana-21",
+    config.affiliate?.amazonTag || "",
     config.affiliate?.products || {}
   );
   const parsed = await generateAndValidateDealArticle(pool, item, directUrl);

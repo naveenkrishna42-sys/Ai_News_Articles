@@ -76,7 +76,7 @@ export function buildTelegramMessage(article) {
     extraCta = `\n\n🔥 <b>Verified Card Offers:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html">Apply &amp; Compare Lifetime Free Cards</a>`;
   } else if (isDeal) {
     icon = '🛍️';
-    extraCta = `\n\n⚡ <b>Verified Deals:</b> <a href="https://www.amazon.in/deals?tag=sirmohana-21">Shop Today's Amazon Deals</a> | <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.flipkart.com%2Foffers-store">Flipkart Deals</a>`;
+    extraCta = `\n\n⚡ <b>Verified Deals:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.amazon.in%2Fdeals">Shop Today's Amazon Deals</a> | <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.flipkart.com%2Foffers-store">Flipkart Deals</a>`;
   }
 
   return `${icon} <b>${escapeHtml(title)}</b>\n\n${escapeHtml((article.description || '').slice(0, 200))}\n\n👉 <a href="${fullUrl}">Read Full Story</a>${extraCta}`;

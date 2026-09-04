@@ -5,9 +5,8 @@ Never invent, alter, or fabricate affiliate URLs.
 
 ## Approved Affiliate Networks Only
 Affiliate links may originate only from configured/approved networks:
-- Amazon Associates (tag: sirmohana-21)
-- Cuelinks (cid: 310115)
-- Verified direct partner programs
+- Cuelinks Unified (CID: 316413) — routes and monetizes Amazon, Flipkart, Ajio, Travel & SaaS without exposing personal affiliate IDs
+- Verified direct partner programs (Impact, CJ, direct merchant campaigns)
 
 ## Strict Contextual Matching
 Affiliate offers must match the article's user intent:
