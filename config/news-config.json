@@ -439,9 +439,9 @@
   },
   "affiliate": {
     "enabled": true,
-    "network": "Amazon Associates & Cuelinks",
+    "network": "Cuelinks Unified",
     "marketplace": "amazon.in",
-    "amazonTag": "sirmohana-21",
+    "monetizationMode": "cuelinks",
     "cuelinks": {
       "enabled": true,
       "cpcUrl": "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html",

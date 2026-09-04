@@ -6,7 +6,6 @@ console.log("Running Universal Dynamic Affiliate Engine Unit Tests...\n");
 const mockConfig = {
   affiliate: {
     enabled: true,
-    amazonTag: "sirmohana-21",
     cuelinks: {
       cpcUrl: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html",
       megaHighTicketUrl: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.riseworks.io"
@@ -14,12 +13,13 @@ const mockConfig = {
   }
 };
 
-// Test 1: Clean CTA Label Check (NO "(Paid link)" inside button text)
+// Test 1: Clean CTA Label Check (NO "(Paid link)" inside button text & Zero personal ID leakage)
 const gadgetBox = renderBuyBox(["OnePlus 13 Pro"], mockConfig, "Technology", "", "OnePlus 13 Pro Price Drop Today");
 assert.ok(gadgetBox.includes("Buy at Amazon"), "Button must have clean 'Buy at Amazon' label");
 assert.ok(gadgetBox.includes("Buy at Flipkart"), "Button must have clean 'Buy at Flipkart' label");
 assert.ok(!gadgetBox.includes("<span>🛒 Check"), "Old wordy button format must be eliminated");
-console.log("✓ Test 1: Clean High-Converting Action Labels passed");
+assert.ok(!gadgetBox.includes("sirmohana"), "Must NOT expose personal Amazon tag sirmohana");
+console.log("✓ Test 1: Clean High-Converting Action Labels passed (Zero personal ID leakage)");
 
 // Test 2: Dynamic In-line Listicle Heading Parser
 const mockBody = `

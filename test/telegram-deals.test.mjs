@@ -19,7 +19,7 @@ const mockDeal = {
     "Two processors and 8 microphones for industry-leading ANC",
     "Up to 30 hours battery life with rapid charging"
   ],
-  buyUrl: "https://www.amazon.in/dp/B09XS7JWHH?tag=sirmohana-21"
+  buyUrl: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.amazon.in%2Fdp%2FB09XS7JWHH"
 };
 
 // Test 1: Full formatting check
@@ -39,9 +39,10 @@ assert.ok(!formatted.includes("tivranews.com/articles"), "Telegram post must NOT
 assert.ok(!formatted.includes("Read Full Review"), "Telegram post must NOT contain article reading prompts");
 console.log("✓ Test 2: Pure deals directive verified (Zero article links)");
 
-// Test 3: Verify Zero cuelinks redirect leaks
+// Test 3: Verify Zero cuelinks redirect leaks & Zero personal ID leakage
 assert.ok(!formatted.includes("clnk.in"), "Must NOT contain dead clnk.in shortlinks");
 assert.ok(!formatted.includes("cuelinks.com"), "Must NOT display or link to cuelinks homepage");
-console.log("✓ Test 3: Anti-Cuelinks leak verification passed");
+assert.ok(!formatted.includes("sirmohana"), "Must NOT expose personal Amazon tag sirmohana");
+console.log("✓ Test 3: Anti-Cuelinks leak & Zero personal ID verification passed");
 
 console.log("\n✅ ALL Telegram Deals Broadcaster unit tests passed with 100% success!");

@@ -1,10 +1,10 @@
-﻿/**
+/**
  * TIVRA News â€” Amazon Direct ASIN & Product Link Resolver
  *
  * Resolves source article URLs (from Google News RSS / tech news feeds)
  * and scans the HTML for real Amazon ASINs (amazon.in/dp/B0XXXXXXXX).
  *
- * If found, returns the direct product URL: https://www.amazon.in/dp/ASIN?tag=sirmohana-21
+ * If found, returns the direct product URL monetized via Cuelinks (https://linksredirect.com/?cid=316413...)
  * If not found, falls back to targeted product search on Amazon India.
  */
 
@@ -179,14 +179,19 @@ export async function fetchCuelinksUrlFromArticle(articleUrl, timeoutMs = 4500) 
   return null;
 }
 
-export async function getBestMonetizedUrl(item, productName, amazonTag = "sirmohana-21", configOverrides = {}) {
+const CUELINKS_CID = "316413";
+
+function buildCuelinksRedirect(url) {
+  return `https://linksredirect.com/?cid=${CUELINKS_CID}&source=api&url=${encodeURIComponent(url)}`;
+}
+
+export async function getBestMonetizedUrl(item, productName, _amazonTag = "", configOverrides = {}) {
   const cleanName = extractCleanProductName(productName || item?.title || "");
 
   // 1. Config override check
   if (configOverrides[cleanName.toLowerCase()]) {
     const override = configOverrides[cleanName.toLowerCase()];
-    const sep = override.includes("?") ? "&" : "?";
-    return `${override}${sep}tag=${encodeURIComponent(amazonTag)}`;
+    return buildCuelinksRedirect(override);
   }
 
   // 2. Attempt URL resolution from sourceUrl
@@ -201,7 +206,7 @@ export async function getBestMonetizedUrl(item, productName, amazonTag = "sirmoh
         // Fallback to Amazon ASIN
         const asin = await fetchAsinFromArticle(realUrl, 2500);
         if (asin) {
-          return `https://www.amazon.in/dp/${asin}?tag=${encodeURIComponent(amazonTag)}`;
+          return buildCuelinksRedirect(`https://www.amazon.in/dp/${asin}`);
         }
       }
     } catch {
@@ -209,11 +214,11 @@ export async function getBestMonetizedUrl(item, productName, amazonTag = "sirmoh
     }
   }
 
-  // 3. Fallback to clean Amazon search URL
+  // 3. Fallback to clean search URL monetized via Cuelinks
   if (cleanName.toLowerCase().includes("flipkart") || (item && item.title && item.title.toLowerCase().includes("flipkart"))) {
-    return `https://www.flipkart.com/search?q=${encodeURIComponent(cleanName)}`;
+    return buildCuelinksRedirect(`https://www.flipkart.com/search?q=${encodeURIComponent(cleanName)}`);
   }
-  return `https://www.amazon.in/s?k=${encodeURIComponent(cleanName)}&tag=${encodeURIComponent(amazonTag)}`;
+  return buildCuelinksRedirect(`https://www.amazon.in/s?k=${encodeURIComponent(cleanName)}`);
 }
 
 
