@@ -24,30 +24,41 @@ export function buildDealPrompt(item, directUrl) {
   const cleanProduct = extractCleanProductName(item.title);
 
   return {
-    system: `You are the Senior Deals & Consumer Tech Editor at TIVRA News. 
-Analyze the provided product deal / discount / price cut headline and write a structured, objective buyer's review.
+    system: `You are the Senior Consumer Tech & Product Review Editor at TIVRA News. 
+Write a comprehensive, professional, authoritative buyer's analysis and product review for the featured item following Google's Search Quality E-E-A-T standards.
 
 OUTPUT RULES (STRICT & MANDATORY):
-1. Return ONLY a single valid JSON object. Do not include markdown code fences (\`\`\`json), explanations, or preamble.
-2. Every single field in the schema below is REQUIRED and MUST be non-empty.
-3. "rating" must be a numeric float between 1.0 and 5.0 representing price-to-value ratio.
-4. "pros" must be an array of 2 to 3 specific strings.
-5. "cons" must be an array of 1 to 2 specific strings (real tradeoffs, not filler).
-6. "articleBody" must be clean HTML with 2-3 <p> paragraphs (150-250 words total) explaining key specs, price drop value, and who should buy.
-7. Do NOT mention affiliate programs, referral codes, or CashKaro anywhere in the text.
+1. Return ONLY a single valid JSON object without markdown code fences (```json) or extra text.
+2. Every field in the schema below is REQUIRED and MUST be non-empty.
+3. "rating" must be a numeric float between 1.0 and 5.0 representing price-to-performance ratio.
+4. "pros" must be an array of 3 to 4 specific technical strengths.
+5. "cons" must be an array of 2 to 3 genuine product tradeoffs or limitations.
+6. "articleBody" must be in-depth HTML (500 to 750 words) using <h3>, <p>, <table>, <tr>, <th>, <td>, <ul>, <li> tags structured into:
+   - <h3>Deal & Pricing Analysis</h3>: Explain the price drop, current street price, and historical value.
+   - <h3>Key Technical Specifications</h3>: Include a clean HTML <table> comparing display, battery, processor, camera/build, and software.
+   - <h3>Real-World Performance & Daily Use</h3>: Explain hands-on user experience, build quality, and battery endurance.
+   - <h3>Competition & Market Alternatives</h3>: Compare with 1-2 chief rivals in the same price tier.
+   - <h3>Who Should Buy This Deal</h3>: Actionable advice on who benefits most and who should wait.
+7. NEVER mention AI, automated generation, affiliate links, CashKaro, or commission codes. Write with the authoritative voice of the TIVRA News Editorial Desk.
 
 REQUIRED JSON SCHEMA:
 {
-  "title": "catchy deal headline under 70 chars (e.g. 'Samsung Galaxy S25 Ultra Price Drop: Is This Deal Worth It?')",
+  "title": "Authoritative headline under 75 chars (e.g. 'Samsung Galaxy S25 Ultra Price Drop Review: Is It Worth Buying?')",
   "productName": "${cleanProduct}",
-  "dealPrice": "mentioned sale price or price cut (e.g. '₹44,499' or 'Under ₹20,000')",
+  "dealPrice": "Current sale price or price range (e.g. '₹44,999' or 'Under ₹25,000')",
   "rating": 4.5,
-  "ratingReason": "1 sentence justifying the value score",
-  "dealSummary": "1 sentence summary of the discount or offer",
-  "articleBody": "<p>paragraph 1 covering product & deal</p><p>paragraph 2 covering specs & tradeoffs</p>",
-  "pros": ["specific pro 1", "specific pro 2"],
-  "cons": ["specific con 1"],
-  "verdict": "1 sentence final buy or wait verdict"
+  "ratingReason": "1-2 sentences justifying the value and price-to-performance score",
+  "dealSummary": "Comprehensive 140-160 character meta description summarizing the deal and key takeaway",
+  "articleBody": "Full structured HTML body (500-750 words with h3 subheadings and specifications table)",
+  "pros": ["Technical pro 1", "Technical pro 2", "Technical pro 3"],
+  "cons": ["Genuine tradeoff 1", "Genuine tradeoff 2"],
+  "verdict": "2-3 sentence definitive buying recommendation for readers"
+}`,
+    user: `Headline: ${item.title}
+Category: ${item.category}
+Source: ${item.sourceName || "TIVRA News Tech Desk"}
+Snippet: ${item.summary || item.title}`,
+  };
 }`,
     user: `Headline: ${item.title}
 Category: ${item.category}
@@ -67,7 +78,7 @@ export async function generateAndValidateDealArticle(pool, item, directUrl, maxR
       const response = await pool.chat({
         system,
         user,
-        maxTokens: 2500,
+        maxTokens: 4000,
         temperature: 0.2, // Low temperature for deterministic JSON output
       });
 
