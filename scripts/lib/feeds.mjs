@@ -85,9 +85,10 @@ async function fetchFeed(feed) {
       const pubDate = tagContent(block, "pubDate");
       const description = tagContent(block, "description").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
-      if (feed.maxAgeHours && pubDate) {
+      const maxAgeHours = feed.maxAgeHours || 72; // Default strict 72h (3 days) freshness threshold
+      if (pubDate) {
         const ageMs = Date.now() - new Date(pubDate).getTime();
-        if (Number.isFinite(ageMs) && ageMs > feed.maxAgeHours * 3600_000) continue;
+        if (Number.isFinite(ageMs) && ageMs > maxAgeHours * 3600_000) continue;
       }
 
       items.push({

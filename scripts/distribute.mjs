@@ -67,16 +67,16 @@ export function buildTelegramMessage(article) {
 
   if (isPayroll) {
     icon = '💼';
-    extraCta = `\n\n💼 <b>Global Payroll & Hiring:</b> <a href="https://clnk.in/B5IT">Explore Rise Global Payroll Plans</a>`;
+    extraCta = `\n\n💼 <b>Global Payroll & Hiring:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.riseworks.io">Explore Rise Global Payroll Plans</a>`;
   } else if (isFashion) {
     icon = '👗';
-    extraCta = `\n\n🛍️ <b>Ajio Fashion Sale:</b> <a href="https://ajo.clnk.in/w0kl">Shop Top Styles (Up to 80% Off)</a>`;
+    extraCta = `\n\n🛍️ <b>Ajio Fashion Sale:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.ajio.com">Shop Ajio Deals (Up to 80% Off)</a>`;
   } else if (isFinance) {
     icon = '💳';
-    extraCta = `\n\n🔥 <b>Exclusive Partner Benefit:</b> <a href="https://clnk.in/B5IT">Apply & Claim High-Value Rewards</a>`;
+    extraCta = `\n\n🔥 <b>Verified Card Offers:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html">Apply &amp; Compare Lifetime Free Cards</a>`;
   } else if (isDeal) {
     icon = '🛍️';
-    extraCta = `\n\n⚡ <b>Top Deals & Cashback:</b> <a href="https://clnk.in/B5IL">Explore Today's Cashback Offers</a>`;
+    extraCta = `\n\n⚡ <b>Verified Deals:</b> <a href="https://www.amazon.in/deals?tag=sirmohana-21">Shop Today's Amazon Deals</a> | <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.flipkart.com%2Foffers-store">Flipkart Deals</a>`;
   }
 
   return `${icon} <b>${escapeHtml(title)}</b>\n\n${escapeHtml((article.description || '').slice(0, 200))}\n\n👉 <a href="${fullUrl}">Read Full Story</a>${extraCta}`;
