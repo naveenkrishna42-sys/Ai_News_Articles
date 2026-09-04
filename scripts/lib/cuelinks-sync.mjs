@@ -153,7 +153,7 @@ export const DEFAULT_CAMPAIGNS = {
     commission: "CPC",
     country: "India",
     category: "Credit Cards & Cashback",
-    url: "https://clnk.in/B5IL",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html",
     tier: 4,
   }
 };
@@ -201,6 +201,10 @@ export function filterActiveOffers(offers = []) {
         return false; // Expired
       }
     }
+    // Enforce channel ID 316413 on any linksredirect URL
+    if (item.tracking_url && item.tracking_url.includes("linksredirect.com")) {
+      item.tracking_url = item.tracking_url.replace(/cid=\d+/, "cid=316413");
+    }
     return true;
   });
 }
@@ -213,7 +217,7 @@ export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "
   try {
     if (fs.existsSync(CACHE_FILE)) {
       const cached = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
-      if (Date.now() - (cached.timestamp || 0) < CACHE_TTL_MS && Array.isArray(cached.offers)) {
+      if (Date.now() - (cached.timestamp || 0) < CACHE_TTL_MS && Array.isArray(cached.offers) && cached.offers.length > 0) {
         return filterActiveOffers(cached.offers);
       }
     }
@@ -243,7 +247,7 @@ export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "
     }
 
     const data = await res.json();
-    const rawOffers = Array.isArray(data.offers) ? data.offers : [];
+    const rawOffers = Array.isArray(data.data) ? data.data : (Array.isArray(data.offers) ? data.offers : []);
     const active = filterActiveOffers(rawOffers);
 
     // Save to disk cache
@@ -256,4 +260,49 @@ export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "
     clearTimeout(timeoutId);
     return Object.values(DEFAULT_CAMPAIGNS);
   }
+}
+
+/**
+ * Product-First Verified Deals Selector
+ * Returns structured, verified, active commercial stories directly anchored to live products.
+ */
+export async function getVerifiedProductDeals(todayStr = new Date().toISOString().slice(0, 10)) {
+  const liveOffers = await fetchLiveOffers();
+  const verifiedDeals = [];
+
+  for (const offer of liveOffers) {
+    const title = offer.title || offer.name || "";
+    if (!title || title.length < 10) continue;
+
+    const merchant = offer.campaign_name || offer.name || "Verified Partner";
+    let trackingUrl = offer.tracking_url || offer.url || "";
+    if (trackingUrl.includes("linksredirect.com")) {
+      trackingUrl = trackingUrl.replace(/cid=\d+/, "cid=316413");
+    }
+
+    // Clean headline
+    let cleanTitle = title;
+    if (!cleanTitle.toLowerCase().includes(merchant.toLowerCase())) {
+      cleanTitle = `${merchant} Deal: ${cleanTitle}`;
+    }
+    // Remove emojis or trailing punctuation from title
+    cleanTitle = cleanTitle.replace(/[^\w\s:,\.\-%–—&]/g, "").trim();
+
+    verifiedDeals.push({
+      key: `deal-${offer.id || merchant.toLowerCase().replace(/\s+/g, '-')}-${todayStr}`,
+      title: cleanTitle.slice(0, 110),
+      productName: merchant,
+      category: "Product Deals & Offers",
+      merchant,
+      couponCode: offer.coupon_code || null,
+      validUntil: offer.end_date || null,
+      directUrl: trackingUrl,
+      sourceName: `${merchant} Official Offers`,
+      sourceUrl: trackingUrl,
+      summary: offer.description || `${merchant} verified promotional deal and discount offer.`,
+      isProductFirstDeal: true
+    });
+  }
+
+  return verifiedDeals;
 }

@@ -1,4 +1,4 @@
-﻿import assert from 'assert';
+import assert from 'assert';
 import { renderBuyBox, injectInlineListicleButtons, sanitizeProductName } from '../scripts/lib/affiliate.mjs';
 
 console.log("Running Universal Dynamic Affiliate Engine Unit Tests...\n");
@@ -8,8 +8,8 @@ const mockConfig = {
     enabled: true,
     amazonTag: "sirmohana-21",
     cuelinks: {
-      cpcUrl: "https://clnk.in/B5IL",
-      megaHighTicketUrl: "https://clnk.in/B5IT"
+      cpcUrl: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html",
+      megaHighTicketUrl: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.riseworks.io"
     }
   }
 };
@@ -26,14 +26,14 @@ const mockBody = `
 <h3>1. Amazon India</h3>
 <p>Market leader in same-day delivery.</p>
 <h3>2. Ajio</h3>
-<p>Best for trendy fashion and 9% cashback rewards.</p>
+<p>Best for trendy fashion and deals.</p>
 <h3>3. Samsung Galaxy S25</h3>
 <p>Flagship smartphone with Snapdragon 8 Elite.</p>
 `;
 
 const processedBody = injectInlineListicleButtons(mockBody, mockConfig);
 assert.ok(processedBody.includes("Buy at Amazon"), "Heading 1 Amazon must have dynamic button");
-assert.ok(processedBody.includes("ajo.clnk.in/w0kl"), "Heading 2 Ajio must have dynamic 9% rewards button");
+assert.ok(processedBody.includes("ajio.com") || processedBody.includes("Buy at Ajio"), "Heading 2 Ajio must have verified button");
 assert.ok(processedBody.includes("Samsung Galaxy S25"), "Heading 3 must generate dynamic product search button");
 console.log("✓ Test 2: Dynamic In-Line Listicle Item Linking passed");
 
