@@ -236,6 +236,31 @@ function countWords(html) {
   return html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
 }
 
+const STRICT_NON_COMMERCIAL_CATEGORIES = new Set([
+  "Sacred Places",
+  "Religion",
+  "World",
+  "India",
+  "Sports",
+  "Crime & Law",
+  "Politics",
+  "Wars & Conflicts",
+  "Environment",
+  "Culture & Arts",
+  "Education",
+  "Hyderabad",
+  "Chennai",
+  "Bengaluru",
+  "Mumbai",
+  "Delhi",
+  "Breaking News",
+  "Top Stories",
+  "Science",
+  "Movies",
+  "Entertainment",
+  "Astrology"
+]);
+
 const results = { written: 0, failed: 0, files: [] };
 
 async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, maxTokens = 3200, kind = "news" } = {}) {
@@ -273,14 +298,25 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
     filename = `${today}-${slug}-${n++}.html`;
   }
 
-  let finalBodyHtml = injectInlineListicleButtons(bodyHtml, config, item.category, title);
-  const isCommercialTopic = /deal|offer|cashback|card|smartphone|phone|camera|laptop|watch|earbuds|tablet|oppo|samsung|apple|iphone|xiaomi|oneplus|vivo|realme|hosting|software|saas|hotels|resort|flight/i.test(title + " " + item.category);
-  const commercialCats = new Set(["Product Deals & Offers", "Credit Cards & Cashback", "Gadget Comparisons", "AI Tips & Tools", "Technology", "Business"]);
-  
+  let finalBodyHtml = bodyHtml;
   let extraJsonLd = [];
-  if (commercialCats.has(item.category) || isCommercialTopic) {
-    const buyBoxHtml = renderBuyBox([title], config, item.category, "", title);
-    if (buyBoxHtml) finalBodyHtml += `\n${buyBoxHtml}`;
+
+  const isNonCommercial = STRICT_NON_COMMERCIAL_CATEGORIES.has(item.category);
+
+  if (!isNonCommercial) {
+    // Only commercial categories get inline listicle buttons
+    const commercialCats = new Set(["Product Deals & Offers", "Credit Cards & Cashback", "Gadget Comparisons"]);
+    if (commercialCats.has(item.category)) {
+      finalBodyHtml = injectInlineListicleButtons(bodyHtml, config, item.category, title);
+    }
+
+    const isExplicitReviewOrDeal = commercialCats.has(item.category) || 
+      (item.category === "Technology" && /\b(review|unboxing|launch price|specifications|discount|price drop)\b/i.test(title)) ||
+      (item.category === "Business" && /\b(web hosting|cloud hosting|global payroll|software discount)\b/i.test(title));
+
+    if (isExplicitReviewOrDeal) {
+      const buyBoxHtml = renderBuyBox([title], config, item.category, "", title);
+      if (buyBoxHtml) finalBodyHtml += `\n${buyBoxHtml}`;
 
     const siteUrl = config?.site?.url || "https://tivranews.com";
     const slugName = filename.replace(/\.html$/, "");
