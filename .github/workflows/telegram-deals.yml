@@ -1,0 +1,53 @@
+name: TIVRA Deals Telegram Broadcast
+
+on:
+  schedule:
+    # Runs every hour at minute 0
+    - cron: "0 * * * *"
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Number of product deals to post this run (default 15)"
+        required: false
+        default: "15"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tivra-telegram-deals
+  cancel-in-progress: false
+
+jobs:
+  broadcast-deals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Broadcast top national & international product deals to Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || '8725425068:AAE3MzMTEMcu1PjMVqpCbwesPjH_rkV5hLg' }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID || '@tivranews_official' }}
+          CUELINKS_API_KEY: ${{ secrets.CUELINKS_API_KEY || 'xnrsT6vr3TP64MM7FSvCvdwY2jvD_jLrwU7B0zXvReI' }}
+        run: |
+          LIMIT="${{ github.event.inputs.limit || '15' }}"
+          node scripts/telegram-deals.mjs --limit "$LIMIT"
+
+      - name: Save dispatched state
+        run: |
+          git config user.name "tivra-deals-bot"
+          git config user.email "actions@github.com"
+          git add data/telegram-deals-dispatched.json data/cuelinks-offers.json || true
+          if git diff --cached --quiet; then
+            echo "No state updates to commit."
+            exit 0
+          fi
+          git commit -m "chore(deals): update telegram dispatched state [skip ci]"
+          git push || (git pull --rebase && git push)
