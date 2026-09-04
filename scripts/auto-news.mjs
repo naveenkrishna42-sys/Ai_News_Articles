@@ -97,6 +97,34 @@ if (!DRY_RUN) {
 }
 
 // ---------- Story selection ----------
+export function isStaleSeasonalStory(title = "", currentDateStr = "") {
+  const lower = String(title || "").toLowerCase();
+  const currentMonth = new Date(currentDateStr || Date.now()).getMonth();
+
+  // Past years check
+  if (/\b(2020|2021|2022|2023|2024)\b/.test(lower)) return true;
+
+  // Stale seasonal events based on current month:
+  // Valentine's Day is Feb (month 1). If current month is >= April (month 3), it's stale!
+  if (/valentine/i.test(lower) && (currentMonth > 2 || currentMonth < 0)) return true;
+  // Republic day is Jan (month 0).
+  if (/republic\s*day/i.test(lower) && currentMonth > 1) return true;
+  // Holi is March (month 2).
+  if (/\bholi\b/i.test(lower) && currentMonth > 3) return true;
+
+  // Outdated specific month claims in deals (e.g. "May 2026 Deals" when month is September)
+  const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+  for (let m = 0; m < months.length; m++) {
+    if (m < currentMonth - 1 && lower.includes(months[m])) {
+      if (/deal|sale|offer|promos?|discount|rates?/i.test(lower)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 const claimedWordSets = [];
 function isDuplicate(item) {
   if (registry[item.key]) return true;
@@ -141,6 +169,7 @@ for (const category of priority) {
   for (const item of items) {
     if (picked >= categoryBudget || queue.length >= budget) break;
     if (item.title.length < 25) continue;
+    if (isStaleSeasonalStory(item.title, today)) continue;
     if (isDuplicate(item)) continue;
     claim(item);
     queue.push(item);
@@ -173,6 +202,7 @@ if (queue.length < budget) {
     for (const item of items) {
       if (queue.length >= budget) break;
       if (item.title.length < 25) continue;
+      if (isStaleSeasonalStory(item.title, today)) continue;
       if (isDuplicate(item)) continue;
       claim(item);
       queue.push(item);
@@ -243,7 +273,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
     filename = `${today}-${slug}-${n++}.html`;
   }
 
-  let finalBodyHtml = injectInlineListicleButtons(bodyHtml, config);
+  let finalBodyHtml = injectInlineListicleButtons(bodyHtml, config, item.category, title);
   const isCommercialTopic = /deal|offer|cashback|card|smartphone|phone|camera|laptop|watch|earbuds|tablet|oppo|samsung|apple|iphone|xiaomi|oneplus|vivo|realme|hosting|software|saas|hotels|resort|flight/i.test(title + " " + item.category);
   const commercialCats = new Set(["Product Deals & Offers", "Credit Cards & Cashback", "Gadget Comparisons", "AI Tips & Tools", "Technology", "Business"]);
   

@@ -30,9 +30,9 @@ assert.strictEqual(telegramDeals[1].slug, 'saas-1');
 
 // Test 3: Telegram message formats with correct CTA buttons
 const ajioMsg = buildTelegramMessage(sampleArticles[1]);
-assert.ok(ajioMsg.includes('https://ajo.clnk.in/w0kl'), 'Ajio post must include Ajio Cuelinks CTA');
+assert.ok(ajioMsg.includes('cid=316413') && ajioMsg.includes('www.ajio.com'), 'Ajio post must include Ajio Cuelinks CTA');
 
 const saasMsg = buildTelegramMessage(sampleArticles[2]);
-assert.ok(saasMsg.includes('https://clnk.in/B5IT'), 'Payroll post must include Rise Works Cuelinks CTA');
+assert.ok(saasMsg.includes('cid=316413') && saasMsg.includes('www.riseworks.io'), 'Payroll post must include Rise Works Cuelinks CTA');
 
 console.log('✅ Distribution Module tests passed.');

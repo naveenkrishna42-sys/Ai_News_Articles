@@ -218,27 +218,27 @@
     },
     {
       "category": "Product Deals & Offers",
-      "url": "https://news.google.com/rss/search?q=amazon+india+deals+discount+offers+price+drop&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=amazon+india+deals+discount+offers+price+drop+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Product Deals & Offers",
-      "url": "https://news.google.com/rss/search?q=best+smartphone+earbuds+smartwatch+deals+sale+india&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=best+smartphone+earbuds+smartwatch+deals+sale+india+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Credit Cards & Cashback",
-      "url": "https://news.google.com/rss/search?q=best+credit+card+cashback+reward+points+offers+india&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=best+credit+card+cashback+reward+points+offers+india+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Credit Cards & Cashback",
-      "url": "https://news.google.com/rss/search?q=hdfc+sbi+icici+axis+credit+card+benefits+lounge+access&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=hdfc+sbi+icici+axis+credit+card+benefits+lounge+access+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Credit Cards & Cashback",
-      "url": "https://news.google.com/rss/search?q=best+health+insurance+term+life+plan+tax+savings+india&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=best+health+insurance+term+life+plan+tax+savings+india+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Credit Cards & Cashback",
-      "url": "https://news.google.com/rss/search?q=high+interest+savings+account+fixed+deposit+rates+india&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=high+interest+savings+account+fixed+deposit+rates+india+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Sacred Places",
@@ -258,11 +258,11 @@
     },
     {
       "category": "Product Deals & Offers",
-      "url": "https://news.google.com/rss/search?q=ajio+sale+fashion+clothing+discount+offers+india&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=ajio+sale+fashion+clothing+discount+offers+india+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Product Deals & Offers",
-      "url": "https://news.google.com/rss/search?q=sneakers+footwear+shoes+sale+deals+india&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=sneakers+footwear+shoes+sale+deals+india+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Business",
@@ -270,11 +270,11 @@
     },
     {
       "category": "Product Deals & Offers",
-      "url": "https://news.google.com/rss/search?q=hotel+discounts+resort+booking+deals+flight+travel&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=hotel+discounts+resort+booking+deals+flight+travel+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Product Deals & Offers",
-      "url": "https://news.google.com/rss/search?q=cruise+vacation+deals+luxury+ship+travel+discounts&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=cruise+vacation+deals+luxury+ship+travel+discounts+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Business",
@@ -282,7 +282,7 @@
     },
     {
       "category": "Product Deals & Offers",
-      "url": "https://news.google.com/rss/search?q=electric+scooter+ev+car+discount+price+drop+deals+india&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=electric+scooter+ev+car+discount+price+drop+deals+india+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     }
   ],
   "categoryPriority": [

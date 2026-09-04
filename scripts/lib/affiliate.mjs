@@ -146,7 +146,7 @@ export const KNOWN_MERCHANTS = [
   {
     pattern: /payroll|hr\s*saas|workforce|remote\s*hiring|contractor|rise\s*works|keka/i,
     name: "Rise Works",
-    url: "https://clnk.in/B5IT",
+    url: cuelinksRedirect("https://www.riseworks.io"),
     color: "#059669",
     icon: "💼",
     cta: "Get Started on Rise Works ($350 Bounty)"
@@ -267,13 +267,14 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   // 3. HEALTH & TERM INSURANCE / HEALTHCARE
   const isInsurance = /health\s*insurance|term\s*insurance|life\s*insurance|mediclaim|medical\s*insurance|insurance\s*policy|policybazaar/i.test(textContext);
   if (isInsurance) {
-    const cpcUrl = config?.affiliate?.cuelinks?.cpcUrl || "https://clnk.in/B5IL";
+    const cpcCardUrl = cuelinksRedirect("https://www.bankbazaar.com/credit-card.html");
+    const cpcFdUrl = cuelinksRedirect("https://www.bankbazaar.com/fixed-deposit-rate.html");
     const oneMgUrl = cuelinksRedirect("https://www.1mg.com");
 
     return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #0284c7;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#0369a1;margin-bottom:12px;">🛡️ Verified Health Insurance & Healthcare Benefits</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
-  <a href="${escapeHtml(cpcUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#0284c7;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
+  <a href="${escapeHtml(cpcFdUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#0284c7;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
     <span>🛡️ Compare Health Insurance Plans</span>
   </a>
   <a href="${escapeHtml(oneMgUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#ff6f61;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
@@ -296,7 +297,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
       return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #059669;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#047857;margin-bottom:12px;">Verified Banking & High-Interest Rates</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
-  <a href="${escapeHtml(cpcUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#059669;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
+  <a href="${escapeHtml(cpcCardUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#059669;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
     <span>🏦 Compare Bank FD Rates & Schemes</span>
   </a>
 </div>
@@ -369,7 +370,12 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
  * Dynamic In-line Listicle Item Linker
  * Parses <h3> headings and injects matching store/product buttons dynamically.
  */
-export function injectInlineListicleButtons(bodyHtml = "", config = {}) {
+export function injectInlineListicleButtons(bodyHtml = "", config = {}, category = "", title = "") {
+  if (!bodyHtml || !bodyHtml.includes("<h3>")) return bodyHtml;
+
+  const catLower = (category || "").toLowerCase();
+  const titleLower = (title || "").toLowerCase();
+  const isFinanceOrCards = catLower.includes("card") || catLower.includes("bank") || catLower.includes("finance") || /credit card|lounge access|fixed deposit/i.test(titleLower);
   if (!bodyHtml || !bodyHtml.includes("<h3>")) return bodyHtml;
 
   return bodyHtml.replace(/<h3>(\d+\.\s*([\s\S]*?))<\/h3>/gi, (match, fullHeading, rawTitle) => {
@@ -384,10 +390,14 @@ export function injectInlineListicleButtons(bodyHtml = "", config = {}) {
       }
     }
 
-    // If specific product name in heading (e.g. "1. Samsung Galaxy S25")
-    if (!btnHtml) {
+    // If financial / credit card topic, DO NOT inject Amazon or Flipkart product buy buttons!
+    if (isFinanceOrCards || /card|bank|account|loan|insurance|elite|rewards|points/i.test(headingLower)) {
+      btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(cuelinksRedirect('https://www.bankbazaar.com/credit-card.html'))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>💳 Compare Features & Eligibility</span></a></div>`;
+    } else if (!btnHtml) {
       const cleanProd = sanitizeProductName(rawTitle);
-      if (cleanProd && cleanProd.length >= 3) {
+      // Filter out non-physical products
+      const isNonPhysical = /card|account|deposit|plan|scheme|service|hotel|stay|flight|cruise|pass/i.test(cleanProd);
+      if (cleanProd && cleanProd.length >= 3 && !isNonPhysical) {
         const amzUrl = buyUrl(cleanProd, config);
         const fkUrl = cuelinksRedirect(`https://www.flipkart.com/search?q=${encodeURIComponent(cleanProd)}`);
         btnHtml = `<div style="display:flex;gap:8px;margin:10px 0 16px;flex-wrap:wrap;"><a href="${escapeHtml(amzUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>🛒 Buy ${escapeHtml(cleanProd)} on Amazon</span></a><a href="${escapeHtml(fkUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2874f0;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>🛍️ Buy on Flipkart</span></a></div>`;
