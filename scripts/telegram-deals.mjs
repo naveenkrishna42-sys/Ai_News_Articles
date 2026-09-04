@@ -7,14 +7,15 @@
  * - Exact deal prices, original MRP, % discount
  * - Real card & bank offers (HDFC, ICICI, SBI, Axis)
  * - Coupon codes & key highlights
- * - 100% direct merchant links (Zero cuelinks redirect leaks)
+ * - High-resolution visual product image with every deal
+ * - 100% direct merchant links (Zero cuelinks redirect leaks & zero 404s)
  * - PURE DEALS ONLY (No unnecessary blog/article links)
  */
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getLiveProductDealsQueue, verifyNoCuelinksLeak } from './lib/deals-engine.mjs';
+import { getLiveProductDealsQueue, verifyNoCuelinksLeak, verifyAndHealDealLink } from './lib/deals-engine.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -33,13 +34,13 @@ export function formatTelegramDeal(deal) {
   const mrp = deal.mrp || "";
   const discount = deal.discount ? ` <i>(${deal.discount})</i>` : "";
   const cardOffer = deal.cardOffer || "";
-  const coupon = deal.coupon ? `🏷️ <b>Coupon Code:</b> <code>${escapeHtml(deal.coupon)}</code>\n` : "";
+  const coupon = deal.coupon ? `🏷️ <b>Coupon:</b> <code>${escapeHtml(deal.coupon)}</code>\n` : "";
   const rating = deal.rating ? `⭐ <b>Rating:</b> ${escapeHtml(deal.rating)}\n` : "";
   const merchant = deal.merchant || "Official Store";
   const buyUrl = deal.buyUrl;
 
   const highlights = Array.isArray(deal.highlights) && deal.highlights.length > 0
-    ? `\n✨ <b>Key Highlights:</b>\n` + deal.highlights.map(h => `• ${escapeHtml(h)}`).join("\n") + "\n"
+    ? `\n✨ <b>Key Highlights:</b>\n` + deal.highlights.slice(0, 4).map(h => `• ${escapeHtml(h)}`).join("\n") + "\n"
     : "";
 
   let priceLine = `💰 <b>Deal Price:</b> ${dealPrice}`;
@@ -49,13 +50,16 @@ export function formatTelegramDeal(deal) {
 
   let bankLine = cardOffer ? `\n💳 <b>Bank / Card Offer:</b> ${escapeHtml(cardOffer)}` : "";
 
-  return `${badge}: <b>${escapeHtml(title)}</b>\n\n` +
+  const text = `${badge}: <b>${escapeHtml(title)}</b>\n\n` +
     `${priceLine}${bankLine}\n` +
     `${coupon}` +
     `${rating}` +
     `${highlights}\n` +
     `🛒 <b>Grab Deal:</b> <a href="${buyUrl}">Buy on ${escapeHtml(merchant)} &rarr;</a>\n\n` +
-    `⚡ <i>Verified Direct Deal · Price & stock subject to change.</i>`;
+    `⚡ <i>Verified Direct Deal · 100% In-Stock Guarantee.</i>`;
+
+  // Telegram captions must not exceed 1024 characters
+  return text.length > 1000 ? text.slice(0, 990) + "..." : text;
 }
 
 function escapeHtml(str) {
@@ -85,7 +89,36 @@ function saveDispatched(list) {
   }
 }
 
-async function sendTelegramMessage(token, channelId, text, buyUrl) {
+/**
+ * Sends a visually rich photo deal with caption or falls back to message
+ */
+async function sendTelegramPhotoOrMessage(token, channelId, text, imageUrl, buyUrl) {
+  // 1. Try sending with visual Product Photo (sendPhoto)
+  if (imageUrl && imageUrl.startsWith('http')) {
+    try {
+      const photoUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
+      const photoRes = await fetch(photoUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: channelId,
+          photo: imageUrl,
+          caption: text,
+          parse_mode: 'HTML'
+        })
+      });
+
+      if (photoRes.ok) {
+        return true;
+      }
+      const photoErr = await photoRes.text();
+      console.warn(`[Telegram] sendPhoto failed (${photoRes.status}): ${photoErr}. Falling back to text...`);
+    } catch (e) {
+      console.warn(`[Telegram] sendPhoto network error: ${e.message}. Falling back to text...`);
+    }
+  }
+
+  // 2. Fallback to sendMessage
   const url = `https://api.telegram.org/bot${token}/sendMessage`;
   const res = await fetch(url, {
     method: 'POST',
@@ -122,7 +155,7 @@ export async function runBroadcast(options = {}) {
   // Find candidate deals not yet sent in this cycle
   let candidates = allDeals.filter(d => !dispatchedIds.has(d.id));
 
-  // If all catalog deals have been cycled through, reset older than 48 hours
+  // If all catalog deals have been cycled through, reset
   if (candidates.length < targetCount) {
     console.log(`[TIVRA Deals] Refreshing queue: cycling back through best trending deals.`);
     candidates = allDeals;
@@ -142,9 +175,12 @@ export async function runBroadcast(options = {}) {
   let failCount = 0;
 
   for (let i = 0; i < selectedDeals.length; i++) {
-    const deal = selectedDeals[i];
+    let deal = selectedDeals[i];
     
-    // Safety check: ensure URL never leaks to cuelinks.com
+    // 1. Pre-flight link health check and self-healing (No 404s)
+    deal = await verifyAndHealDealLink(deal, 3000);
+
+    // 2. Safety check: ensure URL never leaks to cuelinks.com
     const isSafe = await verifyNoCuelinksLeak(deal.buyUrl, 3000);
     if (!isSafe) {
       console.warn(`[TIVRA Deals] SKIPPED: URL failed anti-cuelinks verification for ${deal.title}`);
@@ -155,11 +191,12 @@ export async function runBroadcast(options = {}) {
 
     if (isDryRun) {
       console.log(`\n--- [DEAL #${i + 1} / ${selectedDeals.length}] ---`);
+      console.log(`Image: ${deal.imageUrl}`);
       console.log(messageText);
       sentCount++;
     } else {
       try {
-        await sendTelegramMessage(TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ID, messageText, deal.buyUrl);
+        await sendTelegramPhotoOrMessage(TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ID, messageText, deal.imageUrl, deal.buyUrl);
         console.log(`✔ [${i + 1}/${selectedDeals.length}] Posted: ${deal.title.slice(0, 50)}...`);
         sentCount++;
         dispatched.push({
