@@ -26,6 +26,41 @@
     "publisherId": "ca-pub-6206818645443465",
     "adSlot": ""
   },
+  "pollinationsCommunity": {
+    "baseUrl": "https://gen.pollinations.ai/v1",
+    "envKey": "POLLINATIONS_API_KEY",
+    "capableModels": [
+      { "id": "AkshayCoder48/gpt-4o-latest", "name": "pollinations-gpt-4o", "rpm": 5 },
+      { "id": "AkshayCoder48/gemini-2.5-pro", "name": "pollinations-gemini-2.5-pro", "rpm": 5 },
+      { "id": "AkshayCoder48/gemini-3.6-flash", "name": "pollinations-gemini-3.6-flash", "rpm": 5 },
+      { "id": "AkshayCoder48/gemini-2.5-flash", "name": "pollinations-gemini-2.5-flash", "rpm": 5 },
+      { "id": "AkshayCoder48/deepseek-v3", "name": "pollinations-deepseek-v3", "rpm": 5 },
+      { "id": "AkshayCoder48/deepseek-r1", "name": "pollinations-deepseek-r1", "rpm": 5 },
+      { "id": "NamanSoni78/nemotron-3-ultra-550b-a55b", "name": "pollinations-nemotron-550b", "rpm": 40 },
+      { "id": "AkshayCoder48/gpt-oss-120b", "name": "pollinations-gpt-oss-120b", "rpm": 5 },
+      { "id": "AkshayCoder48/L3-70B-Euryale-v2.1", "name": "pollinations-l3-70b", "rpm": 5 },
+      { "id": "chigwell/llm7-fast", "name": "pollinations-llm7-fast", "rpm": 300 },
+      { "id": "NamanSoni78/gemini-3.8-flash", "name": "pollinations-gemini-3.8-flash", "rpm": 30 }
+    ],
+    "fallbackModels": [
+      { "id": "morriszdweck/osaii-api-fast", "name": "pollinations-osaii-fast", "rpm": 30 },
+      { "id": "morriszdweck/osaii-api-smart", "name": "pollinations-osaii-smart", "rpm": 15 },
+      { "id": "YoannDev90/poolside-laguna-s-2.1:free", "name": "pollinations-poolside-laguna", "rpm": 30 },
+      { "id": "AkshayCoder48/laguna-s-2.1-free", "name": "pollinations-laguna-free", "rpm": 10 },
+      { "id": "AkshayCoder48/gemini-3.1-flash-lite", "name": "pollinations-gemini-3.1-lite", "rpm": 5 },
+      { "id": "AkshayCoder48/gemini-3-flash", "name": "pollinations-gemini-3-flash", "rpm": 5 },
+      { "id": "AkshayCoder48/grok-4-fast", "name": "pollinations-grok-4-fast", "rpm": 5 },
+      { "id": "AkshayCoder48/kilo-auto-free", "name": "pollinations-kilo-auto", "rpm": 10 },
+      { "id": "AkshayCoder48/cohere-north-mini-code:free", "name": "pollinations-cohere-mini", "rpm": 10 },
+      { "id": "vendouple/gpt-5.6-sol:free", "name": "pollinations-gpt-5.6-sol", "rpm": 3 },
+      { "id": "NamanSoni78/gpt-5.4-nano", "name": "pollinations-gpt-5.4-nano", "rpm": 20 },
+      { "id": "iotserver24/deepseek-v4f-free", "name": "pollinations-deepseek-v4f", "rpm": 30 },
+      { "id": "YoannDev90/muse-glimmer-30b:free", "name": "pollinations-muse-30b", "rpm": 10 },
+      { "id": "YoannDev90/diffusiongemma-26b-a4b-it:free", "name": "pollinations-diffusiongemma", "rpm": 10 },
+      { "id": "MarcosFRG/glm-4.6v-flash", "name": "pollinations-glm-4.6v", "rpm": 6 },
+      { "id": "vendouple/muse-glimmer-30b:free", "name": "pollinations-muse-glimmer", "rpm": 5 }
+    ]
+  },
   "providers": [
     {
       "name": "gemini",

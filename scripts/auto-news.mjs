@@ -68,7 +68,8 @@ const ADSENSE_ID = process.env.ADSENSE_PUBLISHER_ID || config.adsense.publisherI
 const ADSENSE_SLOT = process.env.ADSENSE_AD_SLOT || config.adsense.adSlot || "";
 
 const today = new Date().toISOString().slice(0, 10);
-const pool = new ProviderPool(config.providers);
+const pool = new ProviderPool(config.providers, config.pollinationsCommunity);
+await pool.initDynamicCommunityModels();
 
 mkdirSync(DATA_DIR, { recursive: true });
 mkdirSync(ARTICLES_DIR, { recursive: true });
