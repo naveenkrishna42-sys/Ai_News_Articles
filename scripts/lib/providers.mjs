@@ -9,11 +9,116 @@
 const COOLDOWN_MS = 90_000;
 
 export class ProviderPool {
-  constructor(providerConfigs) {
-    this.providers = providerConfigs
+  constructor(providerConfigs, communityConfig = null) {
+    this.providers = (providerConfigs || [])
       .map((p) => ({ ...p, apiKey: (process.env[p.envKey] || "").trim(), cooldownUntil: 0, ok: 0, failed: 0 }))
       .filter((p) => p.apiKey);
+    this.communityConfig = communityConfig;
     this.cursor = 0;
+  }
+
+  /**
+   * Pure logic dynamic verification & tiered wiring of Pollinations community models:
+   * Tier 1: Capable high-parameter models (GPT-4o, Gemini 2.5 Pro, Flash, DeepSeek, Nemotron, LLM7)
+   * Tier 2: Companion fallback models (Osaii, Laguna, Grok, Kilo, Cohere, etc.)
+   * Tier 3: External free providers (OpenRouter 120B/Gemma, Gemini, Groq)
+   */
+  async initDynamicCommunityModels() {
+    if (!this.communityConfig) return;
+    const envKey = this.communityConfig.envKey || "POLLINATIONS_API_KEY";
+    const apiKey = (process.env[envKey] || "").trim();
+    const baseUrl = this.communityConfig.baseUrl || "https://gen.pollinations.ai/v1";
+    const capableConfigs = this.communityConfig.capableModels || [];
+    const fallbackConfigs = this.communityConfig.fallbackModels || [];
+
+    console.log(`[Providers] Pre-flight checking Pollinations community models at ${baseUrl}...`);
+
+    // 1. Fetch live active catalog from gen.pollinations.ai to verify model presence
+    let liveCatalog = new Set();
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch(`${baseUrl}/models`, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        for (const m of (data.data || [])) {
+          if (m.id) liveCatalog.add(m.id);
+        }
+        console.log(`[Providers] Live Pollinations catalog contains ${liveCatalog.size} models.`);
+      }
+    } catch (err) {
+      console.warn(`[Providers] Could not reach Pollinations live catalog: ${err.message}. Relying on config definitions.`);
+    }
+
+    const validCapable = capableConfigs.filter((m) => liveCatalog.size === 0 || liveCatalog.has(m.id));
+    const validFallback = fallbackConfigs.filter((m) => liveCatalog.size === 0 || liveCatalog.has(m.id));
+
+    // 2. Pre-flight handshake ping on the top capable candidate
+    let gatewayHealthy = false;
+    const probeCandidate = validCapable[0];
+    if (probeCandidate) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch(`${baseUrl}/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+          },
+          body: JSON.stringify({
+            model: probeCandidate.id,
+            max_tokens: 2,
+            messages: [{ role: "user", content: "1" }],
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        if (res.status === 200) {
+          gatewayHealthy = true;
+          console.log(`  ✔ [Pollinations Pre-flight] Handshake verified with ${probeCandidate.id}.`);
+        } else if (res.status === 402) {
+          console.warn(`  ⚠ [Pollinations Pre-flight] Account balance exhausted (HTTP 402). Gracefully cascading to Tier 3 free providers.`);
+        } else if (res.status === 401) {
+          console.warn(`  ⚠ [Pollinations Pre-flight] Unauthorized (HTTP 401). Gracefully cascading to Tier 3 free providers.`);
+        } else {
+          console.warn(`  ⚠ [Pollinations Pre-flight] Gateway returned status ${res.status}. Gracefully cascading to Tier 3 free providers.`);
+        }
+      } catch (err) {
+        console.warn(`  ⚠ [Pollinations Pre-flight] Handshake timeout/error (${err.message}). Cascading to Tier 3 free providers.`);
+      }
+    }
+
+    // 3. If gateway is healthy, wire Capable Models (Tier 1) and Fallback Models (Tier 2) to the front
+    if (gatewayHealthy) {
+      const capableProviders = validCapable.map((m) => ({
+        name: m.name || m.id,
+        baseUrl,
+        model: m.id,
+        apiKey,
+        tier: "capable",
+        cooldownUntil: 0,
+        ok: 0,
+        failed: 0,
+      }));
+
+      const fallbackProviders = validFallback.map((m) => ({
+        name: m.name || m.id,
+        baseUrl,
+        model: m.id,
+        apiKey,
+        tier: "fallback",
+        cooldownUntil: 0,
+        ok: 0,
+        failed: 0,
+      }));
+
+      this.providers = [...capableProviders, ...fallbackProviders, ...this.providers];
+      console.log(`[Providers] Successfully wired ${capableProviders.length} Capable Models (Tier 1) + ${fallbackProviders.length} Fallback Models (Tier 2).`);
+    } else {
+      console.log(`[Providers] Operating on Tier 3 verified free providers: ${this.providers.map((p) => p.name).join(", ")}`);
+    }
   }
 
   get available() {
