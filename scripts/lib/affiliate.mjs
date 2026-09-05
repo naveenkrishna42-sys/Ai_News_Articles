@@ -409,7 +409,11 @@ export function injectInlineListicleButtons(bodyHtml = "", config = {}, category
       btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(cuelinksRedirect('https://www.bankbazaar.com/credit-card.html'))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>💳 Compare Features & Eligibility</span></a></div>`;
     } else if (!btnHtml) {
       // ONLY generate Amazon/Flipkart purchase buttons in designated commercial shopping categories
-      const isPhysicalShoppingCategory = catLower.includes("deal") || catLower.includes("gadget") || catLower.includes("comparison") || catLower.includes("offer");
+      const COMMERCIAL_SHOPPING_CATEGORIES = new Set([
+        "product deals & offers",
+        "gadget comparisons"
+      ]);
+      const isPhysicalShoppingCategory = COMMERCIAL_SHOPPING_CATEGORIES.has(catLower);
       if (isPhysicalShoppingCategory) {
         const cleanProd = sanitizeProductName(rawTitle);
         // Exclude people, abstract concepts, places, religious sites, politics, and matchups
