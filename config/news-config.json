@@ -30,6 +30,7 @@
     "baseUrl": "https://gen.pollinations.ai/v1",
     "envKey": "POLLINATIONS_API_KEY",
     "capableModels": [
+      { "id": "chigwell/llm7-fast", "name": "pollinations-llm7-fast", "rpm": 300 },
       { "id": "AkshayCoder48/gpt-4o-latest", "name": "pollinations-gpt-4o", "rpm": 5 },
       { "id": "AkshayCoder48/gemini-2.5-pro", "name": "pollinations-gemini-2.5-pro", "rpm": 5 },
       { "id": "AkshayCoder48/gemini-3.6-flash", "name": "pollinations-gemini-3.6-flash", "rpm": 5 },
@@ -39,7 +40,6 @@
       { "id": "NamanSoni78/nemotron-3-ultra-550b-a55b", "name": "pollinations-nemotron-550b", "rpm": 40 },
       { "id": "AkshayCoder48/gpt-oss-120b", "name": "pollinations-gpt-oss-120b", "rpm": 5 },
       { "id": "AkshayCoder48/L3-70B-Euryale-v2.1", "name": "pollinations-l3-70b", "rpm": 5 },
-      { "id": "chigwell/llm7-fast", "name": "pollinations-llm7-fast", "rpm": 300 },
       { "id": "NamanSoni78/gemini-3.8-flash", "name": "pollinations-gemini-3.8-flash", "rpm": 30 }
     ],
     "fallbackModels": [
