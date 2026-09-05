@@ -208,12 +208,16 @@ const HIGH_MONETIZATION_ORDER = [
   ...priority
 ];
 
-if (queue.length < budget) {
+const runTarget = args.includes("--per-category")
+  ? Math.min(budget, PER_CATEGORY * priority.length)
+  : Math.min(budget, Math.max(PER_CATEGORY * priority.length, 55));
+
+if (queue.length < runTarget) {
   for (const category of HIGH_MONETIZATION_ORDER) {
-    if (queue.length >= budget) break;
+    if (queue.length >= runTarget) break;
     const items = byCategory.get(category) || [];
     for (const item of items) {
-      if (queue.length >= budget) break;
+      if (queue.length >= runTarget) break;
       if (item.title.length < 25) continue;
       if (isStaleSeasonalStory(item.title, today)) continue;
       if (isDuplicate(item)) continue;
