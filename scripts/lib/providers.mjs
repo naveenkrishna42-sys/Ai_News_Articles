@@ -54,13 +54,14 @@ export class ProviderPool {
     const validCapable = capableConfigs.filter((m) => liveCatalog.size === 0 || liveCatalog.has(m.id));
     const validFallback = fallbackConfigs.filter((m) => liveCatalog.size === 0 || liveCatalog.has(m.id));
 
-    // 2. Pre-flight handshake ping on the top capable candidate
+    // 2. Pre-flight handshake ping on top capable candidates (with multi-candidate resilience)
     let gatewayHealthy = false;
-    const probeCandidate = validCapable[0];
-    if (probeCandidate) {
+    let verifiedCandidate = null;
+    const probeCandidates = validCapable.slice(0, 3);
+    for (const candidate of probeCandidates) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
         const res = await fetch(`${baseUrl}/chat/completions`, {
           method: "POST",
           headers: {
@@ -68,7 +69,7 @@ export class ProviderPool {
             ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
           },
           body: JSON.stringify({
-            model: probeCandidate.id,
+            model: candidate.id,
             max_tokens: 2,
             messages: [{ role: "user", content: "1" }],
           }),
@@ -77,22 +78,30 @@ export class ProviderPool {
         clearTimeout(timeoutId);
         if (res.status === 200) {
           gatewayHealthy = true;
-          console.log(`  ✔ [Pollinations Pre-flight] Handshake verified with ${probeCandidate.id}.`);
+          verifiedCandidate = candidate;
+          console.log(`  ✔ [Pollinations Pre-flight] Handshake verified with ${candidate.id}.`);
+          break;
         } else if (res.status === 402) {
           console.warn(`  ⚠ [Pollinations Pre-flight] Account balance exhausted (HTTP 402). Gracefully cascading to Tier 3 free providers.`);
+          break;
         } else if (res.status === 401) {
           console.warn(`  ⚠ [Pollinations Pre-flight] Unauthorized (HTTP 401). Gracefully cascading to Tier 3 free providers.`);
+          break;
         } else {
-          console.warn(`  ⚠ [Pollinations Pre-flight] Gateway returned status ${res.status}. Gracefully cascading to Tier 3 free providers.`);
+          console.warn(`  ⚠ [Pollinations Pre-flight] Candidate ${candidate.id} returned HTTP ${res.status}. Checking next...`);
         }
       } catch (err) {
-        console.warn(`  ⚠ [Pollinations Pre-flight] Handshake timeout/error (${err.message}). Cascading to Tier 3 free providers.`);
+        console.warn(`  ⚠ [Pollinations Pre-flight] Candidate ${candidate.id} timed out / error (${err.message}). Checking next...`);
       }
     }
 
     // 3. If gateway is healthy, wire Capable Models (Tier 1) and Fallback Models (Tier 2) to the front
     if (gatewayHealthy) {
-      const capableProviders = validCapable.map((m) => ({
+      const sortedCapable = verifiedCandidate
+        ? [verifiedCandidate, ...validCapable.filter((m) => m.id !== verifiedCandidate.id)]
+        : validCapable;
+
+      const capableProviders = sortedCapable.map((m) => ({
         name: m.name || m.id,
         baseUrl,
         model: m.id,
