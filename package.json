@@ -8,6 +8,7 @@
     "build": "node scripts/build-index.mjs",
     "import": "node scripts/import-articles.mjs",
     "news": "node scripts/auto-news.mjs",
-    "news:test": "node scripts/auto-news.mjs --per-category 1 --max-total 6 --no-specials"
+    "news:test": "node scripts/auto-news.mjs --per-category 1 --max-total 6 --no-specials",
+    "test": "node --test test/*.test.mjs"
   }
 }
