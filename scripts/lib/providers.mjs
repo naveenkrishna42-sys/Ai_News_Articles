@@ -41,15 +41,17 @@ export class ProviderPool {
       try {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 90_000);
-        const url = provider.baseUrl.includes("generativelanguage.googleapis.com")
+        const isGoogle = provider.baseUrl.includes("generativelanguage.googleapis.com");
+        const url = isGoogle
           ? `${provider.baseUrl}/chat/completions?key=${encodeURIComponent(provider.apiKey)}`
           : `${provider.baseUrl}/chat/completions`;
         const headers = {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${provider.apiKey}`,
         };
-        if (provider.baseUrl.includes("generativelanguage.googleapis.com")) {
+        if (isGoogle) {
           headers["x-goog-api-key"] = provider.apiKey;
+        } else {
+          headers["Authorization"] = `Bearer ${provider.apiKey}`;
         }
         const res = await fetch(url, {
           method: "POST",
