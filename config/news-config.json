@@ -28,10 +28,10 @@
   },
   "providers": [
     {
-      "name": "pollinations",
-      "baseUrl": "https://gen.pollinations.ai/v1",
-      "model": "chigwell/llm7-fast",
-      "envKey": "POLLINATIONS_API_KEY"
+      "name": "gemini",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "model": "gemini-2.0-flash",
+      "envKey": "GEMINI_API_KEY"
     },
     {
       "name": "groq",
@@ -40,16 +40,16 @@
       "envKey": "GROQ_API_KEY"
     },
     {
-      "name": "gemini",
-      "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
-      "model": "gemini-2.5-flash",
-      "envKey": "GEMINI_API_KEY"
-    },
-    {
       "name": "openrouter",
       "baseUrl": "https://openrouter.ai/api/v1",
-      "model": "deepseek/deepseek-chat-v3-0324",
+      "model": "deepseek/deepseek-chat",
       "envKey": "OPENROUTER_API_KEY"
+    },
+    {
+      "name": "pollinations",
+      "baseUrl": "https://gen.pollinations.ai/v1",
+      "model": "chigwell/llm7-fast",
+      "envKey": "POLLINATIONS_API_KEY"
     },
     {
       "name": "deepseek",
