@@ -11,7 +11,7 @@ const COOLDOWN_MS = 90_000;
 export class ProviderPool {
   constructor(providerConfigs) {
     this.providers = providerConfigs
-      .map((p) => ({ ...p, apiKey: process.env[p.envKey] || "", cooldownUntil: 0, ok: 0, failed: 0 }))
+      .map((p) => ({ ...p, apiKey: (process.env[p.envKey] || "").trim(), cooldownUntil: 0, ok: 0, failed: 0 }))
       .filter((p) => p.apiKey);
     this.cursor = 0;
   }
@@ -32,7 +32,7 @@ export class ProviderPool {
     return this.providers.map((p) => `${p.name}: ${p.ok} ok / ${p.failed} failed`).join(", ");
   }
 
-  async chat({ system, user, maxTokens = 3000, temperature = 0.8, attempts = 5 }) {
+  async chat({ system, user, maxTokens = 3000, temperature = 0.8, attempts = 6 }) {
     let lastError = null;
     const maxAttempts = Math.max(attempts, this.providers.length);
     for (let i = 0; i < maxAttempts; i++) {
@@ -42,16 +42,17 @@ export class ProviderPool {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 90_000);
         const isGoogle = provider.baseUrl.includes("generativelanguage.googleapis.com");
-        const url = isGoogle
-          ? `${provider.baseUrl}/chat/completions?key=${encodeURIComponent(provider.apiKey)}`
-          : `${provider.baseUrl}/chat/completions`;
+        const url = `${provider.baseUrl}/chat/completions`;
         const headers = {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${provider.apiKey}`,
         };
         if (isGoogle) {
           headers["x-goog-api-key"] = provider.apiKey;
-        } else {
-          headers["Authorization"] = `Bearer ${provider.apiKey}`;
+        }
+        if (provider.baseUrl.includes("openrouter.ai")) {
+          headers["HTTP-Referer"] = "https://tivranews.com";
+          headers["X-Title"] = "TIVRA News";
         }
         const res = await fetch(url, {
           method: "POST",
