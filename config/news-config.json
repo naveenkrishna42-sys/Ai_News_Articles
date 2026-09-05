@@ -36,13 +36,13 @@
     {
       "name": "groq",
       "baseUrl": "https://api.groq.com/openai/v1",
-      "model": "llama-3.3-70b-versatile",
+      "model": "llama-3.1-8b-instant",
       "envKey": "GROQ_API_KEY"
     },
     {
       "name": "openrouter",
       "baseUrl": "https://openrouter.ai/api/v1",
-      "model": "deepseek/deepseek-chat",
+      "model": "meta-llama/llama-3.3-70b-instruct:free",
       "envKey": "OPENROUTER_API_KEY"
     },
     {
