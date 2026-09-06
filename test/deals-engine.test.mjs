@@ -46,6 +46,19 @@ for (const url of sampleRedirects) {
   const isSafe = await verifyNoCuelinksLeak(url, 3500);
   assert.strictEqual(isSafe, true, `URL must NOT redirect to cuelinks.com: ${url}`);
 }
-console.log("✓ Test 4: Live HTTP verification confirmed zero redirection leaks to cuelinks.com.");
+// Test 5: Verify resolveMerchantProductUrl constructs clean, working search endpoints
+import { resolveMerchantProductUrl } from '../scripts/lib/deals-engine.mjs';
+
+const ajioUrl = resolveMerchantProductUrl("Ajio", "Dennis Lingo Mens Casual Shirts");
+assert.ok(ajioUrl.includes("ajio.com%2Fsearch%2F%3Ftext%3D"), `Ajio URL must use search endpoint: ${ajioUrl}`);
+assert.ok(!ajioUrl.includes("/s/"), `Ajio URL must NOT use fragile /s/ slug: ${ajioUrl}`);
+
+const fkUrl = resolveMerchantProductUrl("Flipkart", "iPhone 16");
+assert.ok(fkUrl.includes("flipkart.com%2Fsearch%3Fq%3D"), `Flipkart URL must use search endpoint: ${fkUrl}`);
+
+const cromaUrl = resolveMerchantProductUrl("Croma", "Sony Headphones");
+assert.ok(cromaUrl.includes("croma.com%2FsearchB%3Fq%3D"), `Croma URL must use searchB endpoint: ${cromaUrl}`);
+
+console.log("✓ Test 5: resolveMerchantProductUrl verified across Ajio, Flipkart & Croma.");
 
 console.log("\n✅ ALL Multi-Category Product Deals Engine unit tests passed with 100% success!");

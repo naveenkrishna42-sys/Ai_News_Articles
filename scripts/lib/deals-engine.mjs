@@ -36,6 +36,89 @@ export function buildAmazonSearchUrl(query) {
 }
 
 /**
+ * Resolves verified, permanent merchant search URLs that never expire.
+ * Specifically prevents Ajio's SPA from throwing "Something went wrong".
+ */
+export function resolveMerchantProductUrl(merchant = "", productName = "", rawUrl = "") {
+  const m = String(merchant || "").toLowerCase();
+  const query = String(productName || "")
+    .replace(/\(.*?\)/g, " ")
+    .replace(/[[\]]/g, " ")
+    .replace(/[^\w\s-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // If rawUrl or merchant is a direct campaign partner (like NCL, Choice Hotels, Verpex, Airalo, AppSumo, etc.)
+  if (rawUrl && /ncl\.com|norwegian|choicehotels|verpex|airalo|hostinger|appsumo|virginvoyages|trip\.com|agoda|airwallex/i.test(rawUrl)) {
+    return rawUrl.includes("linksredirect.com") ? rawUrl.replace(/cid=\d+/, `cid=${CUELINKS_CID}`) : buildMerchantRedirect(rawUrl);
+  }
+
+  if (/cruise|norwegian|choice\s*hotels|verpex|airalo|hostinger|appsumo|airwallex/i.test(m) && rawUrl) {
+    return rawUrl.includes("linksredirect.com") ? rawUrl.replace(/cid=\d+/, `cid=${CUELINKS_CID}`) : buildMerchantRedirect(rawUrl);
+  }
+
+  // Direct Campaign & SaaS Partners
+  if (m.includes("airalo")) {
+    return buildMerchantRedirect("https://www.airalo.com");
+  }
+  if (m.includes("hostinger")) {
+    return buildMerchantRedirect("https://www.hostinger.com");
+  }
+  if (m.includes("verpex")) {
+    return buildMerchantRedirect("https://verpex.com");
+  }
+  if (m.includes("appsumo")) {
+    return buildMerchantRedirect(`https://appsumo.com/search/?query=${encodeURIComponent(query)}`);
+  }
+  if (m.includes("choice") && m.includes("hotel")) {
+    return buildMerchantRedirect("https://www.choicehotels.com");
+  }
+
+  // Ajio: Use permanent /search/?text=... (never fragile /s/... slugs that trigger 'Something went wrong')
+  if (m.includes("ajio")) {
+    return buildMerchantRedirect(`https://www.ajio.com/search/?text=${encodeURIComponent(query)}`);
+  }
+
+  // Flipkart
+  if (m.includes("flipkart")) {
+    return buildMerchantRedirect(`https://www.flipkart.com/search?q=${encodeURIComponent(query)}`);
+  }
+
+  // Croma
+  if (m.includes("croma")) {
+    return buildMerchantRedirect(`https://www.croma.com/searchB?q=${encodeURIComponent(query)}`);
+  }
+
+  // Tata CLiQ
+  if (m.includes("tatacliq") || m.includes("tata cliq")) {
+    return buildMerchantRedirect(`https://www.tatacliq.com/search/?searchCategory=all&text=${encodeURIComponent(query)}`);
+  }
+
+  // Myntra
+  if (m.includes("myntra")) {
+    return buildMerchantRedirect(`https://www.myntra.com/${encodeURIComponent(query.toLowerCase().replace(/\s+/g, '-'))}`);
+  }
+
+  // Samsung Store
+  if (m.includes("samsung")) {
+    return buildMerchantRedirect(`https://www.samsung.com/in/search/?searchvalue=${encodeURIComponent(query)}`);
+  }
+
+  // Reliance Digital
+  if (m.includes("reliance")) {
+    return buildMerchantRedirect(`https://www.reliancedigital.in/search?q=${encodeURIComponent(query)}`);
+  }
+
+  // Nykaa
+  if (m.includes("nykaa")) {
+    return buildMerchantRedirect(`https://www.nykaa.com/search/result/?q=${encodeURIComponent(query)}`);
+  }
+
+  // Default: Amazon India search
+  return buildAmazonSearchUrl(query);
+}
+
+/**
  * Pre-checks if a redirect URL leaks to cuelinks.com
  */
 export async function verifyNoCuelinksLeak(url, timeoutMs = 4000) {
@@ -65,6 +148,15 @@ export async function verifyNoCuelinksLeak(url, timeoutMs = 4000) {
 export async function verifyAndHealDealLink(deal, timeoutMs = 4000) {
   if (!deal || !deal.buyUrl) return deal;
 
+  const cleanTitle = (deal.title || "").split("(")[0].trim();
+  const merchant = deal.merchant || "";
+
+  // 1. Immediately heal known fragile URLs (like Ajio /s/... URLs) to permanent search URLs
+  if (deal.buyUrl.includes("ajio.com/s/")) {
+    console.log(`[Link Healer] Healing fragile Ajio slug to verified search endpoint for "${cleanTitle}".`);
+    deal.buyUrl = resolveMerchantProductUrl("Ajio", cleanTitle, deal.buyUrl);
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -78,19 +170,17 @@ export async function verifyAndHealDealLink(deal, timeoutMs = 4000) {
     });
     clearTimeout(timeoutId);
 
-    const text = await res.text();
-    const isBroken = res.status === 404 || /page not found|something went wrong|dog of amazon/i.test(text);
+    const text = await res.text().catch(() => "");
+    const isBroken = res.status === 404 || res.status === 410 || /page not found|something went wrong|dog of amazon|we couldn't find what you were looking for/i.test(text);
 
     if (isBroken) {
-      console.warn(`[Link Healer] 404 detected for "${deal.title}". Healing with verified search link.`);
-      deal.buyUrl = buildAmazonSearchUrl(deal.title.split("(")[0].trim());
+      console.warn(`[Link Healer] Broken page detected (${res.status}) for "${deal.title}". Healing with verified merchant search link.`);
+      deal.buyUrl = resolveMerchantProductUrl(merchant, cleanTitle, deal.buyUrl);
     }
   } catch {
     clearTimeout(timeoutId);
-    // If exact link had a network timeout, heal to guaranteed Amazon search URL
-    if (deal.merchant && deal.merchant.toLowerCase().includes("amazon")) {
-      deal.buyUrl = buildAmazonSearchUrl(deal.title.split("(")[0].trim());
-    }
+    // If exact link had a network timeout, heal to guaranteed merchant search URL
+    deal.buyUrl = resolveMerchantProductUrl(merchant, cleanTitle, deal.buyUrl);
   }
 
   return deal;
@@ -440,7 +530,7 @@ export const CURATED_PRODUCT_DEALS = [
       "Pre-washed for zero shrinkage and ultra-soft hand feel",
       "Versatile styling for office casual, dinner & weekend outings"
     ],
-    buyUrl: buildMerchantRedirect("https://www.ajio.com/s/dennis-lingo-shirts-4001-52311")
+    buyUrl: resolveMerchantProductUrl("Ajio", "Dennis Lingo Mens Casual Shirts")
   },
   {
     id: "prod-puma-sneakers-smash-v2",
@@ -647,11 +737,27 @@ export const CURATED_PRODUCT_DEALS = [
 ];
 
 /**
- * Merges Cuelinks live API offers with curated multi-category product catalog
+ * Dynamically assembles live product deals queue:
+ * 1. AI-extracted real-time deals from live RSS feeds and Cuelinks campaigns
+ * 2. Active Cuelinks promotional campaigns with clean merchant routing
+ * 3. Verified fallback catalog (only as safety net)
  */
-export async function getLiveProductDealsQueue() {
-  const allDeals = [...CURATED_PRODUCT_DEALS];
+export async function getLiveProductDealsQueue(options = {}) {
+  const dynamicDeals = [];
 
+  // 1. Fetch real-time AI-extracted product deals
+  try {
+    const { extractDynamicDealsFromSources } = await import('./deal-extractor-ai.mjs');
+    const aiDeals = await extractDynamicDealsFromSources(options);
+    if (Array.isArray(aiDeals) && aiDeals.length > 0) {
+      console.log(`[Deals Engine] Injected ${aiDeals.length} dynamic AI-extracted product deals into live queue.`);
+      dynamicDeals.push(...aiDeals);
+    }
+  } catch (err) {
+    console.warn(`[Deals Engine] AI extraction cascade notice: ${err.message}`);
+  }
+
+  // 2. Fetch live Cuelinks API campaigns & offers
   try {
     const liveCuelinksOffers = await fetchLiveOffers();
     for (const offer of liveCuelinksOffers) {
@@ -666,9 +772,12 @@ export async function getLiveProductDealsQueue() {
       const isClean = await verifyNoCuelinksLeak(trackingUrl, 2000);
       if (!isClean) continue;
 
-      allDeals.push({
+      const cleanTitle = offer.title.replace(/[^\w\s:,\.\-%–—&]/g, "").trim();
+      const buyUrl = resolveMerchantProductUrl(merchant, cleanTitle, trackingUrl);
+
+      dynamicDeals.push({
         id: `cuelinks-${offer.id || merchant.toLowerCase().replace(/\s+/g, '-')}`,
-        title: `${merchant}: ${offer.title.replace(/[^\w\s:,\.\-%–—&]/g, "").trim()}`,
+        title: `${merchant}: ${cleanTitle}`,
         category: "Product Deals & Offers",
         market: offer.country === "US" ? "International" : "National",
         merchant,
@@ -685,12 +794,17 @@ export async function getLiveProductDealsQueue() {
           offer.end_date ? `Valid through ${offer.end_date}` : "Limited-time promotional pricing",
           "Direct fulfillment by authorized brand store"
         ],
-        buyUrl: trackingUrl
+        buyUrl
       });
     }
   } catch (err) {
-    console.warn(`[Deals Engine] Fallback to curated catalog: ${err.message}`);
+    console.warn(`[Deals Engine] Cuelinks offers fetch notice: ${err.message}`);
   }
 
-  return allDeals;
+  // 3. Fallback catalog (only appended as safety net if dynamic pool is under 15)
+  if (dynamicDeals.length < 15) {
+    dynamicDeals.push(...CURATED_PRODUCT_DEALS);
+  }
+
+  return dynamicDeals;
 }
