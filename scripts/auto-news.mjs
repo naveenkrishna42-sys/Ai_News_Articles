@@ -174,14 +174,37 @@ for (const c of byCategory.keys()) if (!priority.includes(c)) priority.push(c);
 // value is missing or 0 for one of these three categories, the computed
 // budget is 0 and the category silently produces nothing that day — no
 // crash, no special-cased error path, config-only toggle.
-// Pass 1: Standard fair distribution
+// Target volume calibration:
+// 25 articles per 1-hour run (24 runs * 25 = 600 daily target)
+// 50 articles per 2-hour run (12 runs * 50 = 600 daily target)
+const isTwoHours = args.includes("--two-hours") || args.includes("--50");
+const DEFAULT_RUN_TARGET = isTwoHours ? 50 : 25;
+const runTarget = args.includes("--per-category")
+  ? Math.min(budget, PER_CATEGORY * priority.length)
+  : Math.min(budget, Number(argValue("--target", DEFAULT_RUN_TARGET)));
+
+// Monetization & Commercial categories
+const COMMERCIAL_CATEGORIES = new Set([
+  "Product Deals & Offers",
+  "Credit Cards & Cashback",
+  "Gadget Comparisons",
+  "AI Tips & Tools"
+]);
+
+// Pass 1: Balanced distribution across both monetization and general news
 const queue = [];
+const perMonetizationTarget = isTwoHours ? 3 : 2;
+const perNewsTarget = isTwoHours ? 2 : 1;
+
 for (const category of priority) {
+  if (queue.length >= runTarget) break;
   const items = byCategory.get(category) || [];
   let picked = 0;
-  let categoryBudget = Number(config.newCategoryVolume?.[category] || PER_CATEGORY);
+  const isComm = COMMERCIAL_CATEGORIES.has(category);
+  const categoryCap = isComm ? perMonetizationTarget : perNewsTarget;
+
   for (const item of items) {
-    if (picked >= categoryBudget || queue.length >= budget) break;
+    if (picked >= categoryCap || queue.length >= runTarget) break;
     if (item.title.length < 25) continue;
     if (isStaleSeasonalStory(item.title, today)) continue;
     if (isDuplicate(item)) continue;
@@ -191,7 +214,7 @@ for (const category of priority) {
   }
 }
 
-// Pass 2: Dynamic Overflow Backfill to hit target volume (up to budget / 50)
+// Pass 2: Combined backfill (interleaving monetization and news) to strictly fulfill runTarget
 const HIGH_MONETIZATION_ORDER = [
   "Product Deals & Offers",
   "Credit Cards & Cashback",
@@ -199,6 +222,8 @@ const HIGH_MONETIZATION_ORDER = [
   "Technology",
   "Business",
   "Markets",
+  "Breaking News",
+  "Top Stories",
   "India",
   "World",
   "Sports",
@@ -208,10 +233,6 @@ const HIGH_MONETIZATION_ORDER = [
   "AI Tips & Tools",
   ...priority
 ];
-
-const runTarget = args.includes("--per-category")
-  ? Math.min(budget, PER_CATEGORY * priority.length)
-  : Math.min(budget, Math.max(PER_CATEGORY * priority.length, 55));
 
 if (queue.length < runTarget) {
   for (const category of HIGH_MONETIZATION_ORDER) {
