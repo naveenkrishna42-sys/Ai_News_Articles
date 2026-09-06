@@ -28,6 +28,17 @@ export function slugify(text) {
     .replace(/-$/, "");
 }
 
+export function cleanText(str = "") {
+  return String(str || "")
+    .replace(/&amp;amp;/g, "&")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/â˜…/g, "★")
+    .replace(/âœ…/g, "✅")
+    .replace(/âš\u00A0ï¸\u008F|âš\u00A0ï¸|âš\s*ï¸|âš/g, "⚠️");
+}
+
 export function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
@@ -197,8 +208,12 @@ export function renderArticlePage({
                         // additional <script type="application/ld+json">
                         // tags alongside the NewsArticle block below.
 }) {
-  const safeTitle = escapeHtml(title);
-  const safeDesc = escapeHtml(description).slice(0, 300);
+  const cleanTitle = cleanText(title);
+  const safeTitle = escapeHtml(cleanTitle);
+  const attrTitle = cleanTitle.replace(/"/g, "&quot;");
+  const cleanDesc = cleanText(description);
+  const safeDesc = escapeHtml(cleanDesc).slice(0, 300);
+  const attrDesc = cleanDesc.replace(/"/g, "&quot;").slice(0, 300);
   const catSlug = slugify(category);
   const year = date.slice(0, 4);
   const pageUrl = siteUrl ? `${siteUrl}/articles/${slug}.html` : "";
@@ -214,8 +229,8 @@ export function renderArticlePage({
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "NewsArticle",
-    headline: title.slice(0, 110),
-    description,
+    headline: cleanTitle.slice(0, 110),
+    description: cleanDesc,
     image: heroImage ? [heroImage] : undefined,
     datePublished: date,
     dateModified: date,
@@ -244,22 +259,22 @@ export function renderArticlePage({
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home", "item": siteUrl || "https://tivranews.com" },
       { "@type": "ListItem", "position": 2, "name": category || "News", "item": `${siteUrl || "https://tivranews.com"}/category.html?cat=${catSlug}` },
-      { "@type": "ListItem", "position": 3, "name": safeTitle, "item": pageUrl || undefined }
+      { "@type": "ListItem", "position": 3, "name": attrTitle, "item": pageUrl || undefined }
     ]
   };
 
   const socialMeta = `
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="TIVRA News">
-<meta property="og:title" content="${safeTitle}">
-<meta property="og:description" content="${safeDesc}">
+<meta property="og:title" content="${attrTitle}">
+<meta property="og:description" content="${attrDesc}">
 ${heroImage ? `<meta property="og:image" content="${escapeHtml(heroImage)}">` : ""}
 ${pageUrl ? `<meta property="og:url" content="${escapeHtml(pageUrl)}">\n<link rel="canonical" href="${escapeHtml(pageUrl)}">` : ""}
 <meta property="article:published_time" content="${date}">
 <meta property="article:section" content="${escapeHtml(category)}">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${safeTitle}">
-<meta name="twitter:description" content="${safeDesc}">
+<meta name="twitter:title" content="${attrTitle}">
+<meta name="twitter:description" content="${attrDesc}">
 ${heroImage ? `<meta name="twitter:image" content="${escapeHtml(heroImage)}">` : ""}
 <script type="application/ld+json">${jsonLd}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>

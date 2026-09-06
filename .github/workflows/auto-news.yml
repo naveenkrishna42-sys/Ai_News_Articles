@@ -17,7 +17,8 @@ name: TIVRA auto news
 
 on:
   schedule:
-    - cron: "0 */2 * * *"
+    # Runs every hour at minute 0 (24 runs/day * 25 articles = 600 daily target)
+    - cron: "0 * * * *"
   workflow_dispatch:
     inputs:
       per_category:
