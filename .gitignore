@@ -5,3 +5,5 @@ public.bak/
 .env
 .env.*
 scratch/
+data/cuelinks-offers.json
+data/live-deals-cache.json

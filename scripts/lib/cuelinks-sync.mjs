@@ -216,9 +216,13 @@ export function filterActiveOffers(offers = []) {
 export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "") {
   try {
     if (fs.existsSync(CACHE_FILE)) {
-      const cached = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
-      if (Date.now() - (cached.timestamp || 0) < CACHE_TTL_MS && Array.isArray(cached.offers) && cached.offers.length > 0) {
-        return filterActiveOffers(cached.offers);
+      const raw = fs.readFileSync(CACHE_FILE, 'utf8');
+      if (raw && raw.trim().startsWith('{')) {
+        const cached = JSON.parse(raw);
+        if (Date.now() - (cached.timestamp || 0) < CACHE_TTL_MS && Array.isArray(cached.offers) && cached.offers.length > 0) {
+          const active = filterActiveOffers(cached.offers);
+          if (active.length > 0) return active;
+        }
       }
     }
   } catch (e) {}
@@ -250,10 +254,18 @@ export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "
     const rawOffers = Array.isArray(data.data) ? data.data : (Array.isArray(data.offers) ? data.offers : []);
     const active = filterActiveOffers(rawOffers);
 
-    // Save to disk cache
+    // Atomically save to disk cache
     try {
-      fs.writeFileSync(CACHE_FILE, JSON.stringify({ timestamp: Date.now(), offers: active }), 'utf8');
-    } catch (err) {}
+      const dir = path.dirname(CACHE_FILE);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      const tmpFile = `${CACHE_FILE}.tmp.${Date.now()}`;
+      fs.writeFileSync(tmpFile, JSON.stringify({ timestamp: Date.now(), offers: active }), 'utf8');
+      fs.renameSync(tmpFile, CACHE_FILE);
+    } catch (err) {
+      try {
+        fs.writeFileSync(CACHE_FILE, JSON.stringify({ timestamp: Date.now(), offers: active }), 'utf8');
+      } catch (e) {}
+    }
 
     return active.length > 0 ? active : Object.values(DEFAULT_CAMPAIGNS);
   } catch (err) {

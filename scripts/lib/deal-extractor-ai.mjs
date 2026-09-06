@@ -78,14 +78,31 @@ async function fetchRssDealHeadlines() {
 export async function extractDynamicDealsFromSources(options = {}) {
   const forceRefresh = options.forceRefresh || false;
 
-  // 1. Check disk cache
+  // 1. Check disk cache with pure validation logic (zero junk, corrupted or stale entries)
   if (!forceRefresh && fs.existsSync(CACHE_FILE)) {
     try {
-      const cached = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
-      if (Date.now() - (cached.timestamp || 0) < CACHE_TTL_MS && Array.isArray(cached.deals) && cached.deals.length >= 8) {
-        return cached.deals;
+      const raw = fs.readFileSync(CACHE_FILE, 'utf8');
+      if (raw && raw.trim().startsWith('{')) {
+        const cached = JSON.parse(raw);
+        const age = Date.now() - (cached.timestamp || 0);
+        if (age < CACHE_TTL_MS && Array.isArray(cached.deals)) {
+          const validDeals = [];
+          const seen = new Set();
+          for (const d of cached.deals) {
+            if (!d || !d.title || !d.merchant || !d.buyUrl || !d.buyUrl.startsWith('http')) continue;
+            const slug = String(d.title).toLowerCase().replace(/[^\w]/g, '').slice(0, 30);
+            if (seen.has(slug)) continue;
+            seen.add(slug);
+            validDeals.push(d);
+          }
+          if (validDeals.length >= 8) {
+            return validDeals;
+          }
+        }
       }
-    } catch (e) {}
+    } catch (e) {
+      // Auto-heals corrupted cache by proceeding to fresh fetch
+    }
   }
 
   // 2. Fetch raw inputs: Cuelinks live campaigns + RSS headlines
@@ -231,14 +248,20 @@ Output a STRICT JSON array of objects. No markdown code blocks, no trailing conv
     });
   }
 
-  // 6. Cache to disk
+  // 6. Atomically save clean cache to disk (prevents corrupted or partial reads)
   if (finalDeals.length > 0) {
     try {
       const dir = path.dirname(CACHE_FILE);
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(CACHE_FILE, JSON.stringify({ timestamp: Date.now(), deals: finalDeals }, null, 2), 'utf8');
-      console.log(`[AI Deal Extractor] Cached ${finalDeals.length} deals to ${CACHE_FILE}`);
-    } catch (e) {}
+      const tmpFile = `${CACHE_FILE}.tmp.${Date.now()}`;
+      fs.writeFileSync(tmpFile, JSON.stringify({ timestamp: Date.now(), deals: finalDeals }, null, 2), 'utf8');
+      fs.renameSync(tmpFile, CACHE_FILE);
+      console.log(`[AI Deal Extractor] Cached ${finalDeals.length} validated deals to ${CACHE_FILE}`);
+    } catch (e) {
+      try {
+        fs.writeFileSync(CACHE_FILE, JSON.stringify({ timestamp: Date.now(), deals: finalDeals }, null, 2), 'utf8');
+      } catch (err) {}
+    }
   }
 
   return finalDeals;
