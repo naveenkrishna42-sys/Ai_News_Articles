@@ -216,6 +216,9 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   <a href="${escapeHtml(directUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#e11d48;color:#fff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 24px;border-radius:8px;transition:opacity 0.2s;">
     <span>⚡ Claim Verified Deal (${escapeHtml(cleanProd.slice(0, 45))}) &rarr;</span>
   </a>
+  <a href="${escapeHtml(cuelinksRedirect('https://www.bankbazaar.com/credit-card.html'))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.90rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>💳 Check 10% Card Cashback &amp; EMI &rarr;</span>
+  </a>
 </div>
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
 </div>`;
@@ -380,6 +383,9 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   </a>
   <a href="${escapeHtml(relianceUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e42529;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛒 Buy at Reliance Digital</span>
+  </a>
+  <a href="${escapeHtml(cuelinksRedirect('https://www.bankbazaar.com/credit-card.html'))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>💳 Check 10% Card Discount / EMI &rarr;</span>
   </a>
 </div>
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>

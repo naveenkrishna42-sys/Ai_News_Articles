@@ -44,10 +44,16 @@ jobs:
         run: |
           git config user.name "tivra-deals-bot"
           git config user.email "actions@github.com"
-          git add data/telegram-deals-dispatched.json data/cuelinks-offers.json || true
+          git add data/telegram-deals-dispatched.json || true
           if git diff --cached --quiet; then
             echo "No state updates to commit."
             exit 0
           fi
           git commit -m "chore(deals): update telegram dispatched state [skip ci]"
-          git push || (git pull --rebase && git push)
+          # Retry push up to 3 times with rebase -X theirs so concurrent workflow runs never conflict or fail
+          for i in {1..3}; do
+            git push origin main && break || {
+              echo "Concurrent push contention detected (attempt $i/3). Rebasing with -X theirs..."
+              git pull --rebase -X theirs origin main
+            }
+          done
