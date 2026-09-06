@@ -65,16 +65,6 @@
     "sentAt": "2026-09-04T21:19:45.806Z"
   },
   {
-    "id": "cuelinks-128489",
-    "title": "Zandu Care: Special Offer: Buy 4, Get 4 Ayurvedic Products Free",
-    "sentAt": "2026-09-04T21:19:50.524Z"
-  },
-  {
-    "id": "cuelinks-128475",
-    "title": "GharSoaps: Huge Savings Alert: 7th Birthday Sale on Ghar Soaps Skincare",
-    "sentAt": "2026-09-04T21:19:54.576Z"
-  },
-  {
     "id": "cuelinks-128472",
     "title": "Kindlife: Celebration Awaiting: Kindlife Festive Ready Sale - Save Up to 88%  Extra 10%",
     "sentAt": "2026-09-04T21:20:00.123Z"
@@ -338,5 +328,15 @@
     "id": "cuelinks-128504",
     "title": "Airalo WW: Claim Your 15% Discount on Your First Airalo eSIM",
     "sentAt": "2026-09-06T08:30:47.086Z"
+  },
+  {
+    "id": "cuelinks-128489",
+    "title": "Zandu Care: Special Offer: Buy 4, Get 4 Ayurvedic Products Free",
+    "sentAt": "2026-09-06T12:43:45.232Z"
+  },
+  {
+    "id": "cuelinks-128475",
+    "title": "GharSoaps: Huge Savings Alert: 7th Birthday Sale on Ghar Soaps Skincare",
+    "sentAt": "2026-09-06T12:43:50.139Z"
   }
 ]
