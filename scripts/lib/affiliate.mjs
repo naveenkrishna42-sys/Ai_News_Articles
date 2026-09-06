@@ -8,6 +8,8 @@
  * 4. Zero dead links, zero junk queries, 100% dynamic without hardcoding.
  */
 
+import { resolveMerchantProductUrl } from "./deals-engine.mjs";
+
 const CUELINKS_CID = "316413";
 
 const DISCLOSURE = "As an affiliate and partner, TIVRA News earns from qualifying purchases and verified partner referrals. Prices, discounts, and availability are subject to change.";
@@ -335,10 +337,14 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   // 5. BRAND-SPECIFIC SINGLE MERCHANT DETECTION
   for (const merchant of KNOWN_MERCHANTS) {
     if (merchant.pattern.test(textContext)) {
+      const candidateName = (deviceNames && deviceNames[0]) || title || "";
+      const dynamicUrl = candidateName
+        ? resolveMerchantProductUrl(merchant.name, candidateName, merchant.url)
+        : merchant.url;
       return `<div class="buybox" style="margin:30px 0;padding:20px 22px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid ${merchant.color};border-radius:0 12px 12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
 <div style="font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:${merchant.color};margin-bottom:12px;">Top Offers & Official Store Deals</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
-  <a href="${escapeHtml(merchant.url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:${merchant.color};color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+  <a href="${escapeHtml(dynamicUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:${merchant.color};color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>${merchant.icon} ${escapeHtml(merchant.cta)}</span>
   </a>
 </div>

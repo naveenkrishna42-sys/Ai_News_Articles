@@ -150,26 +150,77 @@ export async function runBroadcast(options = {}) {
   console.log(`[TIVRA Deals Engine] Found ${allDeals.length} available product deals.`);
 
   const dispatched = loadDispatched();
-  const dispatchedIds = new Set(dispatched.map(d => typeof d === 'string' ? d : d.id));
+  const now = Date.now();
+  const RECENT_WINDOW_MS = 48 * 60 * 60 * 1000; // 48 hours uniqueness window
 
-  // Find candidate deals not yet sent in this cycle
-  let candidates = allDeals.filter(d => !dispatchedIds.has(d.id));
-
-  // If all catalog deals have been cycled through, reset
-  if (candidates.length < targetCount) {
-    console.log(`[TIVRA Deals] Refreshing queue: cycling back through best trending deals.`);
-    candidates = allDeals;
+  // Fingerprint recently sent deals by ID and normalized title slug
+  const recentFingerprints = new Set();
+  for (const d of dispatched) {
+    if (!d) continue;
+    const sentTime = d.sentAt ? new Date(d.sentAt).getTime() : 0;
+    if (now - sentTime < RECENT_WINDOW_MS) {
+      if (d.id) recentFingerprints.add(String(d.id).toLowerCase());
+      if (d.title) {
+        const slug = String(d.title).toLowerCase().replace(/[^\w]/g, '').slice(0, 30);
+        recentFingerprints.add(slug);
+      }
+    }
   }
 
-  // Pick balanced selection across categories
-  const selectedDeals = candidates.slice(0, targetCount);
+  // Find candidate deals not sent in the last 48 hours
+  let candidates = allDeals.filter(d => {
+    if (recentFingerprints.has(String(d.id).toLowerCase())) return false;
+    const slug = String(d.title || '').toLowerCase().replace(/[^\w]/g, '').slice(0, 30);
+    return !recentFingerprints.has(slug);
+  });
+
+  // If candidates are fewer than target, backfill using oldest-sent deals (NEVER naive index 0 repeat)
+  if (candidates.length < targetCount) {
+    const candidateIds = new Set(candidates.map(c => c.id));
+    const remainingNeeded = targetCount - candidates.length;
+
+    const lastSentMap = new Map();
+    for (const d of dispatched) {
+      const time = d.sentAt ? new Date(d.sentAt).getTime() : 0;
+      if (!lastSentMap.has(d.id) || time > lastSentMap.get(d.id)) {
+        lastSentMap.set(d.id, time);
+      }
+    }
+
+    const backfill = allDeals
+      .filter(d => !candidateIds.has(d.id))
+      .sort((a, b) => (lastSentMap.get(a.id) || 0) - (lastSentMap.get(b.id) || 0));
+
+    candidates = [...candidates, ...backfill.slice(0, remainingNeeded)];
+  }
+
+  // Ensure balanced category diversity (round-robin across categories)
+  const byCategory = new Map();
+  for (const deal of candidates) {
+    const cat = deal.category || 'General';
+    if (!byCategory.has(cat)) byCategory.set(cat, []);
+    byCategory.get(cat).push(deal);
+  }
+
+  const selectedDeals = [];
+  let added = true;
+  while (selectedDeals.length < targetCount && added) {
+    added = false;
+    for (const [cat, items] of byCategory.entries()) {
+      if (selectedDeals.length >= targetCount) break;
+      if (items.length > 0) {
+        selectedDeals.push(items.shift());
+        added = true;
+      }
+    }
+  }
 
   if (selectedDeals.length === 0) {
     console.log('[TIVRA Deals] No deals available to broadcast.');
     return { sent: 0, failed: 0 };
   }
 
-  console.log(`[TIVRA Deals] Broadcasting ${selectedDeals.length} individual product deals...`);
+  console.log(`[TIVRA Deals] Broadcasting ${selectedDeals.length} fresh, category-balanced product deals...`);
 
   let sentCount = 0;
   let failCount = 0;
