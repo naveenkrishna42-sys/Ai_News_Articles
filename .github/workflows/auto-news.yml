@@ -139,6 +139,14 @@ jobs:
           verify();
           "
 
+      - name: Ping Google WebSub & News Hub
+        run: |
+          echo "Pinging Google WebSub Hub (PubSubHubbub) with feed.xml..."
+          curl -s -X POST "https://pubsubhubbub.appspot.com/publish" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "hub.mode=publish&hub.url=https://tivranews.com/feed.xml" || true
+          echo "WebSub ping sent to Google."
+
       - name: Dispatch top stories to distribution channels
         env:
           ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}

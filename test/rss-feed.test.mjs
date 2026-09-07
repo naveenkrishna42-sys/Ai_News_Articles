@@ -1,4 +1,4 @@
-﻿import assert from 'assert';
+import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 
@@ -16,6 +16,16 @@ const feedContent = fs.readFileSync(feedPath, 'utf8');
 assert(feedContent.includes('<rss version="2.0"'), 'feed.xml must be valid RSS 2.0');
 assert(feedContent.includes('<channel>'), 'feed.xml must contain <channel>');
 assert(feedContent.includes('<item>'), 'feed.xml must contain <item> entries');
-assert(feedContent.includes('https://tivranews.com'), 'feed.xml must link to site URL');
+assert(feedContent.includes('rel="hub"'), 'feed.xml must contain WebSub hub link');
 
-console.log('✅ RSS Feed verification passed.');
+const newsSitemapPath = path.join(publicDir, 'news-sitemap.xml');
+assert(fs.existsSync(newsSitemapPath), 'news-sitemap.xml must exist');
+const newsSitemapContent = fs.readFileSync(newsSitemapPath, 'utf8');
+assert(newsSitemapContent.includes('http://www.google.com/schemas/sitemap-news/0.9'), 'news-sitemap.xml must declare Google News XML namespace');
+
+const robotsPath = path.join(publicDir, 'robots.txt');
+assert(fs.existsSync(robotsPath), 'robots.txt must exist');
+const robotsContent = fs.readFileSync(robotsPath, 'utf8');
+assert(robotsContent.includes('news-sitemap.xml'), 'robots.txt must link to news-sitemap.xml');
+
+console.log('✅ RSS Feed, WebSub Hub & Google News Sitemap verification passed.');

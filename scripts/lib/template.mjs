@@ -224,6 +224,9 @@ export function renderArticlePage({
     "AI Tips & Tools"
   ]).has(category);
 
+  const isoDate = date.includes("T") ? date : `${date}T06:00:00+05:30`;
+  const authorPersona = getAuthorPersona(category);
+
   // NewsArticle structured data &mdash; what search engines and Google Discover
   // read. Built with JSON.stringify so titles with quotes can't break it.
   const jsonLd = JSON.stringify({
@@ -232,16 +235,36 @@ export function renderArticlePage({
     headline: cleanTitle.slice(0, 110),
     description: cleanDesc,
     image: heroImage ? [heroImage] : undefined,
-    datePublished: date,
-    dateModified: date,
+    datePublished: isoDate,
+    dateModified: isoDate,
     articleSection: category,
-    author: { "@type": "Organization", name: "TIVRA News", url: siteUrl || undefined },
+    author: [
+      {
+        "@type": "Person",
+        name: authorPersona.name,
+        jobTitle: authorPersona.title,
+        url: `${siteUrl || "https://tivranews.com"}/about.html`
+      }
+    ],
     publisher: {
-      "@type": "Organization",
+      "@type": "NewsMediaOrganization",
       name: "TIVRA News",
-      logo: siteUrl ? { "@type": "ImageObject", url: `${siteUrl}/logo.svg` } : undefined,
+      url: siteUrl || "https://tivranews.com",
+      logo: siteUrl ? {
+        "@type": "ImageObject",
+        url: `${siteUrl}/logo.svg`,
+        width: 600,
+        height: 60
+      } : undefined,
     },
-    mainEntityOfPage: pageUrl || undefined,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": pageUrl || undefined
+    },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", ".keypoints", ".body p:first-of-type"]
+    }
   });
 
   // Extra structured-data blocks (Product+Review for comparisons/rankings).
@@ -252,7 +275,6 @@ export function renderArticlePage({
     .map((obj) => `<script type="application/ld+json">${JSON.stringify(obj)}</script>`)
     .join("\n");
 
-  const authorPersona = getAuthorPersona(category);
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -264,13 +286,16 @@ export function renderArticlePage({
   };
 
   const socialMeta = `
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="news_keywords" content="${escapeHtml(category)}, breaking news, India news, latest updates">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="TIVRA News">
 <meta property="og:title" content="${attrTitle}">
 <meta property="og:description" content="${attrDesc}">
 ${heroImage ? `<meta property="og:image" content="${escapeHtml(heroImage)}">` : ""}
 ${pageUrl ? `<meta property="og:url" content="${escapeHtml(pageUrl)}">\n<link rel="canonical" href="${escapeHtml(pageUrl)}">` : ""}
-<meta property="article:published_time" content="${date}">
+<meta property="article:published_time" content="${isoDate}">
+<meta property="article:modified_time" content="${isoDate}">
 <meta property="article:section" content="${escapeHtml(category)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${attrTitle}">
