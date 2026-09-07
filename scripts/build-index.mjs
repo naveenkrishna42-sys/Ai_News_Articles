@@ -542,21 +542,35 @@ function main() {
   const categoryUrls = categorySlugs.map((slug) => `${SITE_URL}/category.html?cat=${slug}`);
 
   const staticUrls = [...staticPages.map((p) => `${SITE_URL}/${p}`), ...categoryUrls];
+  const todayIso = new Date().toISOString().slice(0, 10);
+
+  const staticUrlEntries = staticUrls.map((u) => `  <url>
+    <loc>${u}</loc>
+    <lastmod>${todayIso}T06:00:00+05:30</lastmod>
+    <changefreq>${u === `${SITE_URL}/` ? "always" : "daily"}</changefreq>
+    <priority>${u === `${SITE_URL}/` ? "1.0" : "0.7"}</priority>
+  </url>`).join("\n");
+
   writeFileSync(
     path.join(PUBLIC_DIR, "sitemap-static.xml"),
-    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${staticUrls
-      .map((u) => `  <url><loc>${u}</loc></url>`)
-      .join("\n")}\n</urlset>\n`
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${staticUrlEntries}\n</urlset>\n`
   );
 
   for (const key of monthsSorted) {
     const items = byMonth.get(key);
-    const urls = items.map((a) => `${SITE_URL}${a.url}`);
+    const urls = items.map((a) => {
+      const pubIso = a.date ? `${a.date}T06:00:00+05:30` : `${todayIso}T06:00:00+05:30`;
+      const imgBlock = a.image ? `\n    <image:image><image:loc>${escapeHtml(a.image)}</image:loc><image:title>${escapeHtml(a.title)}</image:title></image:image>` : "";
+      return `  <url>
+    <loc>${SITE_URL}${a.url}</loc>
+    <lastmod>${pubIso}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>${imgBlock}
+  </url>`;
+    });
     writeFileSync(
       path.join(PUBLIC_DIR, `sitemap-${key}.xml`),
-      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
-        .map((u) => `  <url><loc>${u}</loc></url>`)
-        .join("\n")}\n</urlset>\n`
+      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${urls.join("\n")}\n</urlset>\n`
     );
   }
 
@@ -585,18 +599,46 @@ ${newsUrlEntries}
 </urlset>\n`;
   writeFileSync(path.join(PUBLIC_DIR, "news-sitemap.xml"), newsSitemapXml);
 
+  // ---- MASTER SITEMAP.XML: Direct URLSet containing static pages + all articles ----
+  // Unlike sitemapindex which causes "Couldn't fetch" in Search Console, a direct
+  // urlset is parsed synchronously and instantly by Google Search Console upon submission.
+  const masterArticleEntries = published.map((a) => {
+    const pubIso = a.date ? `${a.date}T06:00:00+05:30` : `${todayIso}T06:00:00+05:30`;
+    const imgBlock = a.image ? `\n    <image:image><image:loc>${escapeHtml(a.image)}</image:loc><image:title>${escapeHtml(a.title)}</image:title></image:image>` : "";
+    return `  <url>
+    <loc>${SITE_URL}${a.url}</loc>
+    <lastmod>${pubIso}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>${imgBlock}
+  </url>`;
+  }).join("\n");
+
+  const masterSitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${staticUrlEntries}
+${masterArticleEntries}
+</urlset>\n`;
+  writeFileSync(path.join(PUBLIC_DIR, "sitemap.xml"), masterSitemapXml);
+
+  // ---- Standalone SITEMAP-INDEX.XML ----
+  // Clean standard sitemap index (excluding news sitemap per Google News guidelines)
   const sitemapIndexEntries = [
-    `${SITE_URL}/sitemap-static.xml`,
-    `${SITE_URL}/news-sitemap.xml`,
-    ...monthsSorted.map((key) => `${SITE_URL}/sitemap-${key}.xml`),
+    `  <sitemap>
+    <loc>${SITE_URL}/sitemap-static.xml</loc>
+    <lastmod>${todayIso}T06:00:00+05:30</lastmod>
+  </sitemap>`,
+    ...monthsSorted.map((key) => {
+      const items = byMonth.get(key) || [];
+      const latestDate = items[0]?.date || todayIso;
+      return `  <sitemap>
+    <loc>${SITE_URL}/sitemap-${key}.xml</loc>
+    <lastmod>${latestDate}T06:00:00+05:30</lastmod>
+  </sitemap>`;
+    }),
   ];
-  const sitemapIndexXml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapIndexEntries
-    .map((u) => `  <sitemap><loc>${u}</loc></sitemap>`)
-    .join("\n")}\n</sitemapindex>\n`;
+  const sitemapIndexXml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapIndexEntries.join("\n")}\n</sitemapindex>\n`;
   writeFileSync(path.join(PUBLIC_DIR, "sitemap-index.xml"), sitemapIndexXml);
-  // Serve the same index at the conventional /sitemap.xml address too
-  // (Workers static assets don't support _redirects rewrites reliably).
-  writeFileSync(path.join(PUBLIC_DIR, "sitemap.xml"), sitemapIndexXml);
 
   // ---- RSS 2.0 & Atom Feed Generation with Google WebSub (PubSubHubbub) ----
   const rssItems = published.slice(0, 50).map((a) => {
@@ -635,7 +677,7 @@ ${rssItems}
   // robots.txt with absolute sitemap URLs (generated, not copied).
   writeFileSync(
     path.join(PUBLIC_DIR, "robots.txt"),
-    `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap-index.xml\nSitemap: ${SITE_URL}/news-sitemap.xml\n`
+    `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\nSitemap: ${SITE_URL}/news-sitemap.xml\nSitemap: ${SITE_URL}/sitemap-index.xml\n`
   );
 
   // Real-time ping to Google WebSub hub (fire-and-forget)

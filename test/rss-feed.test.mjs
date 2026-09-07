@@ -28,4 +28,10 @@ assert(fs.existsSync(robotsPath), 'robots.txt must exist');
 const robotsContent = fs.readFileSync(robotsPath, 'utf8');
 assert(robotsContent.includes('news-sitemap.xml'), 'robots.txt must link to news-sitemap.xml');
 
-console.log('✅ RSS Feed, WebSub Hub & Google News Sitemap verification passed.');
+const sitemapPath = path.join(publicDir, 'sitemap.xml');
+assert(fs.existsSync(sitemapPath), 'sitemap.xml must exist');
+const sitemapContent = fs.readFileSync(sitemapPath, 'utf8');
+assert(sitemapContent.includes('<urlset'), 'sitemap.xml must be a direct urlset for instant Google Search Console processing');
+assert(sitemapContent.includes('<lastmod>'), 'sitemap.xml must include lastmod tags');
+
+console.log('✅ RSS Feed, WebSub Hub, Direct Sitemap & Google News Sitemap verification passed.');
