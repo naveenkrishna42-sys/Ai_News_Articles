@@ -109,6 +109,18 @@
       "baseUrl": "https://api.deepseek.com/v1",
       "model": "deepseek-chat",
       "envKey": "DEEPSEEK_API_KEY"
+    },
+    {
+      "name": "vercel-laguna-free",
+      "baseUrl": "https://ai-gateway.vercel.sh/v1",
+      "model": "poolside/laguna-s-2.1-free",
+      "envKey": "VERCEL_AI_GATEWAY_KEY"
+    },
+    {
+      "name": "vercel-ling-fin-free",
+      "baseUrl": "https://ai-gateway.vercel.sh/v1",
+      "model": "inclusionai/ling-3.0-flash-fin-free",
+      "envKey": "VERCEL_AI_GATEWAY_KEY"
     }
   ],
   "featuredCategories": [
