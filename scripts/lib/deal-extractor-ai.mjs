@@ -113,11 +113,25 @@ export async function extractDynamicDealsFromSources(options = {}) {
   ]);
 
   const candidateStrings = [];
+  const offerUrlMap = new Map();
 
-  // Add top Cuelinks campaign offers
-  for (const offer of cuelinksOffers.slice(0, 25)) {
+  // Add top Cuelinks campaign offers and index their authentic tracking URLs
+  for (const offer of cuelinksOffers.slice(0, 30)) {
     if (!offer || !offer.title) continue;
     const merchant = offer.campaign_name || offer.name || "Verified Merchant";
+    let trackingUrl = offer.tracking_url || offer.url || "";
+    if (trackingUrl.includes("linksredirect.com")) {
+      trackingUrl = trackingUrl.replace(/cid=\d+/, "cid=316413");
+    }
+
+    if (trackingUrl) {
+      const mKey = merchant.toLowerCase().trim();
+      const tKey = offer.title.toLowerCase().replace(/[^\w]/g, '').slice(0, 25);
+      offerUrlMap.set(mKey, trackingUrl);
+      offerUrlMap.set(tKey, trackingUrl);
+      offerUrlMap.set(`${mKey}:${tKey}`, trackingUrl);
+    }
+
     candidateStrings.push(`[Merchant: ${merchant}] ${offer.title} | ${offer.description || ''} | Code: ${offer.coupon_code || 'None'}`);
   }
 
@@ -219,8 +233,13 @@ Output a STRICT JSON array of objects. No markdown code blocks, no trailing conv
     const slug = item.title.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 50);
     const id = `deal-${slug}-${Date.now().toString(36).slice(-4)}`;
 
-    // Resolve verified merchant URL (prevent Ajio 'something went wrong' & cuelinks leaks)
-    const buyUrl = resolveMerchantProductUrl(item.merchant, item.title, "");
+    // Match authentic Cuelinks campaign URL if this deal originated from a campaign
+    const mKey = String(item.merchant || "").toLowerCase().trim();
+    const tKey = String(item.title || "").toLowerCase().replace(/[^\w]/g, '').slice(0, 25);
+    const matchedTrackingUrl = offerUrlMap.get(`${mKey}:${tKey}`) || offerUrlMap.get(tKey) || offerUrlMap.get(mKey) || "";
+
+    // Resolve verified merchant URL (strictly preserves authentic Cuelinks campaign URL)
+    const buyUrl = resolveMerchantProductUrl(item.merchant, item.title, matchedTrackingUrl);
     
     // Fallback photo
     const category = item.category || "Smartphones & Flagships";

@@ -61,4 +61,31 @@ assert.ok(cromaUrl.includes("croma.com%2FsearchB%3Fq%3D"), `Croma URL must use s
 
 console.log("✓ Test 5: resolveMerchantProductUrl verified across Ajio, Flipkart & Croma.");
 
+// Test 6: Strict Cuelinks Campaign URL Preservation
+const testCampaignUrl = "https://linksredirect.com/?cid=999999&source=api&url=https%3A%2F%2Fwww.healthkart.com%2Fsale%2Fworkout-essentials";
+const preservedUrl = resolveMerchantProductUrl("HealthKart", "Whey Protein", testCampaignUrl);
+assert.ok(preservedUrl.includes("cid=316413"), `Must enforce publisher CID 316413: ${preservedUrl}`);
+assert.ok(preservedUrl.includes("healthkart.com%2Fsale%2Fworkout-essentials"), `Must preserve authentic campaign target: ${preservedUrl}`);
+assert.ok(!preservedUrl.includes("amazon.in"), `Must NEVER convert campaign URL to Amazon: ${preservedUrl}`);
+console.log("✓ Test 6: Cuelinks campaign rawUrl strictly preserved with cid=316413.");
+
+// Test 7: Brand Isolation — Non-Amazon Brands NEVER route to Amazon or Flipkart
+const healthkartSearch = resolveMerchantProductUrl("HealthKart", "Creatine Monohydrate");
+assert.ok(healthkartSearch.includes("healthkart.com"), `HealthKart must route to HealthKart: ${healthkartSearch}`);
+assert.ok(!healthkartSearch.includes("amazon.in"), `HealthKart must NEVER route to Amazon: ${healthkartSearch}`);
+
+const boatSearch = resolveMerchantProductUrl("Boat", "Airdopes 141");
+assert.ok(boatSearch.includes("boat-lifestyle.com"), `Boat must route to Boat: ${boatSearch}`);
+assert.ok(!boatSearch.includes("amazon.in"), `Boat must NEVER route to Amazon: ${boatSearch}`);
+
+const cashifySearch = resolveMerchantProductUrl("Cashify", "Refurbished iPhone 15");
+assert.ok(cashifySearch.includes("cashify.in"), `Cashify must route to Cashify: ${cashifySearch}`);
+assert.ok(!cashifySearch.includes("amazon.in"), `Cashify must NEVER route to Amazon: ${cashifySearch}`);
+
+const indusSearch = resolveMerchantProductUrl("Buyindusvalley", "Bio Organic Henna");
+assert.ok(indusSearch.includes("buyindusvalley.in"), `Buyindusvalley must route to Buyindusvalley: ${indusSearch}`);
+assert.ok(!indusSearch.includes("amazon.in"), `Buyindusvalley must NEVER route to Amazon: ${indusSearch}`);
+console.log("✓ Test 7: Non-Amazon brands (HealthKart, Boat, Cashify, Buyindusvalley) strictly isolated from Amazon/Flipkart.");
+
 console.log("\n✅ ALL Multi-Category Product Deals Engine unit tests passed with 100% success!");
+

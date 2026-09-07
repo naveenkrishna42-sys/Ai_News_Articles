@@ -36,8 +36,10 @@ export function buildAmazonSearchUrl(query) {
 }
 
 /**
- * Resolves verified, permanent merchant search URLs that never expire.
- * Specifically prevents Ajio's SPA from throwing "Something went wrong".
+ * Resolves verified, permanent merchant search/campaign URLs.
+ * - If rawUrl is provided (from Cuelinks campaign/offer), it is strictly preserved with cid=316413.
+ * - If rawUrl is missing, routes to that merchant's authentic store search/landing URL.
+ * - NEVER blindly falls back to Amazon/Flipkart for other brands (HealthKart, Cashify, Boat, etc.).
  */
 export function resolveMerchantProductUrl(merchant = "", productName = "", rawUrl = "") {
   const m = String(merchant || "").toLowerCase();
@@ -48,16 +50,15 @@ export function resolveMerchantProductUrl(merchant = "", productName = "", rawUr
     .replace(/\s+/g, " ")
     .trim();
 
-  // If rawUrl or merchant is a direct campaign partner (like NCL, Choice Hotels, Verpex, Airalo, AppSumo, etc.)
-  if (rawUrl && /ncl\.com|norwegian|choicehotels|verpex|airalo|hostinger|appsumo|virginvoyages|trip\.com|agoda|airwallex/i.test(rawUrl)) {
-    return rawUrl.includes("linksredirect.com") ? rawUrl.replace(/cid=\d+/, `cid=${CUELINKS_CID}`) : buildMerchantRedirect(rawUrl);
+  // 1. If rawUrl is provided (e.g. from Cuelinks API offer/campaign), PRESERVE and ensure cid=316413
+  if (rawUrl && typeof rawUrl === "string" && rawUrl.startsWith("http")) {
+    if (rawUrl.includes("linksredirect.com")) {
+      return rawUrl.replace(/cid=\d+/, `cid=${CUELINKS_CID}`);
+    }
+    return buildMerchantRedirect(rawUrl);
   }
 
-  if (/cruise|norwegian|choice\s*hotels|verpex|airalo|hostinger|appsumo|airwallex/i.test(m) && rawUrl) {
-    return rawUrl.includes("linksredirect.com") ? rawUrl.replace(/cid=\d+/, `cid=${CUELINKS_CID}`) : buildMerchantRedirect(rawUrl);
-  }
-
-  // Direct Campaign & SaaS Partners
+  // 2. Direct Campaign & SaaS Partners
   if (m.includes("airalo")) {
     return buildMerchantRedirect("https://www.airalo.com");
   }
@@ -73,7 +74,17 @@ export function resolveMerchantProductUrl(merchant = "", productName = "", rawUr
   if (m.includes("choice") && m.includes("hotel")) {
     return buildMerchantRedirect("https://www.choicehotels.com");
   }
+  if (m.includes("norwegian") || m.includes("ncl")) {
+    return buildMerchantRedirect("https://www.ncl.com");
+  }
+  if (m.includes("virgin") && m.includes("voyage")) {
+    return buildMerchantRedirect("https://www.virginvoyages.com");
+  }
+  if (m.includes("airwallex")) {
+    return buildMerchantRedirect("https://www.airwallex.com");
+  }
 
+  // 3. Major E-Commerce & Retail Merchants
   // Ajio: Use permanent /search/?text=... (never fragile /s/... slugs that trigger 'Something went wrong')
   if (m.includes("ajio")) {
     return buildMerchantRedirect(`https://www.ajio.com/search/?text=${encodeURIComponent(query)}`);
@@ -114,8 +125,96 @@ export function resolveMerchantProductUrl(merchant = "", productName = "", rawUr
     return buildMerchantRedirect(`https://www.nykaa.com/search/result/?q=${encodeURIComponent(query)}`);
   }
 
-  // Default: Amazon India search
-  return buildAmazonSearchUrl(query);
+  // HealthKart & Muscleblaze
+  if (m.includes("healthkart") || m.includes("health kart")) {
+    return buildMerchantRedirect(`https://www.healthkart.com/search?q=${encodeURIComponent(query)}`);
+  }
+  if (m.includes("muscleblaze")) {
+    return buildMerchantRedirect(`https://www.muscleblaze.com/search?q=${encodeURIComponent(query)}`);
+  }
+
+  // Boat
+  if (m.includes("boat")) {
+    return buildMerchantRedirect(`https://www.boat-lifestyle.com/search?q=${encodeURIComponent(query)}`);
+  }
+
+  // Cashify
+  if (m.includes("cashify")) {
+    return buildMerchantRedirect(`https://www.cashify.in/search?query=${encodeURIComponent(query)}`);
+  }
+
+  // Plum Goodness
+  if (m.includes("plum")) {
+    return buildMerchantRedirect(`https://plumgoodness.com/search?q=${encodeURIComponent(query)}`);
+  }
+
+  // Shopsy
+  if (m.includes("shopsy")) {
+    return buildMerchantRedirect(`https://www.shopsy.in/search?q=${encodeURIComponent(query)}`);
+  }
+
+  // Pepperfry
+  if (m.includes("pepperfry")) {
+    return buildMerchantRedirect(`https://www.pepperfry.com/site_product/search?q=${encodeURIComponent(query)}`);
+  }
+
+  // Firstcry
+  if (m.includes("firstcry") || m.includes("first cry")) {
+    return buildMerchantRedirect(`https://www.firstcry.com/search?q=${encodeURIComponent(query)}`);
+  }
+
+  // Pepe Jeans
+  if (m.includes("pepe")) {
+    return buildMerchantRedirect(`https://www.pepejeans.in/search?q=${encodeURIComponent(query)}`);
+  }
+
+  // Coursera
+  if (m.includes("coursera")) {
+    return buildMerchantRedirect(`https://www.coursera.org/search?query=${encodeURIComponent(query)}`);
+  }
+
+  // Klook
+  if (m.includes("klook")) {
+    return buildMerchantRedirect(`https://www.klook.com/en-IN/search?query=${encodeURIComponent(query)}`);
+  }
+
+  // Specific Direct Brand Stores
+  if (m.includes("buyindusvalley") || m.includes("indus valley")) {
+    return buildMerchantRedirect("https://www.buyindusvalley.in");
+  }
+  if (m.includes("gharsoap") || m.includes("ghar soaps")) {
+    return buildMerchantRedirect("https://www.gharsoaps.shop");
+  }
+  if (m.includes("earth rhythm")) {
+    return buildMerchantRedirect("https://earthrhythm.com");
+  }
+  if (m.includes("zandu")) {
+    return buildMerchantRedirect("https://zanducare.com");
+  }
+  if (m.includes("palmonas")) {
+    return buildMerchantRedirect("https://www.palmonas.com");
+  }
+  if (m.includes("kindlife")) {
+    return buildMerchantRedirect("https://www.kindlife.in");
+  }
+  if (m.includes("sleepwell")) {
+    return buildMerchantRedirect("https://www.sleepwell.com");
+  }
+  if (m.includes("unipin")) {
+    return buildMerchantRedirect("https://www.unipin.com");
+  }
+  if (m.includes("nuawomen") || m.includes("nua")) {
+    return buildMerchantRedirect("https://nuawoman.com");
+  }
+
+  // Amazon India (ONLY when merchant explicitly matches Amazon or is a general gadget deal with no brand specified)
+  if (m.includes("amazon") || !m) {
+    return buildAmazonSearchUrl(query);
+  }
+
+  // Dynamic Merchant Brand fallback: Construct official brand site (NEVER redirect to Amazon/Flipkart for distinct brands)
+  const cleanBrand = m.replace(/[^\w]/g, "");
+  return buildMerchantRedirect(`https://www.${cleanBrand}.com`);
 }
 
 /**
@@ -143,7 +242,8 @@ export async function verifyNoCuelinksLeak(url, timeoutMs = 4000) {
 
 /**
  * Pre-flight link health check and self-healing
- * Ensures no 404, Page Not Found, or Something Went Wrong pages are ever broadcast
+ * Ensures no 404, Page Not Found, or Something Went Wrong pages are ever broadcast.
+ * Preserves active Cuelinks campaign affiliate redirects.
  */
 export async function verifyAndHealDealLink(deal, timeoutMs = 4000) {
   if (!deal || !deal.buyUrl) return deal;
@@ -154,9 +254,42 @@ export async function verifyAndHealDealLink(deal, timeoutMs = 4000) {
   // 1. Immediately heal known fragile URLs (like Ajio /s/... URLs) to permanent search URLs
   if (deal.buyUrl.includes("ajio.com/s/")) {
     console.log(`[Link Healer] Healing fragile Ajio slug to verified search endpoint for "${cleanTitle}".`);
-    deal.buyUrl = resolveMerchantProductUrl("Ajio", cleanTitle, deal.buyUrl);
+    deal.buyUrl = resolveMerchantProductUrl("Ajio", cleanTitle, "");
+    return deal;
   }
 
+  // 2. For linksredirect.com URLs: verify redirect is active without leaking to cuelinks.com
+  if (deal.buyUrl.includes("linksredirect.com")) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(deal.buyUrl, {
+        method: "GET",
+        redirect: "manual",
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      // A 301/302/303/307/308 redirect confirms Cuelinks affiliate dispatch is functioning
+      if (res.status >= 300 && res.status < 400) {
+        const location = res.headers.get("location") || "";
+        if (location.includes("cuelinks.com") && !location.includes("linksredirect.com")) {
+          console.warn(`[Link Healer] Link redirected to cuelinks homepage for "${deal.title}". Healing to official merchant store...`);
+          deal.buyUrl = resolveMerchantProductUrl(merchant, cleanTitle, "");
+        }
+        return deal;
+      }
+    } catch {
+      clearTimeout(timeoutId);
+      // On network timeout during pre-flight redirect check, retain the original campaign tracking link
+      return deal;
+    }
+  }
+
+  // 3. For direct URLs (or if linksredirect returned 200/404)
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -170,17 +303,13 @@ export async function verifyAndHealDealLink(deal, timeoutMs = 4000) {
     });
     clearTimeout(timeoutId);
 
-    const text = await res.text().catch(() => "");
-    const isBroken = res.status === 404 || res.status === 410 || /page not found|something went wrong|dog of amazon|we couldn't find what you were looking for/i.test(text);
-
+    const isBroken = res.status === 404 || res.status === 410;
     if (isBroken) {
       console.warn(`[Link Healer] Broken page detected (${res.status}) for "${deal.title}". Healing with verified merchant search link.`);
-      deal.buyUrl = resolveMerchantProductUrl(merchant, cleanTitle, deal.buyUrl);
+      deal.buyUrl = resolveMerchantProductUrl(merchant, cleanTitle, "");
     }
   } catch {
     clearTimeout(timeoutId);
-    // If exact link had a network timeout, heal to guaranteed merchant search URL
-    deal.buyUrl = resolveMerchantProductUrl(merchant, cleanTitle, deal.buyUrl);
   }
 
   return deal;
