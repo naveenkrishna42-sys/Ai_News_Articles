@@ -560,8 +560,34 @@ function main() {
     );
   }
 
+  // ---- Google News Sitemap (Articles from the last 48 hours per Google News spec) ----
+  const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const recentNews = published.filter((a) => a.date >= twoDaysAgo).slice(0, 1000);
+  const newsUrlEntries = recentNews.map((a) => {
+    const pubDate = new Date(`${a.date}T06:00:00Z`).toISOString();
+    return `  <url>
+    <loc>${SITE_URL}${a.url}</loc>
+    <news:news>
+      <news:publication>
+        <news:name>${escapeHtml(CONFIG.site?.name || "TIVRA News")}</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>${pubDate}</news:publication_date>
+      <news:title>${escapeHtml(a.title)}</news:title>
+    </news:news>
+  </url>`;
+  }).join("\n");
+
+  const newsSitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+${newsUrlEntries}
+</urlset>\n`;
+  writeFileSync(path.join(PUBLIC_DIR, "news-sitemap.xml"), newsSitemapXml);
+
   const sitemapIndexEntries = [
     `${SITE_URL}/sitemap-static.xml`,
+    `${SITE_URL}/news-sitemap.xml`,
     ...monthsSorted.map((key) => `${SITE_URL}/sitemap-${key}.xml`),
   ];
   const sitemapIndexXml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapIndexEntries
@@ -572,7 +598,7 @@ function main() {
   // (Workers static assets don't support _redirects rewrites reliably).
   writeFileSync(path.join(PUBLIC_DIR, "sitemap.xml"), sitemapIndexXml);
 
-  // ---- RSS 2.0 & Atom Feed Generation ----
+  // ---- RSS 2.0 & Atom Feed Generation with Google WebSub (PubSubHubbub) ----
   const rssItems = published.slice(0, 50).map((a) => {
     const pubDate = new Date(a.date).toUTCString();
     const itemUrl = `${SITE_URL}${a.url}`;
@@ -597,6 +623,7 @@ function main() {
     <language>en-US</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml" />
+    <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/" />
 ${rssItems}
   </channel>
 </rss>`;
@@ -605,11 +632,24 @@ ${rssItems}
   writeFileSync(path.join(PUBLIC_DIR, "rss.xml"), rssXml);
 
 
-  // robots.txt with an absolute sitemap URL (generated, not copied).
+  // robots.txt with absolute sitemap URLs (generated, not copied).
   writeFileSync(
     path.join(PUBLIC_DIR, "robots.txt"),
-    `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap-index.xml\n`
+    `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap-index.xml\nSitemap: ${SITE_URL}/news-sitemap.xml\n`
   );
+
+  // Real-time ping to Google WebSub hub (fire-and-forget)
+  try {
+    const hubBody = new URLSearchParams({
+      "hub.mode": "publish",
+      "hub.url": `${SITE_URL}/feed.xml`
+    });
+    fetch("https://pubsubhubbub.appspot.com/publish", {
+      method: "POST",
+      body: hubBody.toString(),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" }
+    }).catch(() => {});
+  } catch {}
 
   console.log(`Copied static files + ${files.length} article(s) into /public`);
   console.log(`Homepage feed: ${published.length} articles. ${scheduledCount} scheduled for the future.`);
