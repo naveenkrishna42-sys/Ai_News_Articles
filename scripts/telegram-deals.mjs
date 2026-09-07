@@ -49,8 +49,8 @@ export function formatTelegramDeal(deal) {
   }
 
   let bankLine = cardOffer ? `\n💳 <b>Bank / Card Offer:</b> ${escapeHtml(cardOffer)}` : "";
-  const cpcCardUrl = "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html";
-  const cpcLine = `\n⚡ <b>Instant Cashback / EMI:</b> <a href="${cpcCardUrl}">Check 10% Card Discount Eligibility &rarr;</a>`;
+  const cpcCardUrl = "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2FsimplyClickMaster";
+  const cpcLine = `\n⚡ <b>Instant Cashback / EMI:</b> <a href="${cpcCardUrl}">Get 10% Extra Cashback with SBI Simply Click &rarr;</a>`;
 
   const text = `${badge}: <b>${escapeHtml(title)}</b>\n\n` +
     `${priceLine}${bankLine}\n` +

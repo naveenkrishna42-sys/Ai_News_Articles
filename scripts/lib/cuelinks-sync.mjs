@@ -2,11 +2,13 @@
  * TIVRA News — Global Multi-Country High-EPC Campaign & Offers Synchronizer (US + India + Global)
  *
  * Automatically fetches and scores active, high-EPC campaigns from Cuelinks API (v3) across:
- * 1. United States (High CPC $32/click, $12/click, Amazon US + High CPS Airwallex, Verpex, AppSumo, Virgin Voyages).
- * 2. India (Ajio 9% CPS, Myntra, Tata CLiQ, Reliance Digital, Croma, Bank FD CPC).
- * 3. Global / All Countries (Trip.com, Agoda, Qatar Airways, HostelWorld 18.75%, Hostinger 37.5%, Bluehost 50%, Wondershare 22.5%).
+ * 1. High-Payout CPL (Credit Cards ₹1,200 - ₹1,950/lead, Bank Accounts, Loans).
+ * 2. Travel & Hospitality (Scapia Zero-Forex ₹1,200, BOB Etihad ₹1,350, Agoda, MakeMyTrip, Trip.com, Klook).
+ * 3. Online Education & Courses (Coursera, Udemy).
+ * 4. SaaS, Web Hosting & Cloud (Hostinger 37.5%, Verpex $52.50, Bluehost 50%, AppSumo 52.5%).
+ * 5. Retail & Fashion (Ajio 9%, Myntra, Tata CLiQ, Croma, Reliance Digital, Amazon, Flipkart).
  *
- * Captures revenue from BOTH Clicks (CPC) and Sales (CPS).
+ * Captures revenue from BOTH CPL Leads (highest ROI) and Sales (CPS).
  */
 
 import fs from 'fs';
@@ -17,20 +19,161 @@ const CACHE_FILE = path.resolve('data/cuelinks-offers.json');
 const CACHE_TTL_MS = 3 * 60 * 60 * 1000; // 3 hours cache to avoid rate limits
 
 /**
- * Top Global High-EPC Fallback Campaigns across US, India, and Worldwide
+ * Top High-Yield Fallback Campaigns across India, US, and Worldwide
  */
 export const DEFAULT_CAMPAIGNS = {
-  // --- UNITED STATES (HIGH CPC & HIGH BOUNTIES) ---
-  verpexHosting: {
-    name: "Verpex Cloud Web Hosting",
-    payout: "$52.50 / sale",
-    commission: "CPS",
-    epc7Day: 157.43,
-    country: "US",
-    category: "Web Hosting & Cloud",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fverpex.com",
+  // --- HIGH-PAYOUT CPL (CREDIT CARDS & BANKING — ₹900 - ₹1,950 PER LEAD) ---
+  auBankCreditCard: {
+    name: "AU Bank Credit Card",
+    payout: "₹1,950 / lead",
+    commission: "CPL",
+    country: "India",
+    category: "Credit Cards & Cashback",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fcconboarding.au.bank.in%2Fauccself%2F",
     tier: 1,
   },
+  sbiSimplyClick: {
+    name: "SBI Simply Click Credit Card",
+    payout: "₹1,890 / lead",
+    commission: "CPL",
+    country: "India",
+    category: "Credit Cards & Cashback",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2FsimplyClickMaster",
+    tier: 1,
+  },
+  sbiCashback: {
+    name: "SBI Cashback Credit Card",
+    payout: "₹1,890 / lead",
+    commission: "CPL",
+    country: "India",
+    category: "Credit Cards & Cashback",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2Fcashback",
+    tier: 1,
+  },
+  axisBankCreditCard: {
+    name: "Axis Bank Credit Card",
+    payout: "₹1,890 / lead",
+    commission: "CPL",
+    country: "India",
+    category: "Credit Cards & Cashback",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fweb.axis.bank.in%2FDigitalChannel%2FWebForm%2F",
+    tier: 1,
+  },
+  hdfcSwiggyCard: {
+    name: "HDFC Swiggy Cashback Credit Card",
+    payout: "₹1,829 / lead",
+    commission: "CPL",
+    country: "India",
+    category: "Credit Cards & Cashback",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fapplyonline.hdfc.bank.in%2Fcards%2Fcredit-cards.html",
+    tier: 1,
+  },
+  kiwiCreditCard: {
+    name: "Kiwi RuPay UPI Credit Card",
+    payout: "₹1,650 / lead",
+    commission: "CPL",
+    country: "India",
+    category: "Credit Cards & Cashback",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fapply.gokiwi.in%2F",
+    tier: 1,
+  },
+  scapiaTravelCard: {
+    name: "Federal Scapia Zero-Forex Travel Card",
+    payout: "₹1,200 / lead",
+    commission: "CPL",
+    country: "India",
+    category: "Credit Cards & Cashback",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fapply.scapia.cards%2Flanding_page",
+    tier: 1,
+  },
+  hdfcBankCreditCard: {
+    name: "HDFC Bank Credit Cards",
+    payout: "₹1,050 / lead",
+    commission: "CPL",
+    country: "India",
+    category: "Credit Cards & Cashback",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fapplyonline.hdfc.bank.in%2Fcards%2Fcredit-cards.html%23nbb",
+    tier: 1,
+  },
+  kotak811Savings: {
+    name: "Kotak 811 Zero Balance Savings Account",
+    payout: "₹210 / lead",
+    commission: "CPL",
+    country: "India",
+    category: "Credit Cards & Cashback",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.kotak811.com%2Fopen-zero-balance-savings-account",
+    tier: 2,
+  },
+
+  // --- TRAVEL & HOSPITALITY ---
+  bobEtihadCard: {
+    name: "BOB Card Etihad Travel Perks",
+    payout: "₹1,350 / sale",
+    commission: "CPL",
+    country: "India",
+    category: "Travel & Hotels",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fetihadguest.bobcard.in%2F",
+    tier: 1,
+  },
+  makeMyTrip: {
+    name: "MakeMyTrip Flights & Hotels",
+    payout: "Verified Deals",
+    commission: "CPS",
+    country: "India",
+    category: "Travel & Hotels",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.makemytrip.com",
+    tier: 2,
+  },
+  agodaTravel: {
+    name: "Agoda Worldwide Hotel Booking",
+    payout: "6.0% / sale",
+    commission: "CPS",
+    country: "Global",
+    category: "Travel & Hotels",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.agoda.com",
+    tier: 2,
+  },
+  tripCom: {
+    name: "Trip.com International Flights & Stays",
+    payout: "7.0% / sale",
+    commission: "CPS",
+    country: "Global",
+    category: "Travel & Hotels",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.trip.com",
+    tier: 2,
+  },
+
+  // --- ONLINE COURSES & CAREER ---
+  courseraCourses: {
+    name: "Coursera Professional Certificates & Degrees",
+    payout: "20.0% / sale",
+    commission: "CPS",
+    country: "Global",
+    category: "Education & Career",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.coursera.org",
+    tier: 2,
+  },
+  udemyCourses: {
+    name: "Udemy Tech & Business Courses",
+    payout: "15.0% / sale",
+    commission: "CPS",
+    country: "Global",
+    category: "Education & Career",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.udemy.com",
+    tier: 2,
+  },
+
+  // --- SAAS, CLOUD & WEB HOSTING ---
+  hostinger: {
+    name: "Hostinger Cloud & Web Hosting",
+    payout: "37.50% / sale",
+    commission: "CPS",
+    country: "Global",
+    category: "Web Hosting & Cloud",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.hostinger.com",
+    tier: 1,
+  },
+  // --- US HIGH-EPC & GLOBAL BOUNTIES ---
   choiceHotels: {
     name: "Choice Hotels US & International",
     payout: "$32.14 / click",
@@ -51,57 +194,26 @@ export const DEFAULT_CAMPAIGNS = {
     url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.airwallex.com",
     tier: 1,
   },
-  norwegianCruise: {
-    name: "Norwegian Cruise Line",
-    payout: "$12.86 / click",
-    commission: "CPC",
-    epc7Day: 55.49,
-    country: "US",
-    category: "Travel & Cruises",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.ncl.com",
-    tier: 1,
-  },
-  virginVoyages: {
-    name: "Virgin Voyages Luxury Cruises",
-    payout: "₹16,071 / sale",
-    commission: "CPS",
-    epc7Day: 45.56,
-    country: "US",
-    category: "Travel & Cruises",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.virginvoyages.com",
-    tier: 1,
-  },
   appsumo: {
     name: "AppSumo Lifetime Software Deals",
     payout: "52.50% / sale",
     commission: "CPS",
-    epc7Day: 22.97,
     country: "Global",
     category: "Software & AI Tools",
     url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fappsumo.com",
     tier: 2,
   },
-  amazonUs: {
-    name: "Amazon US Shopping & Deals",
-    payout: "$6.43 / click",
-    commission: "CPC",
-    epc7Day: 8.43,
-    country: "US",
-    category: "Shopping & Gadgets",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.amazon.com",
-    tier: 2,
-  },
-
-  // --- INDIA (MASSIVE COMMERCE VOLUME & CPS) ---
-  riseWorks: {
-    name: "Rise Works Global Payroll",
-    payout: "₹32,000 / sale",
+  verpexHosting: {
+    name: "Verpex Cloud Web Hosting",
+    payout: "$52.50 / sale",
     commission: "CPS",
-    country: "India / US",
-    category: "Business",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.riseworks.io",
+    country: "US",
+    category: "Web Hosting & Cloud",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fverpex.com",
     tier: 1,
   },
+
+  // --- HIGH-VOLUME COMMERCE & FASHION ---
   ajioFashion: {
     name: "Ajio Fashion & Apparel",
     commission: "9% CPS",
@@ -111,56 +223,20 @@ export const DEFAULT_CAMPAIGNS = {
     url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.ajio.com",
     tier: 2,
   },
-  hostinger: {
-    name: "Hostinger Cloud & Web Hosting",
-    payout: "37.50% / sale",
+  myntraFashion: {
+    name: "Myntra Fashion Deals",
     commission: "CPS",
-    country: "Global",
-    category: "Web Hosting & Cloud",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.hostinger.com",
-    tier: 2,
-  },
-  bluehost: {
-    name: "Bluehost WordPress Hosting",
-    payout: "49.88% / sale",
-    commission: "CPS",
-    country: "Global",
-    category: "Web Hosting & Cloud",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.bluehost.com",
-    tier: 2,
-  },
-  wondershare: {
-    name: "Wondershare Video & Creative Software",
-    payout: "22.50% / sale",
-    commission: "CPS",
-    country: "Global",
-    category: "Software & AI Tools",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.wondershare.com",
-    tier: 2,
-  },
-  hostelworld: {
-    name: "HostelWorld Global Travel Stays",
-    payout: "18.75% / sale",
-    commission: "CPS",
-    country: "Global",
-    category: "Travel & Hotels",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.hostelworld.com",
-    tier: 2,
-  },
-  cpcRewards: {
-    name: "Daily Financial Rates & Cashback Hub",
-    payout: "CPC Clicks",
-    commission: "CPC",
+    payout: "Verified Deals",
     country: "India",
-    category: "Credit Cards & Cashback",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html",
-    tier: 4,
+    category: "Product Deals & Offers",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.myntra.com",
+    tier: 2,
   }
 };
 
 /**
  * Universal Offer & Campaign Scoring Function
- * Accounts for 7-Day EPC, CPC Clicks, High Fixed Bounties, and High Commission %
+ * Accounts for 7-Day EPC, High Fixed Bounties (CPL), and High Commission %
  */
 export function scoreOffer(offer) {
   const payoutStr = String(offer.payout || offer.discount || offer.commission || "");
@@ -168,23 +244,62 @@ export function scoreOffer(offer) {
   const numValue = numMatch ? parseFloat(numMatch[1]) : 0;
   const epc = parseFloat(offer.epc7Day || offer.epc || 0);
 
-  // 1. High-EPC US Campaigns (EPC >= 30) or Mega Bounties (>= 5,000)
-  if (epc >= 30 || numValue >= 5000 || /32000|20250|16071|choice hotels|norwegian|verpex|airwallex|payroll/i.test(offer.title || offer.name || "")) {
-    return { tier: 1, label: "Top High-EPC Global Bounty", score: 2000 + epc * 10 + numValue };
+  // 1. High-payout CPL (Credit Cards & Banking ₹900 - ₹2,000) or Mega Fixed Bounties (>= 5,000)
+  if (offer.commission === "CPL" || offer.payout_type === "Per Lead" || (!payoutStr.includes("%") && numValue >= 900) || epc >= 30 || /choice hotels|airwallex|payroll/i.test(offer.title || offer.name || "")) {
+    return { tier: 1, label: "Top High-Payout Lead / Global Bounty", score: 3000 + numValue + epc * 10 };
   }
 
-  // 2. High Percentage CPS (>= 7% e.g. Ajio 9%, AppSumo 52%, Hostinger 37%) or High CPC ($5+)
-  if ((payoutStr.includes("%") && numValue >= 7) || (offer.commission === "CPC" && numValue >= 5) || epc >= 10) {
-    return { tier: 2, label: "High-Commission CPS / Premium CPC", score: 1000 + epc * 5 + numValue * 10 };
+  // 2. High Percentage CPS (>= 7% e.g. AppSumo 52.5%, Ajio 9%, Hostinger 37%) or High CPC ($5+)
+  if (payoutStr.includes("%") || (offer.commission === "CPS" && numValue >= 7) || epc >= 10) {
+    return { tier: 2, label: "High-Commission CPS", score: 1000 + numValue * 10 + epc * 5 };
   }
 
-  // 3. High-Volume Retail & Global Travel (Amazon, Flipkart, Myntra, Trip.com, Agoda)
-  if (payoutStr.includes("%") || /amazon|flipkart|myntra|trip|agoda|electronics|gadget/i.test(offer.title || offer.name || "")) {
-    return { tier: 3, label: "High-Volume Commerce & Travel", score: 400 + numValue * 5 };
+  // 3. High-Volume Retail & Global Travel (Trip.com, Agoda, Myntra, Tata CLiQ)
+  if (/trip|agoda|myntra|ajio|tatacliq|croma|reliance/i.test(offer.title || offer.name || "")) {
+    return { tier: 3, label: "High-Volume Commerce & Travel", score: 500 + numValue * 5 };
   }
 
-  // 4. Guaranteed CPC Clicks
-  return { tier: 4, label: "Daily CPC Rewards", score: 100 + numValue };
+  return { tier: 4, label: "Standard Commercial Deal", score: 100 + numValue };
+}
+
+/**
+ * Converts any target URL into an official Cuelinks affiliate link.
+ * If shorten=true, requests a branded clnk.in shortlink.
+ * Falls back to standard linksredirect.com format if API fails or rate-limits.
+ */
+export async function convertLinkToCuelinks(targetUrl, shorten = false, apiKey = CUELINKS_API_KEY) {
+  if (!targetUrl || typeof targetUrl !== "string" || !targetUrl.startsWith("http")) return "";
+  const fallback = `https://linksredirect.com/?cid=316413&source=api&url=${encodeURIComponent(targetUrl)}`;
+  if (!apiKey) return fallback;
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch("https://developers.cuelinks.com/pub_api/v3/links/convert", {
+      method: "POST",
+      headers: {
+        "Authorization": `Token ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        url: targetUrl,
+        channel_id: 316413,
+        shorten: Boolean(shorten)
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) return fallback;
+    const json = await res.json();
+    if (json && json.data) {
+      if (shorten && json.data.short_url) return json.data.short_url;
+      if (json.data.tracking_url) return json.data.tracking_url;
+    }
+    return fallback;
+  } catch (e) {
+    return fallback;
+  }
 }
 
 /**
@@ -211,7 +326,7 @@ export function filterActiveOffers(offers = []) {
 
 /**
  * Fetches live offers & campaigns from Cuelinks API with disk caching.
- * Supports multi-country querying (US, IN, Global).
+ * Fetches both high-payout CPL campaigns (Credit Cards & Banking) and live retail offers.
  */
 export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "") {
   try {
@@ -230,31 +345,60 @@ export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "
   if (!apiKey) return Object.values(DEFAULT_CAMPAIGNS);
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 7000);
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
 
   try {
-    const url = countryCode
+    // 1. Fetch live CPL campaigns (Credit Cards & Banking Leads)
+    const cplUrl = "https://developers.cuelinks.com/pub_api/v3/campaigns.json?campaign_type=CPL&per_page=50";
+    // 2. Fetch live promotional offers
+    const offersUrl = countryCode
       ? `https://developers.cuelinks.com/pub_api/v3/offers.json?per_page=50&country=${encodeURIComponent(countryCode)}`
       : "https://developers.cuelinks.com/pub_api/v3/offers.json?per_page=50";
 
-    const res = await fetch(url, {
-      headers: {
-        "Authorization": `Token ${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      signal: controller.signal
-    });
+    const [cplRes, offersRes] = await Promise.allSettled([
+      fetch(cplUrl, { headers: { "Authorization": `Token ${apiKey}`, "Content-Type": "application/json" }, signal: controller.signal }),
+      fetch(offersUrl, { headers: { "Authorization": `Token ${apiKey}`, "Content-Type": "application/json" }, signal: controller.signal })
+    ]);
     clearTimeout(timeoutId);
 
-    if (!res.ok) {
-      return Object.values(DEFAULT_CAMPAIGNS);
+    const combined = [];
+
+    // Process CPL campaigns
+    if (cplRes.status === "fulfilled" && cplRes.value.ok) {
+      const cplData = await cplRes.value.json();
+      const campaigns = Array.isArray(cplData.data) ? cplData.data : [];
+      for (const camp of campaigns) {
+        if (!camp.url) continue;
+        const trackingUrl = `https://linksredirect.com/?cid=316413&source=api&url=${encodeURIComponent(camp.url)}`;
+        combined.push({
+          id: camp.id,
+          name: camp.name,
+          title: `${camp.name} — Apply Online (Instant Approval)`,
+          campaign_name: camp.name,
+          payout: `₹${camp.payout} / lead`,
+          commission: "CPL",
+          payout_type: camp.payout_type || "Per Lead",
+          tracking_url: trackingUrl,
+          url: camp.url,
+          category: camp.categories?.[0]?.name || "Credit Cards & Cashback",
+          isCpl: true,
+          status: "active"
+        });
+      }
     }
 
-    const data = await res.json();
-    const rawOffers = Array.isArray(data.data) ? data.data : (Array.isArray(data.offers) ? data.offers : []);
-    const active = filterActiveOffers(rawOffers);
+    // Process retail offers
+    if (offersRes.status === "fulfilled" && offersRes.value.ok) {
+      const offersData = await offersRes.value.json();
+      const rawOffers = Array.isArray(offersData.data) ? offersData.data : (Array.isArray(offersData.offers) ? offersData.offers : []);
+      for (const o of rawOffers) {
+        combined.push(o);
+      }
+    }
 
-    // Atomically save to disk cache
+    const active = filterActiveOffers(combined);
+
+    // Save to disk cache atomically
     try {
       const dir = path.dirname(CACHE_FILE);
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -295,23 +439,22 @@ export async function getVerifiedProductDeals(todayStr = new Date().toISOString(
     // Clean headline
     let cleanTitle = title;
     if (!cleanTitle.toLowerCase().includes(merchant.toLowerCase())) {
-      cleanTitle = `${merchant} Deal: ${cleanTitle}`;
+      cleanTitle = `${merchant}: ${cleanTitle}`;
     }
-    // Remove emojis or trailing punctuation from title
     cleanTitle = cleanTitle.replace(/[^\w\s:,\.\-%–—&]/g, "").trim();
 
     verifiedDeals.push({
       key: `deal-${offer.id || merchant.toLowerCase().replace(/\s+/g, '-')}-${todayStr}`,
       title: cleanTitle.slice(0, 110),
       productName: merchant,
-      category: "Product Deals & Offers",
+      category: offer.isCpl ? "Credit Cards & Cashback" : "Product Deals & Offers",
       merchant,
       couponCode: offer.coupon_code || null,
       validUntil: offer.end_date || null,
       directUrl: trackingUrl,
       sourceName: `${merchant} Official Offers`,
       sourceUrl: trackingUrl,
-      summary: offer.description || `${merchant} verified promotional deal and discount offer.`,
+      summary: offer.description || `${merchant} verified commercial offer and application link.`,
       isProductFirstDeal: true
     });
   }

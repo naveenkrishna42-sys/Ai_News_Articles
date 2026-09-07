@@ -284,8 +284,8 @@ ${extraJsonLdHtml}`;
   const adsHead = hasAds
     ? `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisherId}" crossorigin="anonymous"></script>`
     : "";
-  const adBlock = hasAds
-    ? `<div style="margin:32px 0;text-align:center;min-height:90px;"><ins class="adsbygoogle" style="display:block;text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="${adsensePublisherId}" data-ad-slot="${adsenseAdSlot || ""}"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>`
+  const adBlock = hasAds && adsenseAdSlot
+    ? `<div style="margin:32px 0;text-align:center;min-height:90px;"><ins class="adsbygoogle" style="display:block;text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="${adsensePublisherId}" data-ad-slot="${adsenseAdSlot}"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>`
     : "";
 
   const keyPointsHtml = (keyPoints || []).filter(Boolean).length
@@ -457,7 +457,7 @@ ${bodyHtml}
   <div>&copy; ${year} TIVRA News &mdash; Trusted Insights, Verified Reports &amp; Alerts.</div>
 </footer>
 <script src="/related.js" defer></script>
-${isCommercial ? `<script type="text/javascript">
+<script type="text/javascript">
     var cId = "316413";
 
     (function(d, t) {
@@ -467,7 +467,7 @@ ${isCommercial ? `<script type="text/javascript">
       s.src = (document.location.protocol == "https:" ? "https://cdn0.cuelinks.com/js/" : "http://cdn0.cuelinks.com/js/") + "cuelinksv2.js";
       document.getElementsByTagName("body")[0].appendChild(s);
     }());
-</script>` : ""}
+</script>
 </body>
 </html>`;
 }

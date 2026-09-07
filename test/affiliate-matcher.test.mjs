@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { renderBuyBox, injectInlineListicleButtons, sanitizeProductName } from '../scripts/lib/affiliate.mjs';
+import { renderBuyBox, injectInlineListicleButtons, sanitizeProductName, HIGH_PAYOUT_CAMPAIGNS } from '../scripts/lib/affiliate.mjs';
 
 console.log("Running Universal Dynamic Affiliate Engine Unit Tests...\n");
 
@@ -68,5 +68,29 @@ console.log("✓ Test 5: High-EPC Global Travel, Cruise & Hosting matching passe
 assert.strictEqual(sanitizeProductName("Top 10 Online Shopping Websites in India: 2026's Best Picks"), "", "Junk listicle must be invalidated");
 assert.strictEqual(sanitizeProductName("Samsung Galaxy S25 Ultra: Full Review"), "Samsung Galaxy S25 Ultra", "Clean product must be extracted");
 console.log("✓ Test 6: Strict Query Sanitizer passed");
+
+// Test 7: High-Payout CPL Credit Cards (SBI, AU Bank, HDFC Swiggy, Scapia)
+const ccBox = renderBuyBox(["Best Credit Cards for Lounge Access"], mockConfig, "Credit Cards & Cashback", "", "Best Credit Cards for Free Domestic Lounge Access in 2026");
+assert.ok(ccBox.includes("Apply for SBI Simply Click"), "Credit card box must include SBI Simply Click CPL");
+assert.ok(ccBox.includes("Apply for AU Bank"), "Credit card box must include AU Bank CPL");
+assert.ok(ccBox.includes("Apply for HDFC Swiggy"), "Credit card box must include HDFC Swiggy CPL");
+assert.ok(ccBox.includes("Scapia Zero-Forex Card"), "Credit card box must include Scapia CPL");
+assert.ok(!ccBox.includes("amazon.in"), "Credit card box must NEVER default to Amazon search");
+console.log("✓ Test 7: High-Payout CPL Credit Card action buttons passed");
+
+// Test 8: Travel & Vacation Category Routing (Zero Amazon fallback)
+const travelBox = renderBuyBox(["Top 5 Summer Vacation Destinations"], mockConfig, "Product Deals & Offers", "", "Top 5 Summer Vacation Destinations in 2026: Flight & Hotel Guide");
+assert.ok(travelBox.includes("Scapia Card (Zero Forex"), "Travel box must include Scapia Zero Forex Card");
+assert.ok(travelBox.includes("makemytrip.com"), "Travel box must include MakeMyTrip");
+assert.ok(travelBox.includes("agoda.com"), "Travel box must include Agoda");
+assert.ok(!travelBox.includes("Buy at Amazon"), "Travel box must NEVER default to Amazon");
+console.log("✓ Test 8: Dedicated Travel & Hospitality routing passed");
+
+// Test 9: Online Education & Courses (Zero Amazon fallback)
+const eduBox = renderBuyBox(["AI & Machine Learning Certification"], mockConfig, "Education", "", "Top 10 AI and Data Science Certifications in 2026");
+assert.ok(eduBox.includes("coursera.org"), "Education box must include Coursera");
+assert.ok(eduBox.includes("udemy.com"), "Education box must include Udemy");
+assert.ok(!eduBox.includes("Buy at Amazon"), "Education box must NEVER default to Amazon");
+console.log("✓ Test 9: Dedicated Education & Online Learning routing passed");
 
 console.log("\n✅ ALL Universal Dynamic Affiliate Engine unit tests passed with 100% accuracy!\n");
