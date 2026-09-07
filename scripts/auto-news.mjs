@@ -190,29 +190,28 @@ const COMMERCIAL_CATEGORIES = new Set([
 ]);
 
 // Pass 1: Balanced distribution across both monetization and general news
-const queue = [];
+const candidatePool = [];
 const perMonetizationTarget = 3;
 const perNewsTarget = 2;
 
 for (const category of priority) {
-  if (queue.length >= runTarget) break;
   const items = byCategory.get(category) || [];
   let picked = 0;
   const isComm = COMMERCIAL_CATEGORIES.has(category);
   const categoryCap = isComm ? perMonetizationTarget : perNewsTarget;
 
   for (const item of items) {
-    if (picked >= categoryCap || queue.length >= runTarget) break;
+    if (picked >= categoryCap) break;
     if (item.title.length < 25) continue;
     if (isStaleSeasonalStory(item.title, today)) continue;
     if (isDuplicate(item)) continue;
     claim(item);
-    queue.push(item);
+    candidatePool.push(item);
     picked++;
   }
 }
 
-// Pass 2: Combined backfill (interleaving monetization and news) to strictly fulfill runTarget
+// Pass 2: Combined backfill (interleaving monetization and news reserves up to runTarget * 2)
 const HIGH_MONETIZATION_ORDER = [
   "Product Deals & Offers",
   "Credit Cards & Cashback",
@@ -232,25 +231,24 @@ const HIGH_MONETIZATION_ORDER = [
   ...priority
 ];
 
-if (queue.length < runTarget) {
-  for (const category of HIGH_MONETIZATION_ORDER) {
-    if (queue.length >= runTarget) break;
-    const items = byCategory.get(category) || [];
-    for (const item of items) {
-      if (queue.length >= runTarget) break;
-      if (item.title.length < 25) continue;
-      if (isStaleSeasonalStory(item.title, today)) continue;
-      if (isDuplicate(item)) continue;
-      claim(item);
-      queue.push(item);
-    }
+const reserveLimit = Math.min(budget, Math.max(runTarget, runTarget * 2));
+for (const category of HIGH_MONETIZATION_ORDER) {
+  if (candidatePool.length >= reserveLimit) break;
+  const items = byCategory.get(category) || [];
+  for (const item of items) {
+    if (candidatePool.length >= reserveLimit) break;
+    if (item.title.length < 25) continue;
+    if (isStaleSeasonalStory(item.title, today)) continue;
+    if (isDuplicate(item)) continue;
+    claim(item);
+    candidatePool.push(item);
   }
 }
 
-console.log(`Selected ${queue.length} new stories to write.`);
+console.log(`Targeting ${runTarget} articles this run (candidate pool with reserves: ${candidatePool.length}).`);
 
 if (DRY_RUN) {
-  for (const q of queue) console.log(`  [${q.category}] ${q.title}`);
+  for (const q of candidatePool.slice(0, runTarget)) console.log(`  [${q.category}] ${q.title}`);
   process.exit(0);
 }
 
@@ -720,17 +718,18 @@ async function writeRankingStory(candidateItems) {
   console.log(`  ✔ [Gadget Comparisons] ${title} (ranking)`);
 }
 
-async function runQueue(items, worker) {
+async function runQueue(candidatePool, targetCount, worker) {
   let index = 0;
-  const lanes = Array.from({ length: Math.min(CONCURRENCY, items.length) }, async () => {
-    while (index < items.length) {
-      const item = items[index++];
+  const lanes = Array.from({ length: Math.min(CONCURRENCY, candidatePool.length) }, async () => {
+    while (index < candidatePool.length && results.written < targetCount) {
+      const item = candidatePool[index++];
+      if (!item) break;
       try {
         await worker(item);
       } catch (err) {
         results.failed++;
-        delete registry[item.key]; // unclaim so the next run retries it
-        console.log(`  ✖ [${item.category}] ${item.title.slice(0, 60)} — ${err.message}`);
+        delete registry[item.key]; // unclaim so another run can retry it
+        console.log(`  ✖ [${item.category}] ${item.title.slice(0, 60)} — ${err.message} (fetching next candidate to strictly fulfill ${targetCount} target)`);
       }
     }
   });
@@ -836,7 +835,7 @@ function dispatchWrite(item) {
   return writeStory(item);
 }
 
-await runQueue(queue, dispatchWrite);
+await runQueue(candidatePool, runTarget, dispatchWrite);
 
 // ---------- Specials ----------
 if (!NO_SPECIALS && pool.providers.length > 0) {
