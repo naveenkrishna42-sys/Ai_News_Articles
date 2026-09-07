@@ -57,26 +57,45 @@ export function buildTelegramMessage(article) {
   const fullUrl = (article.url && article.url.startsWith("http")) ? article.url : `${SITE_URL}/articles/${article.slug}.html`;
   const cat = (article.category || '').toLowerCase();
   const title = article.title || '';
-  const isFashion = /ajio|fashion|clothing|shoes|sneaker|kurta|shirt/i.test(title) || cat.includes('lifestyle');
+  const isFashion = /ajio|fashion|clothing|shoes|sneaker|kurta|shirt|myntra/i.test(title) || cat.includes('lifestyle');
+  const isTravel = /flight|travel|hotel|resort|vacation|cruise|tourism|airline|stay/i.test(title) || cat.includes('travel');
+  const isEducation = /course|learn|certificate|degree|tutorial|training|upskill|exam|university/i.test(title) || cat.includes('education');
+  const isHosting = /hosting|cloud|server|domain|vps|wordpress/i.test(title);
   const isPayroll = /payroll|remote work|saas|contractor|hiring/i.test(title);
-  const isFinance = cat.includes('card') || cat.includes('bank') || cat.includes('cashback') || cat.includes('insurance');
-  const isDeal = cat.includes('deal') || /deal|sale|price drop/i.test(title);
+  const isFinance = cat.includes('card') || cat.includes('bank') || cat.includes('cashback') || cat.includes('insurance') || /credit card|fixed deposit|savings account/i.test(title);
+  const isDeal = cat.includes('deal') || /deal|sale|price drop|discount|loot/i.test(title);
 
   let icon = '📰';
   let extraCta = '';
 
+  const sbiCplUrl = "https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2FsimplyClickMaster";
+  const auCplUrl = "https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fcconboarding.au.bank.in%2Fauccself%2F";
+  const scapiaCplUrl = "https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fapply.scapia.cards%2Flanding_page";
+
   if (isPayroll) {
     icon = '💼';
-    extraCta = `\n\n💼 <b>Global Payroll & Hiring:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.riseworks.io">Explore Rise Global Payroll Plans</a>`;
-  } else if (isFashion) {
-    icon = '👗';
-    extraCta = `\n\n🛍️ <b>Ajio Fashion Sale:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.ajio.com">Shop Ajio Deals (Up to 80% Off)</a>`;
+    extraCta = `\n\n💼 <b>Global Payroll &amp; Hiring:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.riseworks.io">Explore Rise Global Payroll Plans</a>`;
   } else if (isFinance) {
     icon = '💳';
-    extraCta = `\n\n🔥 <b>Verified Card Offers:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html">Apply &amp; Compare Lifetime Free Cards</a>`;
+    extraCta = `\n\n💳 <b>Top Credit Card Perks:</b> <a href="${sbiCplUrl}">Apply for SBI Simply Click (₹500 Voucher)</a> | <a href="${auCplUrl}">AU Bank Lifetime Free Card</a>`;
+  } else if (isTravel) {
+    icon = '✈️';
+    extraCta = `\n\n✈️ <b>Travel &amp; Lounge Access:</b> <a href="${scapiaCplUrl}">Get Scapia Zero-Forex Card (Free Lounge)</a> | <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.makemytrip.com">MakeMyTrip Flight Deals</a>`;
+  } else if (isEducation) {
+    icon = '🎓';
+    extraCta = `\n\n🎓 <b>Top Certifications:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.coursera.org">Explore Coursera Certificates</a> | <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.udemy.com">Udemy Tech Courses</a>`;
+  } else if (isHosting) {
+    icon = '⚡';
+    extraCta = `\n\n⚡ <b>Web Hosting Deal:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.hostinger.com">Get 75% Off Hostinger Cloud Hosting</a>`;
+  } else if (isFashion) {
+    icon = '👗';
+    extraCta = `\n\n🛍️ <b>Fashion Sale:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.ajio.com">Shop Ajio Deals (Up to 80% Off)</a> | <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.myntra.com">Myntra Offers</a>`;
   } else if (isDeal) {
     icon = '🛍️';
-    extraCta = `\n\n⚡ <b>Verified Deals:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.amazon.in%2Fdeals">Shop Today's Amazon Deals</a> | <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.flipkart.com%2Foffers-store">Flipkart Deals</a>`;
+    extraCta = `\n\n⚡ <b>Verified Deals &amp; Cashback:</b> <a href="${sbiCplUrl}">Get 10% Extra Cashback with SBI Simply Click</a> | <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.amazon.in%2Fdeals">Amazon Deals</a>`;
+  } else {
+    // General News stories: rotate high-converting CPL CTA
+    extraCta = `\n\n⚡ <b>Special Offer:</b> <a href="${sbiCplUrl}">Apply for SBI Simply Click Credit Card (Instant Approval)</a>`;
   }
 
   return `${icon} <b>${escapeHtml(title)}</b>\n\n${escapeHtml((article.description || '').slice(0, 200))}\n\n👉 <a href="${fullUrl}">Read Full Story</a>${extraCta}`;
