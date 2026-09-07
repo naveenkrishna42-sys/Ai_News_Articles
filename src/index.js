@@ -391,6 +391,23 @@ export default {
             headers: newHeaders,
           });
         }
+
+        // 6c. XML Sitemaps, Feeds and robots.txt (Compliant headers for search engine crawlers)
+        if (pathLower.endsWith(".xml") || pathLower === "/robots.txt") {
+          const newHeaders = new Headers(response.headers);
+          if (pathLower.endsWith(".xml")) {
+            newHeaders.set("Content-Type", "application/xml; charset=utf-8");
+          } else {
+            newHeaders.set("Content-Type", "text/plain; charset=utf-8");
+          }
+          newHeaders.set("Cache-Control", "public, max-age=300, must-revalidate");
+          newHeaders.set("cloudflare-cdn-cache-control", "public, max-age=600, stale-while-revalidate=1800");
+          return new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: newHeaders,
+          });
+        }
       }
 
       return response;
