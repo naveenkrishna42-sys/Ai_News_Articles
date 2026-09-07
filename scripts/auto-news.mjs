@@ -304,7 +304,28 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
   const { text } = await pool.chat({ system: systemPrompt, user: userPrompt, maxTokens });
   const parsed = extractJson(text);
   const title = (parsed.title || item.title).slice(0, 110);
-  const bodyHtml = parsed.content || "";
+  let bodyHtml = parsed.content || "";
+
+  // Multi-part generation: if output was cut off or shorter than minWords, request Part 2 continuation
+  if (countWords(bodyHtml) < minWords) {
+    try {
+      const continuationPrompt = `You previously wrote this article part:\n${bodyHtml}\n\nPlease continue and complete this article with the remaining sections, detailed analysis, specification/pricing data table, and takeaways. Output ONLY valid HTML using <h2>, <h3>, <p>, <ul>, <li>, <table> tags (no JSON wrappers, no fences).`;
+      const contRes = await pool.chat({
+        system: "You are a senior investigative journalist and editor. Continue the article smoothly in valid HTML.",
+        user: continuationPrompt,
+        maxTokens: 2000,
+      });
+      let contText = contRes.text.trim();
+      const contFence = contText.match(/```(?:html)?\s*([\s\S]*?)```/);
+      if (contFence) contText = contFence[1].trim();
+      if (contText) {
+        bodyHtml += `\n${contText}`;
+      }
+    } catch (contErr) {
+      console.warn(`  ⚠ Continuation attempt failed: ${contErr.message}`);
+    }
+  }
+
   if (countWords(bodyHtml) < minWords) throw new Error(`too short (${countWords(bodyHtml)} words)`);
 
   // Image strategy: real Wikipedia portrait when the story is about one
