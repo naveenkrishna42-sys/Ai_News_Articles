@@ -45,4 +45,27 @@ assert.ok(!formatted.includes("cuelinks.com"), "Must NOT display or link to cuel
 assert.ok(!formatted.includes("sirmohana"), "Must NOT expose personal Amazon tag sirmohana");
 console.log("✓ Test 3: Anti-Cuelinks leak & Zero personal ID verification passed");
 
+// Test 4: Verify non-Amazon merchant deal renders authentic merchant button & URL
+const mockHealthkartDeal = {
+  id: "cuelinks-128459",
+  title: "MuscleBlaze Biozyme Whey Protein",
+  category: "Product Deals & Offers",
+  merchant: "HealthKart",
+  badge: "⚡ LIVE CAMPAIGN",
+  mrp: "₹3,499",
+  dealPrice: "₹2,999",
+  discount: "14% OFF",
+  cardOffer: "Extra 10% Instant Discount with Code: MB10",
+  coupon: "MB10",
+  rating: "4.6 / 5.0 (Verified Partner)",
+  highlights: ["25g Protein per scoop", "Labdoor certified"],
+  buyUrl: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.healthkart.com%2Fsale%2Fworkout-essentials-range"
+};
+const hkFormatted = formatTelegramDeal(mockHealthkartDeal);
+assert.ok(hkFormatted.includes("Buy on HealthKart"), "Must render 'Buy on HealthKart': " + hkFormatted);
+assert.ok(hkFormatted.includes("https%3A%2F%2Fwww.healthkart.com%2Fsale%2Fworkout-essentials-range"), "Must link to HealthKart campaign: " + hkFormatted);
+assert.ok(!hkFormatted.includes("amazon.in"), "Must NEVER contain Amazon URL for HealthKart: " + hkFormatted);
+console.log("✓ Test 4: Non-Amazon merchant deal renders authentic merchant button & campaign URL.");
+
 console.log("\n✅ ALL Telegram Deals Broadcaster unit tests passed with 100% success!");
+
