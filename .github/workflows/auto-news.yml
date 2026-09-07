@@ -17,8 +17,8 @@ name: TIVRA auto news
 
 on:
   schedule:
-    # Runs every hour at minute 0 (24 runs/day * 25 articles = 600 daily target)
-    - cron: "0 * * * *"
+    # Runs every 2 hours at off-peak minute 20 (6 runs per 12h, 12 runs/day * 50 articles = 600 daily target)
+    - cron: "20 */2 * * *"
   workflow_dispatch:
     inputs:
       per_category:
@@ -64,7 +64,7 @@ jobs:
           if [ -n "${{ github.event.inputs.per_category }}" ]; then
             EXTRA="--per-category ${{ github.event.inputs.per_category }}"
           fi
-          node scripts/auto-news.mjs $EXTRA
+          node scripts/auto-news.mjs --target 50 $EXTRA
 
       - name: Publish incoming uploads with TIVRA branding
         env:

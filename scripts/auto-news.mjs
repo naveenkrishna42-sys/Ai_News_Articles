@@ -175,10 +175,8 @@ for (const c of byCategory.keys()) if (!priority.includes(c)) priority.push(c);
 // budget is 0 and the category silently produces nothing that day — no
 // crash, no special-cased error path, config-only toggle.
 // Target volume calibration:
-// 25 articles per 1-hour run (24 runs * 25 = 600 daily target)
-// 50 articles per 2-hour run (12 runs * 50 = 600 daily target)
-const isTwoHours = args.includes("--two-hours") || args.includes("--50");
-const DEFAULT_RUN_TARGET = isTwoHours ? 50 : 25;
+// Default: 50 articles per run (12 runs * 50 = 600 daily target)
+const DEFAULT_RUN_TARGET = 50;
 const runTarget = args.includes("--per-category")
   ? Math.min(budget, PER_CATEGORY * priority.length)
   : Math.min(budget, Number(argValue("--target", DEFAULT_RUN_TARGET)));
@@ -193,8 +191,8 @@ const COMMERCIAL_CATEGORIES = new Set([
 
 // Pass 1: Balanced distribution across both monetization and general news
 const queue = [];
-const perMonetizationTarget = isTwoHours ? 3 : 2;
-const perNewsTarget = isTwoHours ? 2 : 1;
+const perMonetizationTarget = 3;
+const perNewsTarget = 2;
 
 for (const category of priority) {
   if (queue.length >= runTarget) break;
