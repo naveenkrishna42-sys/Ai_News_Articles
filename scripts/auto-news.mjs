@@ -82,7 +82,9 @@ function saveRegistry() {
   writeFileSync(REGISTRY_PATH, JSON.stringify(registry, null, 1));
 }
 
-const todayCount = Object.values(registry).filter((r) => r.d === today).length;
+const todayCount = existsSync(ARTICLES_DIR)
+  ? readdirSync(ARTICLES_DIR).filter((f) => f.startsWith(today) && f.endsWith(".html")).length
+  : Object.values(registry).filter((r) => r.d === today).length;
 let budget = Math.max(0, MAX_TOTAL - todayCount);
 
 console.log(`TIVRA auto-news — ${new Date().toISOString()}`);
@@ -127,16 +129,17 @@ export function isStaleSeasonalStory(title = "", currentDateStr = "") {
   return false;
 }
 
+const claimedKeys = new Set();
 const claimedWordSets = [];
 function isDuplicate(item) {
-  if (registry[item.key]) return true;
+  if (registry[item.key] || claimedKeys.has(item.key)) return true;
   const words = significantWords(item.title);
   for (const w of claimedWordSets) if (titlesOverlap(words, w)) return true;
   item._words = words;
   return false;
 }
-function claim(item, kind = "news") {
-  registry[item.key] = { t: item.title.slice(0, 120), d: today, c: item.category, k: kind };
+function claim(item) {
+  claimedKeys.add(item.key);
   claimedWordSets.push(item._words || significantWords(item.title));
 }
 
@@ -447,6 +450,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
   writeFileSync(path.join(ARTICLES_DIR, filename), html);
   results.written++;
   results.files.push(filename);
+  registry[item.key] = { t: title.slice(0, 120), d: today, c: item.category, k: kind };
   if (results.written % 20 === 0) saveRegistry();
   console.log(`  ✔ [${item.category}] ${title}`);
 }
@@ -543,6 +547,7 @@ ${cons.length ? `<div style="flex:1;min-width:220px;"><strong style="color:#be12
   writeFileSync(path.join(ARTICLES_DIR, filename), html);
   results.written++;
   results.files.push(filename);
+  registry[item.key] = { t: title.slice(0, 120), d: today, c: "Gadget Comparisons", k: "review" };
   if (results.written % 20 === 0) saveRegistry();
   console.log(`  ✔ [Gadget Comparisons] ${title} (review)`);
 }
@@ -631,6 +636,7 @@ async function writeComparisonStory(item) {
   writeFileSync(path.join(ARTICLES_DIR, filename), html);
   results.written++;
   results.files.push(filename);
+  registry[item.key] = { t: title.slice(0, 120), d: today, c: "Gadget Comparisons", k: "comparison" };
   if (results.written % 20 === 0) saveRegistry();
   console.log(`  ✔ [Gadget Comparisons] ${title}`);
 }
@@ -749,6 +755,7 @@ async function runQueue(candidatePool, targetCount, worker) {
         await worker(item);
       } catch (err) {
         results.failed++;
+        claimedKeys.delete(item.key);
         delete registry[item.key]; // unclaim so another run can retry it
         console.log(`  ✖ [${item.category}] ${item.title.slice(0, 60)} — ${err.message} (fetching next candidate to strictly fulfill ${targetCount} target)`);
       }
