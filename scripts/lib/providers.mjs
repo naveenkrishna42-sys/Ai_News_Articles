@@ -11,7 +11,19 @@ const COOLDOWN_MS = 90_000;
 export class ProviderPool {
   constructor(providerConfigs, communityConfig = null) {
     this.providers = (providerConfigs || [])
-      .map((p) => ({ ...p, apiKey: (process.env[p.envKey] || "").trim(), cooldownUntil: 0, ok: 0, failed: 0 }))
+      .map((p) => {
+        const rpm = p.rpm || 10;
+        return {
+          ...p,
+          apiKey: (process.env[p.envKey] || "").trim(),
+          rpm,
+          minIntervalMs: Math.ceil(60_000 / rpm),
+          lastCallTime: 0,
+          cooldownUntil: 0,
+          ok: 0,
+          failed: 0,
+        };
+      })
       .filter((p) => p.apiKey);
     this.communityConfig = communityConfig;
     this.cursor = 0;
@@ -129,38 +141,10 @@ export class ProviderPool {
         failed: 0,
       }));
 
-      const anonymousProvider = {
-        name: "pollinations-anonymous-fast",
-        baseUrl: "https://text.pollinations.ai/openai",
-        model: "openai-fast",
-        apiKey: "",
-        tier: "fallback",
-        rpm: 30,
-        minIntervalMs: 2000,
-        lastCallTime: 0,
-        cooldownUntil: 0,
-        ok: 0,
-        failed: 0,
-      };
-
-      this.providers = [...capableProviders, ...fallbackProviders, anonymousProvider, ...this.providers];
-      console.log(`[Providers] Successfully wired ${capableProviders.length} Capable Models (Tier 1) + ${fallbackProviders.length} Fallback Models (Tier 2) + Anonymous Free Provider.`);
+      this.providers = [...capableProviders, ...fallbackProviders, ...this.providers];
+      console.log(`[Providers] Successfully wired ${capableProviders.length} Capable Models (Tier 1) + ${fallbackProviders.length} Fallback Models (Tier 2) + Tier 3 Free Models.`);
     } else {
-      const anonymousProvider = {
-        name: "pollinations-anonymous-fast",
-        baseUrl: "https://text.pollinations.ai/openai",
-        model: "openai-fast",
-        apiKey: "",
-        tier: "fallback",
-        rpm: 30,
-        minIntervalMs: 2000,
-        lastCallTime: 0,
-        cooldownUntil: 0,
-        ok: 0,
-        failed: 0,
-      };
-      this.providers = [anonymousProvider, ...this.providers];
-      console.log(`[Providers] Operating on Tier 3 verified free providers + Pollinations Anonymous.`);
+      console.log(`[Providers] Operating on Tier 3 verified free providers.`);
     }
   }
 
@@ -209,7 +193,7 @@ export class ProviderPool {
         // Enforce strict RPM tier pacing to prevent HTTP 429
         const now = Date.now();
         const waitMs = Math.max(0, ((provider.lastCallTime || 0) + (provider.minIntervalMs || 0)) - now);
-        if (waitMs > 0 && waitMs <= 10_000) {
+        if (waitMs > 0 && waitMs <= 30_000) {
           await new Promise((resolve) => setTimeout(resolve, waitMs));
         }
         provider.lastCallTime = Date.now();
