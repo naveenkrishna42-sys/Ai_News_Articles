@@ -47,11 +47,6 @@ export default {
     // 3. Edge API: GET /api/feed
     if (url.pathname === "/api/feed") {
       try {
-        const cacheKey = new Request(url.toString(), request);
-        const cache = caches.default;
-        const cached = await cache.match(cacheKey);
-        if (cached) return cached;
-
         const catParam = url.searchParams.get("category") || "all";
         const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10));
         const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get("limit") || "12", 10)));
@@ -92,18 +87,15 @@ export default {
           articles: pagedArticles,
         };
 
-        const response = new Response(JSON.stringify(responsePayload), {
+        return new Response(JSON.stringify(responsePayload), {
           status: 200,
           headers: {
             "Content-Type": "application/json; charset=utf-8",
-            "Cache-Control": "public, max-age=60",
-            "cloudflare-cdn-cache-control": "public, max-age=300, stale-while-revalidate=600",
+            "Cache-Control": "public, max-age=15, must-revalidate",
+            "cloudflare-cdn-cache-control": "public, max-age=15, must-revalidate",
             "Access-Control-Allow-Origin": "*",
           },
         });
-
-        ctx.waitUntil(cache.put(cacheKey, response.clone()));
-        return response;
       } catch (err) {
         return new Response(JSON.stringify({ status: "error", message: err.message }), {
           status: 500,
@@ -356,8 +348,8 @@ export default {
         // 6a. JSON data files (dynamic feeds)
         if (pathLower.endsWith(".json")) {
           const newHeaders = new Headers(response.headers);
-          newHeaders.set("Cache-Control", "public, max-age=60");
-          newHeaders.set("cloudflare-cdn-cache-control", "public, max-age=120, stale-while-revalidate=300");
+          newHeaders.set("Cache-Control", "public, max-age=30, must-revalidate");
+          newHeaders.set("cloudflare-cdn-cache-control", "public, max-age=30, must-revalidate");
           return new Response(response.body, {
             status: response.status,
             statusText: response.statusText,
@@ -365,7 +357,19 @@ export default {
           });
         }
 
-        // 6b. Static media, fonts, and assets (immutable cache)
+        // 6b. HTML pages (homepage, articles, categories)
+        if (pathLower.endsWith(".html") || pathLower === "/" || !pathLower.includes(".")) {
+          const newHeaders = new Headers(response.headers);
+          newHeaders.set("Cache-Control", "public, max-age=0, must-revalidate");
+          newHeaders.set("cloudflare-cdn-cache-control", "public, max-age=30, must-revalidate");
+          return new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: newHeaders,
+          });
+        }
+
+        // 6c. Static media, fonts, and assets (immutable cache)
         if (
           pathLower.endsWith(".css") ||
           pathLower.endsWith(".js") ||
@@ -392,7 +396,7 @@ export default {
           });
         }
 
-        // 6c. XML Sitemaps, Feeds and robots.txt (Compliant headers for search engine crawlers)
+        // 6d. XML Sitemaps, Feeds and robots.txt (Compliant headers for search engine crawlers)
         if (pathLower.endsWith(".xml") || pathLower === "/robots.txt") {
           const newHeaders = new Headers(response.headers);
           if (pathLower.endsWith(".xml")) {
@@ -401,7 +405,7 @@ export default {
             newHeaders.set("Content-Type", "text/plain; charset=utf-8");
           }
           newHeaders.set("Cache-Control", "public, max-age=300, must-revalidate");
-          newHeaders.set("cloudflare-cdn-cache-control", "public, max-age=600, stale-while-revalidate=1800");
+          newHeaders.set("cloudflare-cdn-cache-control", "public, max-age=300, must-revalidate");
           return new Response(response.body, {
             status: response.status,
             statusText: response.statusText,
