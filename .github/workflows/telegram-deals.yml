@@ -52,9 +52,18 @@ jobs:
           git commit -m "chore(deals): update telegram dispatched state [skip ci]"
           # Retry push up to 5 times with clean rebase so concurrent pushes never conflict
           for i in {1..5}; do
-            git push origin main && break || {
-              echo "Push contention detected (attempt $i/5). Rebasing..."
-              sleep $((RANDOM % 5 + 2))
-              git pull --rebase origin main
+            if git push origin main; then
+              echo "Pushed successfully."
+              break
+            fi
+            echo "Push contention detected (attempt $i/5). Rebasing..."
+            sleep $((RANDOM % 5 + 2))
+            git rebase --abort 2>/dev/null || true
+            git pull --rebase origin main || {
+              git rebase --abort 2>/dev/null || true
+              git fetch origin main
+              git reset --soft origin/main
+              git add data/telegram-deals-dispatched.json || true
+              git commit -m "chore(deals): update telegram dispatched state [skip ci]" || true
             }
           done
