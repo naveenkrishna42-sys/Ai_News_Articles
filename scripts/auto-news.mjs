@@ -194,8 +194,8 @@ const COMMERCIAL_CATEGORIES = new Set([
 
 // Pass 1: Balanced distribution across both monetization and general news
 const candidatePool = [];
-const perMonetizationTarget = 3;
-const perNewsTarget = 2;
+const perMonetizationTarget = 4;
+const perNewsTarget = 3;
 
 for (const category of priority) {
   const items = byCategory.get(category) || [];
@@ -214,7 +214,7 @@ for (const category of priority) {
   }
 }
 
-// Pass 2: Combined backfill (interleaving monetization and news reserves up to runTarget * 2)
+// Pass 2: Combined backfill (interleaving monetization and news reserves up to at least 150 candidates)
 const HIGH_MONETIZATION_ORDER = [
   "Product Deals & Offers",
   "Credit Cards & Cashback",
@@ -234,7 +234,7 @@ const HIGH_MONETIZATION_ORDER = [
   ...priority
 ];
 
-const reserveLimit = Math.min(budget, Math.max(runTarget, runTarget * 2));
+const reserveLimit = Math.min(budget, Math.max(150, runTarget * 3));
 for (const category of HIGH_MONETIZATION_ORDER) {
   if (candidatePool.length >= reserveLimit) break;
   const items = byCategory.get(category) || [];
@@ -747,10 +747,33 @@ async function writeRankingStory(candidateItems) {
 
 async function runQueue(candidatePool, targetCount, worker) {
   let index = 0;
-  const lanes = Array.from({ length: Math.min(CONCURRENCY, candidatePool.length) }, async () => {
-    while (index < candidatePool.length && results.written < targetCount) {
-      const item = candidatePool[index++];
+  let inFlight = 0;
+
+  function getNext() {
+    if (index < candidatePool.length) {
+      return candidatePool[index++];
+    }
+    // Deep fallback: scan all categories for any fresh unharvested stories so the queue NEVER stops prematurely
+    for (const cat of priority) {
+      const items = byCategory.get(cat) || [];
+      for (const item of items) {
+        if (item.title.length < 25) continue;
+        if (isStaleSeasonalStory(item.title, today)) continue;
+        if (isDuplicate(item)) continue;
+        claim(item);
+        return item;
+      }
+    }
+    return null;
+  }
+
+  const concurrencyLimit = Math.min(CONCURRENCY, Math.max(1, targetCount));
+  const lanes = Array.from({ length: concurrencyLimit }, async () => {
+    while (results.written < targetCount) {
+      if ((results.written + inFlight) >= targetCount) break;
+      const item = getNext();
       if (!item) break;
+      inFlight++;
       try {
         await worker(item);
       } catch (err) {
@@ -758,6 +781,8 @@ async function runQueue(candidatePool, targetCount, worker) {
         claimedKeys.delete(item.key);
         delete registry[item.key]; // unclaim so another run can retry it
         console.log(`  ✖ [${item.category}] ${item.title.slice(0, 60)} — ${err.message} (fetching next candidate to strictly fulfill ${targetCount} target)`);
+      } finally {
+        inFlight--;
       }
     }
   });

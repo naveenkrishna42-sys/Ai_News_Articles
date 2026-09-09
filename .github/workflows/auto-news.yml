@@ -17,8 +17,8 @@ name: TIVRA auto news
 
 on:
   schedule:
-    # Runs every hour at off-peak minute 20 (24 runs/day * 50 articles = guaranteed 600 daily target even with GitHub Action delays)
-    - cron: "20 * * * *"
+    # Runs every 2 hours at off-peak minute 15 (12 runs/day * 50 articles = 600 daily target)
+    - cron: "15 */2 * * *"
   workflow_dispatch:
     inputs:
       per_category:
@@ -30,7 +30,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: tivra-production-publish
+  group: tivra-auto-news
   cancel-in-progress: false
 
 jobs:

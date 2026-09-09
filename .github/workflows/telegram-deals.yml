@@ -2,8 +2,8 @@ name: TIVRA Deals Telegram Broadcast
 
 on:
   schedule:
-    # Runs every hour at minute 50 (spaced 30 minutes after auto-news to broadcast fresh deals without contention)
-    - cron: "50 * * * *"
+    # Runs every 2 hours at odd hours minute 45 (spaced 1.5 hours after auto-news to ensure zero collisions)
+    - cron: "45 1-23/2 * * *"
   workflow_dispatch:
     inputs:
       limit:
@@ -15,7 +15,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: tivra-production-publish
+  group: tivra-telegram-deals
   cancel-in-progress: false
 
 jobs:
