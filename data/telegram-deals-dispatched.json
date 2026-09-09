@@ -225,76 +225,6 @@
     "sentAt": "2026-09-06T18:57:09.862Z"
   },
   {
-    "id": "cuelinks-4615",
-    "title": "Axis Credit Card CPL: Axis Credit Card CPL — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:14.213Z"
-  },
-  {
-    "id": "cuelinks-57531",
-    "title": "BOB Card Etihad: BOB Card Etihad — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:17.599Z"
-  },
-  {
-    "id": "cuelinks-161",
-    "title": "Bank Bazaar Credit Card: Bank Bazaar Credit Card — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:20.963Z"
-  },
-  {
-    "id": "cuelinks-4770",
-    "title": "Bank of Baroda Credit Card: Bank of Baroda Credit Card — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:24.340Z"
-  },
-  {
-    "id": "cuelinks-40179",
-    "title": "BetterHelp - Mental Health: BetterHelp - Mental Health — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:27.769Z"
-  },
-  {
-    "id": "cuelinks-9538",
-    "title": "CIMB Credit Card CPL: CIMB Credit Card CPL — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:31.184Z"
-  },
-  {
-    "id": "cuelinks-7687",
-    "title": "Federal Bank Credit Card: Federal Bank Credit Card — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:34.552Z"
-  },
-  {
-    "id": "cuelinks-6232",
-    "title": "Federal Scapia Credit card CPL: Federal Scapia Credit card CPL — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:37.963Z"
-  },
-  {
-    "id": "cuelinks-6391",
-    "title": "Finbro - PH CPL: Finbro - PH CPL — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:41.317Z"
-  },
-  {
-    "id": "cuelinks-66947",
-    "title": "Flipkart Seller Kids: Flipkart Seller Kids — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:44.720Z"
-  },
-  {
-    "id": "cuelinks-5465",
-    "title": "HDFC Bank Credit Card CPL: HDFC Bank Credit Card CPL — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:48.176Z"
-  },
-  {
-    "id": "cuelinks-5507",
-    "title": "HDFC Bank Swiggy Credit Card CPL: HDFC Bank Swiggy Credit Card CPL — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:51.581Z"
-  },
-  {
-    "id": "cuelinks-4606",
-    "title": "IDFC First Bank Credit Card: IDFC First Bank Credit Card — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:55.015Z"
-  },
-  {
-    "id": "cuelinks-9496",
-    "title": "Indusind Bajaj Tiger Credit Card: Indusind Bajaj Tiger Credit Card — Apply Online Instant Approval",
-    "sentAt": "2026-09-07T09:08:58.453Z"
-  },
-  {
     "id": "cuelinks-4831",
     "title": "Indusind Credit Card CPL: Indusind Credit Card CPL — Apply Online Instant Approval",
     "sentAt": "2026-09-07T15:38:01.890Z"
@@ -718,5 +648,75 @@
     "id": "cuelinks-128638",
     "title": "Fitspire: Save 25% Instantly on Super Bold Protein – Badam Kesar Pista 4 LBS",
     "sentAt": "2026-09-09T06:46:01.870Z"
+  },
+  {
+    "id": "cuelinks-4615",
+    "title": "Axis Credit Card CPL: Axis Credit Card CPL — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:18.173Z"
+  },
+  {
+    "id": "cuelinks-57531",
+    "title": "BOB Card Etihad: BOB Card Etihad — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:21.563Z"
+  },
+  {
+    "id": "cuelinks-161",
+    "title": "Bank Bazaar Credit Card: Bank Bazaar Credit Card — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:24.981Z"
+  },
+  {
+    "id": "cuelinks-4770",
+    "title": "Bank of Baroda Credit Card: Bank of Baroda Credit Card — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:28.388Z"
+  },
+  {
+    "id": "cuelinks-40179",
+    "title": "BetterHelp - Mental Health: BetterHelp - Mental Health — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:31.819Z"
+  },
+  {
+    "id": "cuelinks-9538",
+    "title": "CIMB Credit Card CPL: CIMB Credit Card CPL — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:35.227Z"
+  },
+  {
+    "id": "cuelinks-7687",
+    "title": "Federal Bank Credit Card: Federal Bank Credit Card — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:38.652Z"
+  },
+  {
+    "id": "cuelinks-6232",
+    "title": "Federal Scapia Credit card CPL: Federal Scapia Credit card CPL — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:42.083Z"
+  },
+  {
+    "id": "cuelinks-6391",
+    "title": "Finbro - PH CPL: Finbro - PH CPL — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:45.474Z"
+  },
+  {
+    "id": "cuelinks-66947",
+    "title": "Flipkart Seller Kids: Flipkart Seller Kids — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:48.915Z"
+  },
+  {
+    "id": "cuelinks-5465",
+    "title": "HDFC Bank Credit Card CPL: HDFC Bank Credit Card CPL — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:52.336Z"
+  },
+  {
+    "id": "cuelinks-5507",
+    "title": "HDFC Bank Swiggy Credit Card CPL: HDFC Bank Swiggy Credit Card CPL — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:55.728Z"
+  },
+  {
+    "id": "cuelinks-4606",
+    "title": "IDFC First Bank Credit Card: IDFC First Bank Credit Card — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:55:59.143Z"
+  },
+  {
+    "id": "cuelinks-9496",
+    "title": "Indusind Bajaj Tiger Credit Card: Indusind Bajaj Tiger Credit Card — Apply Online Instant Approval",
+    "sentAt": "2026-09-09T11:56:02.608Z"
   }
 ]
