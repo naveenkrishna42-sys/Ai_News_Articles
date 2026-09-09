@@ -92,13 +92,44 @@ jobs:
           fi
           COUNT=$(git diff --cached --numstat | wc -l)
           git commit -m "TIVRA auto news: $(date -u +'%Y-%m-%d %H:%M UTC') ($COUNT file changes)"
-          # Retry push up to 5 times with clean rebase so concurrent workflow runs never conflict or fail
+          # Retry push up to 5 times with conflict-proof re-sync so contention never fails the run
           for i in {1..5}; do
-            git push origin main && break || {
-              echo "Push contention detected (attempt $i/5). Rebasing..."
-              sleep $((RANDOM % 5 + 2))
-              git pull --rebase origin main
-            }
+            if git push origin main; then
+              echo "Pushed successfully to origin main."
+              break
+            fi
+            echo "Push contention detected (attempt $i/5). Syncing with upstream..."
+            sleep $((RANDOM % 5 + 2))
+            git rebase --abort 2>/dev/null || true
+            git fetch origin main
+            # Save newly created/modified articles and data
+            rm -rf /tmp/tivra_sync_backup
+            mkdir -p /tmp/tivra_sync_backup
+            cp -r articles data /tmp/tivra_sync_backup/ 2>/dev/null || true
+            # Align branch with latest upstream
+            git reset --hard origin/main
+            # Overlay new files
+            cp -r /tmp/tivra_sync_backup/* ./ 2>/dev/null || true
+            # Cleanly merge JSON registry
+            node -e "
+              import { readFileSync, writeFileSync, existsSync } from 'fs';
+              import { execSync } from 'child_process';
+              const p = 'data/published-registry.json';
+              if (existsSync(p)) {
+                try {
+                  const remote = JSON.parse(execSync('git show origin/main:' + p, { encoding: 'utf8' }));
+                  const local = JSON.parse(readFileSync(p, 'utf8'));
+                  writeFileSync(p, JSON.stringify({ ...remote, ...local }, null, 1));
+                } catch {}
+              }
+            "
+            git add articles/ data/ incoming/
+            if git diff --cached --quiet; then
+              echo "Changes already present in upstream."
+              break
+            fi
+            COUNT=$(git diff --cached --numstat | wc -l)
+            git commit -m "TIVRA auto news: $(date -u +'%Y-%m-%d %H:%M UTC') ($COUNT file changes)" || true
           done
 
       - name: Purge Cloudflare Edge Cache
