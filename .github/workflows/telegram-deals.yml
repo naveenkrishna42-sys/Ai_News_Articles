@@ -2,14 +2,15 @@ name: TIVRA Deals Telegram Broadcast
 
 on:
   schedule:
-    # Runs every 2 hours at odd hours minute 45 (spaced 1.5 hours after auto-news to ensure zero collisions)
-    - cron: "45 1-23/2 * * *"
+    # 2 Prime Drops per day at peak Indian shopping hours (10:15 AM IST & 08:15 PM IST)
+    # Perfectly buffered between auto-news runs (04:15 & 14:15 UTC) to ensure 0% collision
+    - cron: "45 4,14 * * *"
   workflow_dispatch:
     inputs:
       limit:
-        description: "Number of product deals to post this run (default 15)"
+        description: "Number of product deals to post this run (default 20)"
         required: false
-        default: "15"
+        default: "20"
 
 permissions:
   contents: write
@@ -37,7 +38,7 @@ jobs:
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID || '@tivranews_official' }}
           CUELINKS_API_KEY: ${{ secrets.CUELINKS_API_KEY || 'xnrsT6vr3TP64MM7FSvCvdwY2jvD_jLrwU7B0zXvReI' }}
         run: |
-          LIMIT="${{ github.event.inputs.limit || '15' }}"
+          LIMIT="${{ github.event.inputs.limit || '20' }}"
           node scripts/telegram-deals.mjs --limit "$LIMIT"
 
       - name: Save dispatched state
