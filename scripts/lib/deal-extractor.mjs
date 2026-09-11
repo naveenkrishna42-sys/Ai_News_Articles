@@ -181,11 +181,12 @@ export async function fetchCuelinksUrlFromArticle(articleUrl, timeoutMs = 4500) 
 
 const CUELINKS_CID = "316413";
 
-function buildCuelinksRedirect(url) {
-  return `https://linksredirect.com/?cid=${CUELINKS_CID}&source=api&url=${encodeURIComponent(url)}`;
+function buildCuelinksRedirect(url, subid = "tivra_deals") {
+  return `https://linksredirect.com/?cid=${CUELINKS_CID}&subid=${encodeURIComponent(subid)}&source=api&url=${encodeURIComponent(url)}`;
 }
 
-export async function getBestMonetizedUrl(item, productName, _amazonTag = "", configOverrides = {}) {
+export async function getBestMonetizedUrl(item, productName, amazonTag = "sirmohana-21", configOverrides = {}) {
+  const tag = amazonTag || "sirmohana-21";
   const cleanName = extractCleanProductName(productName || item?.title || "");
 
   // 1. Config override check
@@ -203,10 +204,10 @@ export async function getBestMonetizedUrl(item, productName, _amazonTag = "", co
         const cuelinksUrl = await fetchCuelinksUrlFromArticle(realUrl, 3000);
         if (cuelinksUrl) return cuelinksUrl;
 
-        // Fallback to Amazon ASIN
+        // Fallback to direct Amazon ASIN with OneLink tag
         const asin = await fetchAsinFromArticle(realUrl, 2500);
         if (asin) {
-          return buildCuelinksRedirect(`https://www.amazon.in/dp/${asin}`);
+          return `https://www.amazon.in/dp/${asin}?tag=${encodeURIComponent(tag)}`;
         }
       }
     } catch {
@@ -214,11 +215,11 @@ export async function getBestMonetizedUrl(item, productName, _amazonTag = "", co
     }
   }
 
-  // 3. Fallback to clean search URL monetized via Cuelinks
+  // 3. Fallback to clean search URL (Direct Amazon tag or Cuelinks Flipkart)
   if (cleanName.toLowerCase().includes("flipkart") || (item && item.title && item.title.toLowerCase().includes("flipkart"))) {
     return buildCuelinksRedirect(`https://www.flipkart.com/search?q=${encodeURIComponent(cleanName)}`);
   }
-  return buildCuelinksRedirect(`https://www.amazon.in/s?k=${encodeURIComponent(cleanName)}`);
+  return `https://www.amazon.in/s?k=${encodeURIComponent(cleanName)}&tag=${encodeURIComponent(tag)}`;
 }
 
 

@@ -299,7 +299,7 @@ export const KNOWN_MERCHANTS = [
   {
     pattern: /amazon/i,
     name: "Amazon",
-    url: cuelinksRedirect("https://www.amazon.in/deals"),
+    url: "https://www.amazon.in/deals?tag=sirmohana-21",
     color: "#e11d48",
     icon: "🛒",
     cta: "Buy at Amazon"
@@ -325,14 +325,17 @@ export function sanitizeProductName(name) {
   return (clean.length >= 3 && clean.length <= 35) ? clean : "";
 }
 
+export const DEFAULT_AMAZON_TAG = "sirmohana-21";
+
 /**
- * Builds Amazon search URL monetized via Cuelinks (No personal ID leakage)
+ * Builds direct, high-converting Amazon URL with OneLink tag sirmohana-21
  */
-export function buyUrl(cleanName) {
+export function buyUrl(cleanName, config = {}) {
+  const tag = config?.affiliate?.amazonTag || DEFAULT_AMAZON_TAG;
   if (!cleanName || cleanName.length < 3) {
-    return cuelinksRedirect("https://www.amazon.in/deals");
+    return `https://www.amazon.in/deals?tag=${encodeURIComponent(tag)}`;
   }
-  return cuelinksRedirect(`https://www.amazon.in/s?k=${encodeURIComponent(cleanName)}`);
+  return `https://www.amazon.in/s?k=${encodeURIComponent(cleanName)}&tag=${encodeURIComponent(tag)}`;
 }
 
 /**
@@ -395,10 +398,12 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   // 2. BROAD E-COMMERCE LISTICLES (e.g. "Top 10 Online Shopping Websites")
   const isGeneralListicle = /top\s*\d+.*(shopping|website|site|store|app)|best.*(online shopping)/i.test(textContext);
   if (isGeneralListicle) {
+    const amazonTag = config?.affiliate?.amazonTag || DEFAULT_AMAZON_TAG;
+    const amazonDealsUrl = `https://www.amazon.in/deals?tag=${encodeURIComponent(amazonTag)}`;
     return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:14px;">Explore Verified Deals Across Top Shopping Portals</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
-  <a href="${escapeHtml(cuelinksRedirect("https://www.amazon.in/deals"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+  <a href="${escapeHtml(amazonDealsUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛒 Buy at Amazon Deals</span>
   </a>
   <a href="${escapeHtml(cuelinksRedirect("https://www.flipkart.com/offers-store"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2874f0;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
@@ -575,7 +580,8 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   const candidateName = (deviceNames && deviceNames[0]) || title || "";
   const cleanProd = sanitizeProductName(candidateName);
 
-  const amazonUrl = cleanProd ? buyUrl(cleanProd, config) : cuelinksRedirect("https://www.amazon.in/deals");
+  const amazonTag = config?.affiliate?.amazonTag || DEFAULT_AMAZON_TAG;
+  const amazonUrl = cleanProd ? buyUrl(cleanProd, config) : `https://www.amazon.in/deals?tag=${encodeURIComponent(amazonTag)}`;
   const flipkartUrl = cleanProd
     ? cuelinksRedirect(`https://www.flipkart.com/search?q=${encodeURIComponent(cleanProd)}`)
     : cuelinksRedirect("https://www.flipkart.com/offers-store");

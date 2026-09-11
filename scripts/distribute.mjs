@@ -92,7 +92,7 @@ export function buildTelegramMessage(article) {
     extraCta = `\n\n🛍️ <b>Fashion Sale:</b> <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.ajio.com">Shop Ajio Deals (Up to 80% Off)</a> | <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.myntra.com">Myntra Offers</a>`;
   } else if (isDeal) {
     icon = '🛍️';
-    extraCta = `\n\n⚡ <b>Verified Deals &amp; Cashback:</b> <a href="${sbiCplUrl}">Get 10% Extra Cashback with SBI Simply Click</a> | <a href="https://linksredirect.com/?cid=316413&amp;source=api&amp;url=https%3A%2F%2Fwww.amazon.in%2Fdeals">Amazon Deals</a>`;
+    extraCta = `\n\n⚡ <b>Verified Deals &amp; Cashback:</b> <a href="${sbiCplUrl}">Get 10% Extra Cashback with SBI Simply Click</a> | <a href="https://www.amazon.in/deals?tag=sirmohana-21">Amazon Deals</a>`;
   } else {
     // General News stories: rotate high-converting CPL CTA
     extraCta = `\n\n⚡ <b>Special Offer:</b> <a href="${sbiCplUrl}">Apply for SBI Simply Click Credit Card (Instant Approval)</a>`;

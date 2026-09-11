@@ -21,18 +21,41 @@ import { fetchLiveOffers } from "./cuelinks-sync.mjs";
 
 const CUELINKS_CID = "316413";
 
+export const DEFAULT_AMAZON_TAG = "sirmohana-21";
+
 /**
- * Creates a verified Cuelinks direct redirect URL with cid=316413
+ * Creates a verified Cuelinks direct redirect URL with cid=316413 and subid
  */
-export function buildMerchantRedirect(targetUrl) {
-  return `https://linksredirect.com/?cid=${CUELINKS_CID}&source=api&url=${encodeURIComponent(targetUrl)}`;
+export function buildMerchantRedirect(targetUrl, subid = "tivra_deals") {
+  return `https://linksredirect.com/?cid=${CUELINKS_CID}&subid=${encodeURIComponent(subid)}&source=api&url=${encodeURIComponent(targetUrl)}`;
 }
 
 /**
- * Builds bullet-proof Amazon search URL monetized via Cuelinks (Zero personal ID leakage)
+ * Builds direct, high-converting Amazon URL with OneLink tag sirmohana-21
  */
-export function buildAmazonSearchUrl(query) {
-  return buildMerchantRedirect(`https://www.amazon.in/s?k=${encodeURIComponent(query)}`);
+export function buildAmazonUrl(target, amazonTag = DEFAULT_AMAZON_TAG) {
+  const tag = amazonTag || DEFAULT_AMAZON_TAG;
+  if (!target) return `https://www.amazon.in/deals?tag=${encodeURIComponent(tag)}`;
+  if (target.startsWith("http")) {
+    try {
+      const u = new URL(target);
+      u.searchParams.set("tag", tag);
+      return u.toString();
+    } catch {
+      return target.includes("?") ? `${target}&tag=${encodeURIComponent(tag)}` : `${target}?tag=${encodeURIComponent(tag)}`;
+    }
+  }
+  if (/^[A-Z0-9]{10}$/i.test(target.trim())) {
+    return `https://www.amazon.in/dp/${target.trim()}?tag=${encodeURIComponent(tag)}`;
+  }
+  return `https://www.amazon.in/s?k=${encodeURIComponent(target)}&tag=${encodeURIComponent(tag)}`;
+}
+
+/**
+ * Builds Amazon search URL with user's verified Amazon Associate tag sirmohana-21
+ */
+export function buildAmazonSearchUrl(query, amazonTag = DEFAULT_AMAZON_TAG) {
+  return buildAmazonUrl(query, amazonTag);
 }
 
 /**
@@ -41,7 +64,7 @@ export function buildAmazonSearchUrl(query) {
  * - If rawUrl is missing, routes to that merchant's authentic store search/landing URL.
  * - NEVER blindly falls back to Amazon/Flipkart for other brands (HealthKart, Cashify, Boat, etc.).
  */
-export function resolveMerchantProductUrl(merchant = "", productName = "", rawUrl = "") {
+export function resolveMerchantProductUrl(merchant = "", productName = "", rawUrl = "", amazonTag = DEFAULT_AMAZON_TAG) {
   const m = String(merchant || "").toLowerCase();
   const query = String(productName || "")
     .replace(/\(.*?\)/g, " ")
@@ -431,7 +454,7 @@ export const CURATED_PRODUCT_DEALS = [
       "Up to 30-hour battery life with quick charge (3 mins = 3 hours)",
       "Ultra-comfortable lightweight design with soft fit leather"
     ],
-    buyUrl: buildMerchantRedirect("https://www.amazon.in/dp/B09XS7JWHH")
+    buyUrl: buildAmazonUrl("https://www.amazon.in/dp/B09XS7JWHH")
   },
   {
     id: "prod-apple-airpods-pro-2-usbc",
