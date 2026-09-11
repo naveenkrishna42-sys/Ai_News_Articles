@@ -10,7 +10,7 @@ on:
       limit:
         description: "Number of product deals to post this run (default 20)"
         required: false
-        default: "20"
+        default: "200"
 
 permissions:
   contents: write
@@ -38,8 +38,8 @@ jobs:
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID || '@tivranews_official' }}
           CUELINKS_API_KEY: ${{ secrets.CUELINKS_API_KEY || 'xnrsT6vr3TP64MM7FSvCvdwY2jvD_jLrwU7B0zXvReI' }}
         run: |
-          LIMIT="${{ github.event.inputs.limit || '20' }}"
-          node scripts/telegram-deals.mjs --limit "$LIMIT"
+          LIMIT="${{ github.event.inputs.limit || '200' }}"
+          node scripts/telegram-deals.mjs --limit "$LIMIT" --digest
 
       - name: Save dispatched state
         run: |

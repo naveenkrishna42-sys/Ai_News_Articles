@@ -65,6 +65,58 @@ export function formatTelegramDeal(deal) {
   return text.length > 1000 ? text.slice(0, 990) + "..." : text;
 }
 
+/**
+ * Builds high-converting, compact Telegram HTML message combining 10 deals into ONE digest post
+ */
+export function formatTelegramDigest(themeTitle, deals = []) {
+  const badge = "🔥 TIVRA DEALS MEGA DIGEST";
+  let header = `<b>${badge}</b>\n` +
+               `📌 <b>${escapeHtml(themeTitle.toUpperCase())}</b>\n` +
+               `⚡ <i>Top 10 Verified Loot & Value Deals · 100% In-Stock Guarantee</i>\n\n`;
+
+  const items = deals.slice(0, 10).map((deal, idx) => {
+    const num = `${idx + 1}️⃣`;
+    const title = escapeHtml(deal.title || "Featured Deal");
+    const dealPrice = deal.dealPrice || "Best Price";
+    const mrp = deal.mrp && deal.mrp !== dealPrice ? ` <s>${deal.mrp}</s>` : "";
+    const discount = deal.discount ? ` <i>(${escapeHtml(deal.discount)})</i>` : "";
+    const merchant = escapeHtml(deal.merchant || "Official Store");
+    const coupon = deal.coupon ? ` · 🏷️ <code>${escapeHtml(deal.coupon)}</code>` : "";
+    const buyUrl = deal.buyUrl;
+
+    return `${num} <b>${title}</b>\n` +
+           `   💰 <b>Price:</b> ${dealPrice}${mrp}${discount}${coupon}\n` +
+           `   🛒 <a href="${buyUrl}">👉 Grab Deal on ${merchant} &rarr;</a>`;
+  });
+
+  const cpcCardUrl = "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2FsimplyClickMaster";
+  const footer = `\n\n💳 <b>Extra 10% Cashback / EMI:</b> <a href="${cpcCardUrl}">Apply SBI Simply Click Card &rarr;</a>\n` +
+                 `📢 <i>Join @tivranews_official for Instant Verified Price Drops!</i>`;
+
+  const fullText = `${header}${items.join("\n\n")}${footer}`;
+  return fullText.length > 4000 ? fullText.slice(0, 3950) + "..." : fullText;
+}
+
+export async function sendTelegramMessage(token, channelId, text) {
+  const url = `https://api.telegram.org/bot${token}/sendMessage`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: channelId,
+      text,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Telegram API responded with status ${res.status}: ${err}`);
+  }
+  return true;
+}
+
 function escapeHtml(str) {
   return String(str || '')
     .replace(/&/g, '&amp;')
@@ -253,7 +305,82 @@ export async function runBroadcast(options = {}) {
     return { sent: 0, failed: 0 };
   }
 
-  console.log(`[TIVRA Deals] Broadcasting ${selectedDeals.length} fresh, category-balanced product deals...`);
+  const isDigest = options.format === 'digest' || process.argv.includes('--digest') || (!process.argv.includes('--single') && targetCount >= 30);
+
+  if (isDigest) {
+    console.log(`[TIVRA Deals] Digest Mode: Grouping ${selectedDeals.length} deals into 10-link themed mega-digests...`);
+    const chunks = [];
+    for (let i = 0; i < selectedDeals.length; i += 10) {
+      chunks.push(selectedDeals.slice(i, i + 10));
+    }
+
+    let sentDigests = 0;
+    let sentLinks = 0;
+    let failDigests = 0;
+
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      // Clean and verify each deal in chunk
+      const verifiedChunk = [];
+      for (let deal of chunk) {
+        deal = await verifyAndHealDealLink(deal, 2500);
+        const isSafe = await verifyNoCuelinksLeak(deal.buyUrl, 2500);
+        if (isSafe) verifiedChunk.push(deal);
+      }
+
+      if (verifiedChunk.length === 0) continue;
+
+      // Theme detection
+      const catCount = {};
+      for (const d of verifiedChunk) {
+        const c = d.category || 'Curated Deals';
+        catCount[c] = (catCount[c] || 0) + 1;
+      }
+      const topCat = Object.entries(catCount).sort((a, b) => b[1] - a[1])[0][0];
+      const themeTitle = `Top 10 ${topCat} & Verified Loot Offers`;
+
+      const digestText = formatTelegramDigest(themeTitle, verifiedChunk);
+
+      if (isDryRun) {
+        console.log(`\n--- [MEGA DIGEST #${i + 1} / ${chunks.length}] (${verifiedChunk.length} Deals) ---`);
+        console.log(digestText);
+        sentDigests++;
+        sentLinks += verifiedChunk.length;
+      } else {
+        try {
+          await sendTelegramMessage(TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ID, digestText);
+          console.log(`✔ [Digest #${i + 1}/${chunks.length}] Posted ${verifiedChunk.length} deals: ${themeTitle}`);
+          sentDigests++;
+          sentLinks += verifiedChunk.length;
+
+          for (const d of verifiedChunk) {
+            dispatched.push({
+              id: d.id,
+              title: d.title,
+              sentAt: new Date().toISOString()
+            });
+          }
+
+          // Polite pacing delay (2.5 seconds) between digest messages
+          if (i < chunks.length - 1) {
+            await new Promise(r => setTimeout(r, 2500));
+          }
+        } catch (err) {
+          console.error(`✖ Failed to post digest #${i + 1}: ${err.message}`);
+          failDigests++;
+        }
+      }
+    }
+
+    if (!isDryRun && sentDigests > 0) {
+      saveDispatched(dispatched);
+    }
+
+    console.log(`[TIVRA Deals] Digest Broadcast complete. Sent ${sentDigests} digests (${sentLinks} total links), Failed: ${failDigests}`);
+    return { sent: sentLinks, digests: sentDigests, failed: failDigests };
+  }
+
+  console.log(`[TIVRA Deals] Single Mode: Broadcasting ${selectedDeals.length} fresh, category-balanced product deals...`);
 
   let sentCount = 0;
   let failCount = 0;
