@@ -87,6 +87,11 @@ const todayCount = existsSync(ARTICLES_DIR)
   : Object.values(registry).filter((r) => r.d === today).length;
 let budget = Math.max(0, MAX_TOTAL - todayCount);
 
+if (budget <= 0 && !DRY_RUN) {
+  console.log(`Daily cap of ${MAX_TOTAL} articles already reached today (${todayCount} published). Exiting cleanly.`);
+  process.exit(0);
+}
+
 console.log(`TIVRA auto-news — ${new Date().toISOString()}`);
 console.log(`Providers with keys: ${pool.providers.map((p) => p.name).join(", ") || "NONE"}`);
 console.log(`Published today so far: ${todayCount}. Budget this run: ${budget}. Per-category: ${PER_CATEGORY}.`);

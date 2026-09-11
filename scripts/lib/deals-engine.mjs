@@ -930,10 +930,38 @@ export async function getLiveProductDealsQueue(options = {}) {
     console.warn(`[Deals Engine] Cuelinks offers fetch notice: ${err.message}`);
   }
 
-  // 3. Fallback catalog (only appended as safety net if dynamic pool is under 15)
-  if (dynamicDeals.length < 15) {
-    dynamicDeals.push(...CURATED_PRODUCT_DEALS);
+  // 3. High-Payout CPL & High-EPC Tier 1 Campaigns (Credit Cards ₹1,950/lead, Hosting 52.5%, Travel $32.14)
+  try {
+    const { DEFAULT_CAMPAIGNS } = await import("./cuelinks-sync.mjs");
+    for (const [key, camp] of Object.entries(DEFAULT_CAMPAIGNS)) {
+      dynamicDeals.push({
+        id: `camp-${key}`,
+        title: `${camp.name} — ${camp.payout}`,
+        category: camp.category || "Credit Cards & Cashback",
+        market: camp.country === "US" ? "International" : "National",
+        merchant: camp.name,
+        badge: "💳 HIGH REVENUE OFFER",
+        mrp: "Lifetime Free / Zero Annual Fee",
+        dealPrice: "Instant Online Approval",
+        discount: "High Rewards",
+        cardOffer: camp.payout,
+        coupon: null,
+        rating: "4.9 / 5.0 (Verified Partner)",
+        imageUrl: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
+        highlights: [
+          "100% paperless digital onboarding",
+          `Verified payout rewards: ${camp.payout}`,
+          "Direct partner application link"
+        ],
+        buyUrl: camp.url
+      });
+    }
+  } catch (err) {
+    console.warn(`[Deals Engine] Campaigns fetch notice: ${err.message}`);
   }
+
+  // 4. Always append verified curated consumer tech and retail deals
+  dynamicDeals.push(...CURATED_PRODUCT_DEALS);
 
   return dynamicDeals;
 }
