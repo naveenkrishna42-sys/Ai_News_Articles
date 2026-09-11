@@ -179,14 +179,33 @@ export async function fetchCuelinksUrlFromArticle(articleUrl, timeoutMs = 4500) 
   return null;
 }
 
-const CUELINKS_CID = "316413";
+import fs from "fs";
+import path from "path";
+
+function getAffiliateConfig() {
+  try {
+    const p = path.resolve("config/news-config.json");
+    if (fs.existsSync(p)) {
+      const cfg = JSON.parse(fs.readFileSync(p, "utf-8"));
+      return cfg.affiliate || {};
+    }
+  } catch {
+    // fallback
+  }
+  return {};
+}
+
+const _affCfg = getAffiliateConfig();
+
+const CUELINKS_CID = process.env.CUELINKS_CID || _affCfg.cuelinks?.cid || "316413";
+const DEFAULT_AMAZON_TAG = process.env.AMAZON_AFFILIATE_TAG || _affCfg.amazonTag || "sirmohana-21";
 
 function buildCuelinksRedirect(url, subid = "tivra_deals") {
   return `https://linksredirect.com/?cid=${CUELINKS_CID}&subid=${encodeURIComponent(subid)}&source=api&url=${encodeURIComponent(url)}`;
 }
 
-export async function getBestMonetizedUrl(item, productName, amazonTag = "sirmohana-21", configOverrides = {}) {
-  const tag = amazonTag || "sirmohana-21";
+export async function getBestMonetizedUrl(item, productName, amazonTag = DEFAULT_AMAZON_TAG, configOverrides = {}) {
+  const tag = amazonTag || DEFAULT_AMAZON_TAG;
   const cleanName = extractCleanProductName(productName || item?.title || "");
 
   // 1. Config override check

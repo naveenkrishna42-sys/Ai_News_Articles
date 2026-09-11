@@ -17,11 +17,27 @@
  * 3. High-resolution visual product image with every deal card.
  */
 
+import fs from "fs";
+import path from "path";
 import { fetchLiveOffers } from "./cuelinks-sync.mjs";
 
-const CUELINKS_CID = "316413";
+function getAffiliateConfig() {
+  try {
+    const p = path.resolve("config/news-config.json");
+    if (fs.existsSync(p)) {
+      const cfg = JSON.parse(fs.readFileSync(p, "utf-8"));
+      return cfg.affiliate || {};
+    }
+  } catch {
+    // fallback
+  }
+  return {};
+}
 
-export const DEFAULT_AMAZON_TAG = "sirmohana-21";
+const _affCfg = getAffiliateConfig();
+
+export const CUELINKS_CID = process.env.CUELINKS_CID || _affCfg.cuelinks?.cid || "316413";
+export const DEFAULT_AMAZON_TAG = process.env.AMAZON_AFFILIATE_TAG || _affCfg.amazonTag || "sirmohana-21";
 
 /**
  * Creates a verified Cuelinks direct redirect URL with cid=316413 and subid

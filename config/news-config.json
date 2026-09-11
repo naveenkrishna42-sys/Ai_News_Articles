@@ -515,6 +515,7 @@
     "monetizationMode": "hybrid",
     "cuelinks": {
       "enabled": true,
+      "cid": "316413",
       "cpcUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html",
       "megaHighTicketUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.riseworks.io",
       "b2bGrowthUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.airwallex.com",

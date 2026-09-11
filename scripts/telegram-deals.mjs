@@ -49,7 +49,7 @@ export function formatTelegramDeal(deal) {
   }
 
   let bankLine = cardOffer ? `\n💳 <b>Bank / Card Offer:</b> ${escapeHtml(cardOffer)}` : "";
-  const cpcCardUrl = "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2FsimplyClickMaster";
+  const cpcCardUrl = "https://linksredirect.com/?cid=316413&subid=tivra_telegram&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2FsimplyClickMaster";
   const cpcLine = `\n⚡ <b>Instant Cashback / EMI:</b> <a href="${cpcCardUrl}">Get 10% Extra Cashback with SBI Simply Click &rarr;</a>`;
 
   const text = `${badge}: <b>${escapeHtml(title)}</b>\n\n` +
@@ -89,7 +89,7 @@ export function formatTelegramDigest(themeTitle, deals = []) {
            `   🛒 <a href="${buyUrl}">👉 Grab Deal on ${merchant} &rarr;</a>`;
   });
 
-  const cpcCardUrl = "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2FsimplyClickMaster";
+  const cpcCardUrl = "https://linksredirect.com/?cid=316413&subid=tivra_telegram&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2FsimplyClickMaster";
   const footer = `\n\n💳 <b>Extra 10% Cashback / EMI:</b> <a href="${cpcCardUrl}">Apply SBI Simply Click Card &rarr;</a>\n` +
                  `📢 <i>Join @tivranews_official for Instant Verified Price Drops!</i>`;
 

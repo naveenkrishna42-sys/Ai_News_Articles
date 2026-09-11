@@ -13,9 +13,27 @@
  * 4. Zero dead links, zero junk queries, 100% dynamic without hardcoding.
  */
 
+import fs from "fs";
+import path from "path";
 import { resolveMerchantProductUrl } from "./deals-engine.mjs";
 
-const CUELINKS_CID = "316413";
+function getAffiliateConfig() {
+  try {
+    const p = path.resolve("config/news-config.json");
+    if (fs.existsSync(p)) {
+      const cfg = JSON.parse(fs.readFileSync(p, "utf-8"));
+      return cfg.affiliate || {};
+    }
+  } catch {
+    // fallback
+  }
+  return {};
+}
+
+const _affCfg = getAffiliateConfig();
+
+export const CUELINKS_CID = process.env.CUELINKS_CID || _affCfg.cuelinks?.cid || "316413";
+export const DEFAULT_AMAZON_TAG = process.env.AMAZON_AFFILIATE_TAG || _affCfg.amazonTag || "sirmohana-21";
 
 const DISCLOSURE = "As an affiliate and partner, TIVRA News earns from qualifying purchases and verified partner referrals. Prices, discounts, and availability are subject to change.";
 
@@ -28,9 +46,9 @@ function escapeHtml(str = "") {
     .replace(/'/g, "&#39;");
 }
 
-export function cuelinksRedirect(targetUrl, cid = CUELINKS_CID) {
+export function cuelinksRedirect(targetUrl, cid = CUELINKS_CID, subid = "tivra_web") {
   if (!targetUrl) return "";
-  return `https://linksredirect.com/?cid=${encodeURIComponent(cid)}&source=api&url=${encodeURIComponent(targetUrl)}`;
+  return `https://linksredirect.com/?cid=${encodeURIComponent(cid)}&subid=${encodeURIComponent(subid)}&source=api&url=${encodeURIComponent(targetUrl)}`;
 }
 
 /**
@@ -299,7 +317,7 @@ export const KNOWN_MERCHANTS = [
   {
     pattern: /amazon/i,
     name: "Amazon",
-    url: "https://www.amazon.in/deals?tag=sirmohana-21",
+    url: `https://www.amazon.in/deals?tag=${encodeURIComponent(DEFAULT_AMAZON_TAG)}`,
     color: "#e11d48",
     icon: "🛒",
     cta: "Buy at Amazon"
@@ -324,8 +342,6 @@ export function sanitizeProductName(name) {
   clean = clean.replace(junkPattern, "").trim();
   return (clean.length >= 3 && clean.length <= 35) ? clean : "";
 }
-
-export const DEFAULT_AMAZON_TAG = "sirmohana-21";
 
 /**
  * Builds direct, high-converting Amazon URL with OneLink tag sirmohana-21
