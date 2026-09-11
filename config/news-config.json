@@ -509,15 +509,16 @@
   },
   "affiliate": {
     "enabled": true,
-    "network": "Cuelinks Unified",
+    "network": "Cuelinks Unified & Amazon Associates",
     "marketplace": "amazon.in",
-    "monetizationMode": "cuelinks",
+    "amazonTag": "sirmohana-21",
+    "monetizationMode": "hybrid",
     "cuelinks": {
       "enabled": true,
-      "cpcUrl": "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html",
-      "megaHighTicketUrl": "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.riseworks.io",
-      "b2bGrowthUrl": "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.airwallex.com",
-      "ajioFashionUrl": "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.ajio.com"
+      "cpcUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html",
+      "megaHighTicketUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.riseworks.io",
+      "b2bGrowthUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.airwallex.com",
+      "ajioFashionUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.ajio.com"
     },
     "products": {}
   }

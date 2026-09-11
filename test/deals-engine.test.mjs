@@ -28,11 +28,13 @@ for (const d of CURATED_PRODUCT_DEALS) {
   assert.ok(d.buyUrl, `Deal must have buyUrl: ${d.id}`);
   assert.ok(d.merchant, `Deal must have merchant: ${d.id}`);
   assert.ok(d.highlights && d.highlights.length >= 2, `Deal must have at least 2 highlights: ${d.id}`);
-  // Guarantee NO dead shortlinks & NO personal tag exposure
+  // Guarantee NO dead shortlinks and valid OneLink Amazon tag
   assert.ok(!d.buyUrl.includes("clnk.in"), `buyUrl MUST NOT contain dead clnk.in: ${d.buyUrl}`);
-  assert.ok(!d.buyUrl.includes("sirmohana"), `buyUrl MUST NOT expose personal Amazon tag: ${d.buyUrl}`);
+  if (d.merchant && d.merchant.toLowerCase().includes("amazon")) {
+    assert.ok(d.buyUrl.includes("tag=sirmohana-21"), `Amazon deal must contain verified OneLink tag sirmohana-21: ${d.buyUrl}`);
+  }
 }
-console.log("✓ Test 3: All deals contain mandatory price, specs, card offers and clean merchant URLs (Zero personal tag leakage).");
+console.log("✓ Test 3: All deals contain mandatory price, specs, card offers and verified merchant URLs with sirmohana-21 Amazon OneLink tag.");
 
 // Test 4: Verify Cuelinks direct redirect links never leak to cuelinks.com
 const sampleRedirects = [

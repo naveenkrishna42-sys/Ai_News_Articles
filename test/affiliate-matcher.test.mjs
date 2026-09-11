@@ -13,13 +13,13 @@ const mockConfig = {
   }
 };
 
-// Test 1: Clean CTA Label Check (NO "(Paid link)" inside button text & Zero personal ID leakage)
+// Test 1: Clean CTA Label Check (NO "(Paid link)" inside button text & verified Amazon tag)
 const gadgetBox = renderBuyBox(["OnePlus 13 Pro"], mockConfig, "Technology", "", "OnePlus 13 Pro Price Drop Today");
 assert.ok(gadgetBox.includes("Buy at Amazon"), "Button must have clean 'Buy at Amazon' label");
 assert.ok(gadgetBox.includes("Buy at Flipkart"), "Button must have clean 'Buy at Flipkart' label");
 assert.ok(!gadgetBox.includes("<span>🛒 Check"), "Old wordy button format must be eliminated");
-assert.ok(!gadgetBox.includes("sirmohana"), "Must NOT expose personal Amazon tag sirmohana");
-console.log("✓ Test 1: Clean High-Converting Action Labels passed (Zero personal ID leakage)");
+assert.ok(gadgetBox.includes("tag=sirmohana-21"), "Must include verified Amazon OneLink tag sirmohana-21");
+console.log("✓ Test 1: Clean High-Converting Action Labels with verified OneLink tag passed");
 
 // Test 2: Dynamic In-line Listicle Heading Parser
 const mockBody = `
