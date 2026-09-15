@@ -138,6 +138,14 @@ export const KNOWN_MERCHANTS = [
     icon: "🏦",
     cta: "Open Kotak 811 Zero Balance Account"
   },
+  {
+    pattern: /zurich\s*kotak|kotak\s*car\s*insurance|kotak\s*(?:general\s*)?insurance/i,
+    name: "Zurich Kotak Car Insurance",
+    url: cuelinksRedirect("https://www.zurichkotak.com/car-insurance"),
+    color: "#0284c7",
+    icon: "🛡️",
+    cta: "Apply for Zurich Kotak Car Insurance"
+  },
 
   // --- TRAVEL & HOSPITALITY ---
   {
@@ -361,7 +369,27 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   const catLower = (category || "").toLowerCase();
   const textContext = `${title} ${category} ${(deviceNames || []).join(" ")}`.toLowerCase();
 
-  // 0. VERIFIED DIRECT PRODUCT / DEAL URL (Product-First Commercial Engine)
+  // 0a. DEDICATED MOTOR & CAR INSURANCE (Higher priority than generic retail deals)
+  const isCarInsurance = /car\s*insurance|motor\s*insurance|auto\s*insurance|vehicle\s*insurance/i.test(textContext);
+  if (isCarInsurance) {
+    const isZurichKotak = /zurich|kotak/i.test(textContext);
+    const insuranceUrl = directUrl || (isZurichKotak
+      ? cuelinksRedirect("https://www.zurichkotak.com/car-insurance")
+      : cuelinksRedirect("https://www.zurichkotak.com/car-insurance"));
+    const label = isZurichKotak ? "Apply for Zurich Kotak Car Insurance (Instant Approval)" : "Compare & Buy Car Insurance Plans";
+
+    return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #0284c7;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+<div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#0369a1;margin-bottom:12px;">🛡️ Instant Car Insurance &amp; Policy Renewal</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+  <a href="${escapeHtml(insuranceUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#0284c7;color:#ffffff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 22px;border-radius:8px;transition:background 0.2s;">
+    <span>🛡️ ${escapeHtml(label)}</span>
+  </a>
+</div>
+<p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
+</div>`;
+  }
+
+  // 0b. VERIFIED DIRECT PRODUCT / DEAL URL (Product-First Commercial Engine)
   if (directUrl && typeof directUrl === "string" && directUrl.startsWith("http")) {
     const candidateName = (deviceNames && deviceNames[0]) || title || "Featured Offer";
     const cleanProd = sanitizeProductName(candidateName) || candidateName;
@@ -633,12 +661,13 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
  * Dynamic In-line Listicle Item Linker
  * Parses <h3> headings and injects matching store/product buttons dynamically.
  */
-export function injectInlineListicleButtons(bodyHtml = "", config = {}, category = "", title = "") {
+export function injectInlineListicleButtons(bodyHtml = "", config = {}, category = "", title = "", itemDirectUrl = "") {
   if (!bodyHtml || !bodyHtml.includes("<h3>")) return bodyHtml;
 
   const catLower = (category || "").toLowerCase();
   const titleLower = (title || "").toLowerCase();
-  const isFinanceOrCards = catLower.includes("card") || catLower.includes("bank") || catLower.includes("finance") || /credit card|lounge access|fixed deposit|savings/i.test(titleLower);
+  const isCarInsurance = /car\s*insurance|motor\s*insurance|auto\s*insurance|vehicle\s*insurance|zurich\s*kotak/i.test(titleLower);
+  const isFinanceOrCards = !isCarInsurance && (catLower.includes("card") || catLower.includes("bank") || catLower.includes("finance") || /credit card|lounge access|fixed deposit|savings/i.test(titleLower));
 
   return bodyHtml.replace(/<h3>(\d+\.\s*([\s\S]*?))<\/h3>/gi, (match, fullHeading, rawTitle) => {
     const headingLower = rawTitle.toLowerCase();
@@ -646,18 +675,27 @@ export function injectInlineListicleButtons(bodyHtml = "", config = {}, category
 
     // 1. Check against known merchants dynamically
     for (const merchant of KNOWN_MERCHANTS) {
-      if (merchant.pattern.test(headingLower)) {
+      if (merchant.pattern.test(headingLower) || (isCarInsurance && /zurich.*kotak|kotak.*insurance/i.test(merchant.name))) {
         btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(merchant.url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:${merchant.color};color:#fff;font-weight:700;font-size:.88rem;text-decoration:none;padding:8px 16px;border-radius:6px;"><span>${merchant.icon} ${escapeHtml(merchant.cta)}</span></a></div>`;
         break;
       }
     }
 
+    // 1b. Dedicated Car Insurance / Motor Insurance
+    if (!btnHtml && isCarInsurance) {
+      const insUrl = itemDirectUrl || cuelinksRedirect("https://www.zurichkotak.com/car-insurance");
+      btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(insUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>🛡️ Apply for Zurich Kotak Car Insurance (Instant Approval)</span></a></div>`;
+    }
+
+    // 1c. If article has a verified direct offer URL and heading is an application step
+    if (!btnHtml && itemDirectUrl && /access|apply|get started|register|select|submit|choose|step|quote/i.test(headingLower)) {
+      btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(itemDirectUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>⚡ Apply Now (${escapeHtml(title.slice(0, 45))})</span></a></div>`;
+    }
+
     // 2. High-Payout CPL Credit Cards & Finance
-    if (isFinanceOrCards || /card|bank|account|loan|insurance|elite|rewards|points/i.test(headingLower)) {
-      if (!btnHtml) {
-        btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(HIGH_PAYOUT_CAMPAIGNS.sbiSimplyClick.url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>💳 Apply for Lifetime Free Card (Instant Approval)</span></a></div>`;
-      }
-    } else if (/hotel|flight|airline|resort|vacation|cruise|tourism|trip/i.test(headingLower)) {
+    if (!btnHtml && (isFinanceOrCards || /card|bank|account|loan|elite|rewards|points/i.test(headingLower))) {
+      btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(HIGH_PAYOUT_CAMPAIGNS.sbiSimplyClick.url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>💳 Apply for Lifetime Free Card (Instant Approval)</span></a></div>`;
+    } else if (!btnHtml && /hotel|flight|airline|resort|vacation|cruise|tourism|trip/i.test(headingLower)) {
       // 3. Travel & Stays
       if (!btnHtml) {
         btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(cuelinksRedirect('https://www.makemytrip.com'))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#eb2026;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>✈️ Book Stays &amp; Flights (Verified Deals)</span></a></div>`;

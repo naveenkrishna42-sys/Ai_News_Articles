@@ -377,7 +377,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
       "AI Tips & Tools"
     ]);
     if (commercialCats.has(item.category)) {
-      finalBodyHtml = injectInlineListicleButtons(bodyHtml, config, item.category, title);
+      finalBodyHtml = injectInlineListicleButtons(bodyHtml, config, item.category, title, item.directUrl || item.sourceUrl || "");
     }
 
     const isExplicitReviewOrDeal = commercialCats.has(item.category) || 
@@ -386,7 +386,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
       (item.category === "Lifestyle" && /\b(travel|flight|hotel|vacation|resort|fashion|clothes|shoes|apparel)\b/i.test(title));
 
     if (isExplicitReviewOrDeal) {
-      const buyBoxHtml = renderBuyBox([title], config, item.category, "", title);
+      const buyBoxHtml = renderBuyBox([title], config, item.category, item.directUrl || item.sourceUrl || "", title);
       if (buyBoxHtml) finalBodyHtml += `\n${buyBoxHtml}`;
 
       const siteUrl = config?.site?.url || "https://tivranews.com";
@@ -882,7 +882,7 @@ const NICHE_SYSTEM_PROMPTS = {
 };
 
 function dispatchWrite(item) {
-  if (item.category === "Product Deals & Offers") {
+  if (item.category === "Product Deals & Offers" || item.isProductFirstDeal) {
     return writeDealStory(item);
   }
   if (item.category === "Gadget Comparisons") {

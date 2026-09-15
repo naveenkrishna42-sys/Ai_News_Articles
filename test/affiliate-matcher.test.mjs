@@ -52,6 +52,23 @@ assert.ok(insuranceBox.includes("1mg.com"), "Must include 1mg Health tests butto
 assert.ok(!insuranceBox.includes("Lifetime Free Cards"), "Insurance MUST NOT show Credit Card button");
 console.log("✓ Test 4: Dedicated Health Insurance & Healthcare matching passed");
 
+// Test 4b: Dedicated Car Insurance & Zurich Kotak
+const carInsBox = renderBuyBox(["Zurich Kotak Car Insurance"], mockConfig, "Credit Cards & Cashback", "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.zurichkotak.com%2Fcar-insurance", "Zurich Kotak Car Insurance: Instant Online Approval Available");
+assert.ok(carInsBox.includes("zurichkotak.com/car-insurance") || carInsBox.includes("zurichkotak"), "Must link to working Zurich Kotak insurance page");
+assert.ok(carInsBox.includes("Apply for Zurich Kotak Car Insurance"), "Must include Zurich Kotak action label");
+assert.ok(!carInsBox.includes("Simply Click") && !carInsBox.includes("SimplyClick"), "Car Insurance MUST NOT show Credit Card buttons");
+
+const mockCarInsBody = `
+<h3>1. Access the Official Application</h3>
+<p>Visit the official portal.</p>
+<h3>2. Select Coverage Options</h3>
+<p>Choose policy tier.</p>
+`;
+const processedCarBody = injectInlineListicleButtons(mockCarInsBody, mockConfig, "Credit Cards & Cashback", "Zurich Kotak Car Insurance: Instant Online Approval Available");
+assert.ok(processedCarBody.includes("zurichkotak.com") && processedCarBody.includes("car-insurance"), "Inline buttons must link to Zurich Kotak car insurance");
+assert.ok(!processedCarBody.includes("simplyClickMaster"), "Car insurance article must NEVER inject credit card buttons");
+console.log("✓ Test 4b: Dedicated Car Insurance & Zurich Kotak matching passed");
+
 // Test 5: High-EPC US Campaigns (Choice Hotels $32 CPC, Norwegian Cruise $12 CPC, Verpex $52 CPS)
 const hotelBox = renderBuyBox(["Choice Hotels Deals"], mockConfig, "Product Deals & Offers", "", "Choice Hotels 2026: Save 30% on US Hotel Stays");
 assert.ok(hotelBox.includes("choicehotels.com"), "Hotel deal must link to Choice Hotels");
