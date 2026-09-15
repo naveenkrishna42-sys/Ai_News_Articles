@@ -245,6 +245,9 @@ export function resolveMerchantProductUrl(merchant = "", productName = "", rawUr
   if (m.includes("nuawomen") || m.includes("nua")) {
     return buildMerchantRedirect("https://nuawoman.com");
   }
+  if (m.includes("zurich") || (m.includes("kotak") && m.includes("insurance"))) {
+    return buildMerchantRedirect("https://www.zurichkotak.com/car-insurance");
+  }
 
   // Amazon India (ONLY when merchant explicitly matches Amazon or is a general gadget deal with no brand specified)
   if (m.includes("amazon") || !m) {
@@ -297,6 +300,13 @@ export async function verifyAndHealDealLink(deal, timeoutMs = 4000) {
     return deal;
   }
 
+  // 1b. Normalize Zurich Kotak Car Insurance URL to working canonical endpoint
+  if (deal.buyUrl.includes("zurichkotak.com/motor-insurance/car-insurance")) {
+    console.log(`[Link Healer] Normalizing Zurich Kotak Car Insurance URL for "${cleanTitle}".`);
+    deal.buyUrl = deal.buyUrl.replace(/zurichkotak\.com%2Fmotor-insurance%2Fcar-insurance/gi, "zurichkotak.com%2Fcar-insurance")
+                             .replace(/zurichkotak\.com\/motor-insurance\/car-insurance/gi, "zurichkotak.com/car-insurance");
+  }
+
   // 2. For linksredirect.com URLs: verify redirect is active without leaking to cuelinks.com
   if (deal.buyUrl.includes("linksredirect.com")) {
     const controller = new AbortController();
@@ -318,6 +328,29 @@ export async function verifyAndHealDealLink(deal, timeoutMs = 4000) {
         if (location.includes("cuelinks.com") && !location.includes("linksredirect.com")) {
           console.warn(`[Link Healer] Link redirected to cuelinks homepage for "${deal.title}". Healing to official merchant store...`);
           deal.buyUrl = resolveMerchantProductUrl(merchant, cleanTitle, "");
+          return deal;
+        }
+
+        // Check if downstream affiliate network URL is paused/inactive (e.g. iCubesWire offer inactive)
+        if (location && (location.includes("icubeswire.co") || location.includes("aff_c?") || location.includes("inactive"))) {
+          try {
+            const downRes = await fetch(location, {
+              headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+              signal: AbortSignal.timeout(3000)
+            });
+            const text = await downRes.text();
+            if (text.includes("Offer is not active") || (text.includes("error") && text.length < 200)) {
+              console.warn(`[Link Healer] Downstream affiliate offer inactive for "${deal.title}". Healing to canonical merchant URL.`);
+              const urlMatch = deal.buyUrl.match(/[?&]url=([^&]+)/);
+              if (urlMatch) {
+                const decoded = decodeURIComponent(urlMatch[1]).replace(/motor-insurance\/car-insurance/g, "car-insurance");
+                deal.buyUrl = buildMerchantRedirect(decoded);
+              } else {
+                deal.buyUrl = resolveMerchantProductUrl(merchant, cleanTitle, "");
+              }
+              return deal;
+            }
+          } catch {}
         }
         return deal;
       }

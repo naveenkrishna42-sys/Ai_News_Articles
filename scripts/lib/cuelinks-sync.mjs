@@ -319,6 +319,13 @@ export function filterActiveOffers(offers = []) {
     // Enforce channel ID 316413 on any linksredirect URL
     if (item.tracking_url && item.tracking_url.includes("linksredirect.com")) {
       item.tracking_url = item.tracking_url.replace(/cid=\d+/, "cid=316413");
+      if (item.tracking_url.includes("zurichkotak.com/motor-insurance/car-insurance")) {
+        item.tracking_url = item.tracking_url.replace(/zurichkotak\.com%2Fmotor-insurance%2Fcar-insurance/gi, "zurichkotak.com%2Fcar-insurance")
+                                             .replace(/zurichkotak\.com\/motor-insurance\/car-insurance/gi, "zurichkotak.com/car-insurance");
+      }
+    }
+    if (item.url && item.url.includes("zurichkotak.com/motor-insurance/car-insurance")) {
+      item.url = item.url.replace(/zurichkotak\.com\/motor-insurance\/car-insurance/gi, "zurichkotak.com/car-insurance");
     }
     return true;
   });
@@ -434,6 +441,10 @@ export async function getVerifiedProductDeals(todayStr = new Date().toISOString(
     let trackingUrl = offer.tracking_url || offer.url || "";
     if (trackingUrl.includes("linksredirect.com")) {
       trackingUrl = trackingUrl.replace(/cid=\d+/, "cid=316413");
+      if (trackingUrl.includes("zurichkotak.com/motor-insurance/car-insurance")) {
+        trackingUrl = trackingUrl.replace(/zurichkotak\.com%2Fmotor-insurance%2Fcar-insurance/gi, "zurichkotak.com%2Fcar-insurance")
+                                 .replace(/zurichkotak\.com\/motor-insurance\/car-insurance/gi, "zurichkotak.com/car-insurance");
+      }
     }
 
     // Clean headline
