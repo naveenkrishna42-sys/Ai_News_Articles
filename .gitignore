@@ -7,3 +7,11 @@ public.bak/
 scratch/
 data/cuelinks-offers.json
 data/live-deals-cache.json
+
+# AI agent configs — may contain API keys / bearer tokens
+.agents/
+.agent/
+.ai/
+.claude/
+.cursor/
+.vscode/settings.json
