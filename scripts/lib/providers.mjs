@@ -73,7 +73,7 @@ export class ProviderPool {
     for (const candidate of probeCandidates) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
         const res = await fetch(`${baseUrl}/chat/completions`, {
           method: "POST",
           headers: {
@@ -82,8 +82,8 @@ export class ProviderPool {
           },
           body: JSON.stringify({
             model: candidate.id,
-            max_tokens: 2,
-            messages: [{ role: "user", content: "1" }],
+            max_tokens: 16,
+            messages: [{ role: "user", content: "hi" }],
           }),
           signal: controller.signal,
         });

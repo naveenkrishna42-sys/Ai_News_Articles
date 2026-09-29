@@ -199,8 +199,8 @@ const COMMERCIAL_CATEGORIES = new Set([
 
 // Pass 1: Balanced distribution across both monetization and general news
 const candidatePool = [];
-const perMonetizationTarget = 4;
-const perNewsTarget = 3;
+const perMonetizationTarget = 8;
+const perNewsTarget = 6;
 
 for (const category of priority) {
   const items = byCategory.get(category) || [];
@@ -219,7 +219,7 @@ for (const category of priority) {
   }
 }
 
-// Pass 2: Combined backfill (interleaving monetization and news reserves up to at least 150 candidates)
+// Pass 2: Combined backfill (interleaving monetization and news reserves up to at least 250 candidates)
 const HIGH_MONETIZATION_ORDER = [
   "Product Deals & Offers",
   "Credit Cards & Cashback",
@@ -239,7 +239,7 @@ const HIGH_MONETIZATION_ORDER = [
   ...priority
 ];
 
-const reserveLimit = Math.min(budget, Math.max(150, runTarget * 3));
+const reserveLimit = Math.min(budget, Math.max(250, runTarget * 4));
 for (const category of HIGH_MONETIZATION_ORDER) {
   if (candidatePool.length >= reserveLimit) break;
   const items = byCategory.get(category) || [];

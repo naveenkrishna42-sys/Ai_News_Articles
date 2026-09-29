@@ -53,7 +53,7 @@ export function titlesOverlap(aWords, bWords) {
   if (aWords.size === 0 || bWords.size === 0) return false;
   let shared = 0;
   for (const w of aWords) if (bWords.has(w)) shared++;
-  return shared / Math.min(aWords.size, bWords.size) > 0.6;
+  return shared / Math.min(aWords.size, bWords.size) > 0.75;
 }
 
 async function fetchFeed(feed) {
