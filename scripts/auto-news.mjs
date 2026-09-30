@@ -140,6 +140,35 @@ function isDuplicate(item) {
   if (registry[item.key] || claimedKeys.has(item.key)) return true;
   const words = significantWords(item.title);
   for (const w of claimedWordSets) if (titlesOverlap(words, w)) return true;
+
+  // 7-DAY PRODUCT COOLDOWN FOR COMMERCIAL / CREDIT CARD ARTICLES
+  // Prevent daily duplicate reviews of the same financial product or merchant
+  const isCommercial = item.category === "Credit Cards & Cashback" || item.category === "Product Deals & Offers";
+  if (isCommercial) {
+    const titleLower = item.title.toLowerCase();
+    const commercialKeywords = [
+      "sbi simply", "simplyclick", "kiwi rupay", "scapia", "swiggy cashback",
+      "hdfc swiggy", "au bank", "axis bank", "kotak 811", "betterhelp", "coursera",
+      "hostinger", "verpex", "appsumo", "choice hotels", "airwallex"
+    ];
+
+    for (const kw of commercialKeywords) {
+      if (titleLower.includes(kw)) {
+        // Check if published in registry in the last 7 days
+        for (const [regKey, regData] of Object.entries(registry)) {
+          if (!regData || !regData.d) continue;
+          const regTitle = (regData.t || "").toLowerCase();
+          if (regTitle.includes(kw)) {
+            const daysDiff = (new Date(today) - new Date(regData.d)) / (1000 * 60 * 60 * 24);
+            if (daysDiff < 7) {
+              return true; // Cooldown active, skip duplicate review!
+            }
+          }
+        }
+      }
+    }
+  }
+
   item._words = words;
   return false;
 }
@@ -266,11 +295,13 @@ const SYSTEM_PROMPT = `You are a senior investigative journalist, tech authority
 Non-negotiable formatting and depth requirements:
 - Length: 500 to 750 words. Divide logically into 3-5 structured <h2> and <h3> subheadings with concise paragraphs (2-4 sentences each).
 - Technical Depth: Do not just summarize. Explain real-world buyer implications, practical benchmarks, pricing context, and value justification.
-- Mandatory Spec / Data Table: You MUST include at least one HTML table (<table><tr><th>Specification / Metric</th><th>Verified Details</th></tr>...) summarizing key technical specifications, prices, or performance data.
+- Mandatory Spec / Data Table: For tech hardware or finance articles with concrete metrics, include a clean HTML table (<table><tr><th>Feature / Metric</th><th>Details</th></tr>...) summarizing verifiable figures. DO NOT invent fictional processors, chipsets, or benchmark stats.
+- Financial Products Rule: Credit cards, bank accounts, and loans are NOT gadgets! NEVER invent a retail purchase price, "price drop", or "₹149,990 cost" for a credit card. Structure financial reviews strictly around Annual Fee, Joining Fee, Rewards Rate, Cashback Categories, Lounge Access, and Eligibility Criteria.
+- Health & Services Rule: If an article is about healthcare, mental health, or online services, focus strictly on therapy sessions, professional counseling, subscription plans, and medical guidelines. NEVER inject unrelated computer processors, hardware specs, or chipsets.
 - Pros & Cons / Key Insights: You MUST include a bulleted list (<ul><li>) of clear Pros/Cons or Key Real-World Highlights.
 - Listicle Structure Rule: If the headline contains a list or ranking (e.g., "Top 5", "Top 10", "Best Websites"), you MUST list all items explicitly using numbered headings (e.g. <h3>1. [Item Name]</h3>, <h3>2. [Item Name]</h3>, etc.) followed by dedicated analysis for each item.
 - Tone: Crisp, objective, expert, active voice. Banned fluff: "in conclusion", "it is important to note", "delve", "landscape", "moreover", "in today's fast-paced world", "stay tuned".
-- Accuracy: NEVER fabricate quotes, casualty numbers, or launch dates. Use natural Indian English conventions (lakh/crore) where appropriate.
+- Accuracy & Fact-Checking: NEVER fabricate quotes, casualty numbers, non-existent organizations (e.g. "War Department"), or launch dates. Rely strictly on real, plausible details. Use natural Indian English conventions (lakh/crore) where appropriate.
 
 Output STRICT JSON only, no markdown codeblocks, matching this exact schema:
 {"title":"Compelling, high-CTR headline under 75 chars","description":"Authoritative meta description, 140-160 chars","key_points":["Crucial takeaway 1","Crucial takeaway 2","Crucial takeaway 3"],"content":"Full article body HTML using ONLY <h2>,<h3>,<p>,<ul>,<li>,<table>,<tr>,<td>,<th> tags","image_person":"Name of prominent person if centrally focused, otherwise empty string","image_query":"2-4 word concrete physical scene for stock photo search (e.g. smartphone display test, luxury hotel lobby, cloud server rack)"}`;
@@ -335,6 +366,26 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
   }
 
   if (countWords(bodyHtml) < minWords) throw new Error(`too short (${countWords(bodyHtml)} words)`);
+
+  // FACT-CHECK / QUALITY GATE:
+  // Catch severe content mismatches, fabricated retail prices on cards, or anachronisms
+  const bodyTextLower = bodyHtml.replace(/<[^>]+>/g, " ").toLowerCase();
+  const headlineLower = item.title.toLowerCase();
+
+  // 1. Check for QuantumX / processor hallucination in non-tech articles
+  if (/quantumx|i9-13900k|ryzen 9 7950x/i.test(bodyTextLower) && !/processor|chipset|intel|amd|cpu/i.test(headlineLower)) {
+    throw new Error(`Quality Gate: rejected due to mismatched CPU processor hallucination`);
+  }
+
+  // 2. Check for credit card retail price hallucination (₹149,990 or price drop on cards)
+  if (/credit card|forex card|rupay card/i.test(headlineLower) && /available at ₹|available at rs|price cut of ₹|price drop of/i.test(bodyTextLower)) {
+    throw new Error(`Quality Gate: rejected due to retail price hallucination on financial credit card`);
+  }
+
+  // 3. Check for War Department / Secretary of War anachronism
+  if (/secretary of war|war department release/i.test(bodyTextLower) && !/194[0-7]|world war/i.test(headlineLower)) {
+    throw new Error(`Quality Gate: rejected due to historical War Department anachronism`);
+  }
 
   // Image strategy: real Wikipedia portrait when the story is about one
   // famous person (never for crime/war stories — wrong-face risk), else a

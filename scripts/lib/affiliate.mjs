@@ -369,6 +369,17 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   const catLower = (category || "").toLowerCase();
   const textContext = `${title} ${category} ${(deviceNames || []).join(" ")}`.toLowerCase();
 
+  // STRICT AD-SENSE COMPLIANCE GATE:
+  // Never show commercial buyboxes on news, politics, crime, world, sports, or health reporting!
+  const nonCommercialCategories = [
+    "breaking news", "top stories", "india", "world", "politics", "sports", 
+    "entertainment", "health", "crime & law", "wars & conflicts", "environment",
+    "culture & arts", "religion", "sacred places"
+  ];
+  if (nonCommercialCategories.some(nc => catLower === nc || catLower.startsWith(nc))) {
+    return ""; // Zero commercial widgets on sensitive editorial news!
+  }
+
   // 0a. DEDICATED MOTOR & CAR INSURANCE (Higher priority than generic retail deals)
   const isCarInsurance = /car\s*insurance|motor\s*insurance|auto\s*insurance|vehicle\s*insurance/i.test(textContext);
   if (isCarInsurance) {
@@ -398,9 +409,6 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
   <a href="${escapeHtml(directUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#e11d48;color:#fff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 24px;border-radius:8px;transition:opacity 0.2s;">
     <span>⚡ Claim Verified Deal (${escapeHtml(cleanProd.slice(0, 45))}) &rarr;</span>
-  </a>
-  <a href="${escapeHtml(HIGH_PAYOUT_CAMPAIGNS.sbiSimplyClick.url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.90rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>💳 Check 10% Card Cashback &amp; EMI &rarr;</span>
   </a>
 </div>
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
@@ -648,9 +656,6 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   </a>
   <a href="${escapeHtml(relianceUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e42529;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛒 Buy at Reliance Digital</span>
-  </a>
-  <a href="${escapeHtml(HIGH_PAYOUT_CAMPAIGNS.sbiSimplyClick.url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>💳 Check 10% Card Discount / EMI &rarr;</span>
   </a>
 </div>
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>

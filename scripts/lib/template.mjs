@@ -2,15 +2,15 @@
 export function getAuthorPersona(category = "") {
   const cat = (category || "").toLowerCase();
   if (cat.includes("deal") || cat.includes("gadget") || cat.includes("tech") || cat.includes("phone")) {
-    return { name: "TIVRA News Tech & Gadgets Desk", title: "Product Research & Analysis" };
+    return { name: "TIVRA News Tech Desk", title: "Technology Curation & Gadget Research" };
   }
   if (cat.includes("business") || cat.includes("market") || cat.includes("credit card") || cat.includes("bank") || cat.includes("finance")) {
-    return { name: "TIVRA News Markets & Finance Desk", title: "Financial & Economic Insights" };
+    return { name: "TIVRA News Business Desk", title: "Markets & Consumer Finance Curation" };
   }
   if (cat.includes("health") || cat.includes("science")) {
-    return { name: "TIVRA News Science & Health Desk", title: "Medical & Environmental Research" };
+    return { name: "TIVRA News Science & Health Desk", title: "Science & Health Curation" };
   }
-  return { name: "TIVRA News Editorial Team", title: "Verified Newsroom" };
+  return { name: "TIVRA News Editorial Desk", title: "News Summaries & Briefings" };
 }
 
 // TIVRA News &mdash; article page template.
@@ -465,7 +465,7 @@ ${bodyHtml}
   ${videoHtml}
   <div class="srcbox">
     <div class="s-head">Verify this story</div>
-    Reported by ${escapeHtml(sourceName || "wire agencies")} and verified by the TIVRA News Editorial Desk. Documented from primary sources, official statements, and verified reports.
+    Based on reporting by ${escapeHtml(sourceName || "wire agencies")}. Summarized with AI assistance and curated for quick reading.
     <div class="links">
       ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">Read the original report</a>` : ""}
       <a href="${gnSearch}" target="_blank" rel="noopener noreferrer nofollow">More coverage on Google News</a>
@@ -473,7 +473,7 @@ ${bodyHtml}
     </div>
   </div>
   <div class="related" id="relatedArticles" data-category="${catSlug}" data-slug="${escapeHtml(slug)}"></div>
-  <div class="notice">Curated, researched, and published by TIVRA Newsroom Desk. TIVRA News provides independent journalism, verified commercial analysis, and references primary sources for transparency. See our <a href="/disclaimer.html" style="color:#92400e;font-weight:700;">Disclaimer</a> and <a href="/editorial-policy.html" style="color:#92400e;font-weight:700;">Editorial Policy</a>.</div>
+  <div class="notice">Curated by TIVRA News. Summarized with AI assistance from publicly available news reporting. See our <a href="/disclaimer.html" style="color:#92400e;font-weight:700;">Disclaimer</a> and <a href="/editorial-policy.html" style="color:#92400e;font-weight:700;">Editorial Policy</a>.</div>
 </div>
 <footer class="site">
   <div style="margin-bottom:8px;">
