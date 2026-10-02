@@ -70,7 +70,7 @@ async function fetchFeed(feed) {
 
     const items = [];
     const itemBlocks = xml.match(/<item[\s>][\s\S]*?<\/item>/gi) || [];
-    for (const block of itemBlocks.slice(0, 40)) {
+    for (const block of itemBlocks.slice(0, 100)) {
       let title = tagContent(block, "title");
       if (!title) continue;
       // Google News appends " - Publisher" to titles; keep the publisher as

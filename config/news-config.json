@@ -5,7 +5,7 @@
     "url": "https://tivranews.com"
   },
   "volume": {
-    "perCategoryPerRun": 6,
+    "perCategoryPerRun": 12,
     "dailyCap": 600,
     "concurrency": 8
   },
@@ -20,7 +20,7 @@
     "days": 30,
     "maxPerCategory": 1000,
     "maxTotalLive": 12000,
-    "registryDays": 90
+    "registryDays": 45
   },
   "adsense": {
     "publisherId": "ca-pub-6206818645443465",

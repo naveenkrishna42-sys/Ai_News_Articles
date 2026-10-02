@@ -213,7 +213,7 @@ for (const c of byCategory.keys()) if (!priority.includes(c)) priority.push(c);
 // crash, no special-cased error path, config-only toggle.
 // Target volume calibration:
 // Default: 50 articles per run (12 runs * 50 = 600 daily target)
-const DEFAULT_RUN_TARGET = 50;
+const DEFAULT_RUN_TARGET = 200;
 const runTarget = args.includes("--per-category")
   ? Math.min(budget, PER_CATEGORY * priority.length)
   : Math.min(budget, Number(argValue("--target", DEFAULT_RUN_TARGET)));
@@ -228,8 +228,8 @@ const COMMERCIAL_CATEGORIES = new Set([
 
 // Pass 1: Balanced distribution across both monetization and general news
 const candidatePool = [];
-const perMonetizationTarget = 8;
-const perNewsTarget = 6;
+const perMonetizationTarget = Math.max(15, PER_CATEGORY);
+const perNewsTarget = Math.max(12, PER_CATEGORY);
 
 for (const category of priority) {
   const items = byCategory.get(category) || [];
@@ -268,7 +268,7 @@ const HIGH_MONETIZATION_ORDER = [
   ...priority
 ];
 
-const reserveLimit = Math.min(budget, Math.max(250, runTarget * 4));
+const reserveLimit = Math.min(budget, Math.max(600, runTarget * 4));
 for (const category of HIGH_MONETIZATION_ORDER) {
   if (candidatePool.length >= reserveLimit) break;
   const items = byCategory.get(category) || [];
@@ -1091,7 +1091,7 @@ const fileMeta = allFiles.map((f) => {
 let deleted = 0;
 const survivors = [];
 for (const m of fileMeta) {
-  if (m.date < cutoff) { /* unlinkSync(m.p); deleted++; */ } else survivors.push(m);
+  if (m.date < cutoff) { unlinkSync(m.p); deleted++; } else survivors.push(m);
 }
 
 const byCat = new Map();
@@ -1103,12 +1103,12 @@ let remaining = [];
 for (const [, items] of byCat) {
   items.sort((a, b) => (a.date < b.date ? 1 : -1));
   const keep = items.slice(0, config.retention.maxPerCategory);
-  for (const drop of items.slice(config.retention.maxPerCategory)) { /* unlinkSync(drop.p); deleted++; */ }
+  for (const drop of items.slice(config.retention.maxPerCategory)) { unlinkSync(drop.p); deleted++; }
   remaining.push(...keep);
 }
 if (remaining.length > config.retention.maxTotalLive) {
   remaining.sort((a, b) => (a.date < b.date ? 1 : -1));
-  for (const drop of remaining.slice(config.retention.maxTotalLive)) { /* unlinkSync(drop.p); deleted++; */ }
+  for (const drop of remaining.slice(config.retention.maxTotalLive)) { unlinkSync(drop.p); deleted++; }
   remaining = remaining.slice(0, config.retention.maxTotalLive);
 }
 
