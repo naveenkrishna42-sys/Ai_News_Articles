@@ -214,10 +214,6 @@
       "url": "https://news.google.com/rss/search?q=war+conflict+military+defence&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
-      "category": "Crypto",
-      "url": "https://news.google.com/rss/search?q=cryptocurrency+bitcoin&hl=en-IN&gl=IN&ceid=IN:en"
-    },
-    {
       "category": "Markets",
       "url": "https://news.google.com/rss/search?q=stock+market+sensex+nifty&hl=en-IN&gl=IN&ceid=IN:en"
     },
@@ -366,7 +362,6 @@
     "Delhi",
     "Science",
     "Space",
-    "Crypto",
     "Banking",
     "Education",
     "Crime & Law",

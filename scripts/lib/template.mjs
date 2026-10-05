@@ -2,15 +2,31 @@
 export function getAuthorPersona(category = "") {
   const cat = (category || "").toLowerCase();
   if (cat.includes("deal") || cat.includes("gadget") || cat.includes("tech") || cat.includes("phone")) {
-    return { name: "TIVRA News Tech Desk", title: "Technology Curation & Gadget Research" };
+    return { 
+      name: "TIVRA News Tech Desk", 
+      title: "Technology Curation & Gadget Research",
+      bio: "Focusing on consumer electronics, hardware specifications, benchmark analysis, and verified pricing trends."
+    };
   }
   if (cat.includes("business") || cat.includes("market") || cat.includes("credit card") || cat.includes("bank") || cat.includes("finance")) {
-    return { name: "TIVRA News Business Desk", title: "Markets & Consumer Finance Curation" };
+    return { 
+      name: "TIVRA News Business Desk", 
+      title: "Markets & Consumer Finance Curation",
+      bio: "Focusing on market indices, banking products, regulatory notifications, and structured consumer financial literacy."
+    };
   }
   if (cat.includes("health") || cat.includes("science")) {
-    return { name: "TIVRA News Science & Health Desk", title: "Science & Health Curation" };
+    return { 
+      name: "TIVRA News Science & Health Desk", 
+      title: "Science & Health Curation",
+      bio: "Reporting on public health announcements, medical research papers, space missions, and peer-reviewed scientific studies."
+    };
   }
-  return { name: "TIVRA News Editorial Desk", title: "News Summaries & Briefings" };
+  return { 
+    name: "TIVRA News Editorial Desk", 
+    title: "News Summaries & Briefings",
+    bio: "Curating and summarizing major national, international, and regional developments from accredited wire agencies."
+  };
 }
 
 // TIVRA News &mdash; article page template.
@@ -470,6 +486,15 @@ ${bodyHtml}
       ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer nofollow">Read the original report</a>` : ""}
       <a href="${gnSearch}" target="_blank" rel="noopener noreferrer nofollow">More coverage on Google News</a>
       <a href="${ytSearch}" target="_blank" rel="noopener noreferrer nofollow">Watch on YouTube</a>
+    </div>
+  </div>
+  <div class="author-box" style="margin:26px 0;padding:18px 20px;background:#fff;border:1px solid #e2e8f0;border-left:4px solid #be123c;border-radius:0 12px 12px 0;">
+    <div style="font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:4px;">Published by</div>
+    <div style="font-weight:800;font-size:1.02rem;color:#0b1220;">${escapeHtml(authorPersona.name)}</div>
+    <div style="font-size:.8rem;color:#64748b;font-weight:600;margin-bottom:8px;">${escapeHtml(authorPersona.title)}</div>
+    <p style="font-size:.88rem;color:#475569;margin-bottom:8px;line-height:1.5;">${escapeHtml(authorPersona.bio)}</p>
+    <div style="font-size:.76rem;color:#94a3b8;">
+      Summarized with AI assistance in strict compliance with our <a href="/editorial-policy.html" style="color:#be123c;font-weight:600;">Editorial Policy</a>. Spot a factual error? <a href="/contact.html" style="color:#be123c;font-weight:600;">Submit a correction</a>.
     </div>
   </div>
   <div class="related" id="relatedArticles" data-category="${catSlug}" data-slug="${escapeHtml(slug)}"></div>
