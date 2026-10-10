@@ -401,7 +401,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   }
 
   // 0b. VERIFIED DIRECT PRODUCT / DEAL URL (Product-First Commercial Engine)
-  if (directUrl && typeof directUrl === "string" && directUrl.startsWith("http")) {
+  if (directUrl && typeof directUrl === "string" && directUrl.startsWith("http") && !directUrl.includes("news.google.com")) {
     const candidateName = (deviceNames && deviceNames[0]) || title || "Featured Offer";
     const cleanProd = sanitizeProductName(candidateName) || candidateName;
     return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">

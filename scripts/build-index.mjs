@@ -527,6 +527,7 @@ function main() {
   // FRESH_WINDOW_DAYS does not remove it from the sitemap or from search. ----
   const staticPages = [
     "",
+    "tools.html",
     "archive.html",
     "about.html",
     "contact.html",

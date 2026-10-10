@@ -277,7 +277,7 @@ function renderNextPage() {
 
 function buildCategoryUI(categories, featuredOrder) {
   if (!categoryNav || !chipRow) return;
-  categoryNav.innerHTML = '<a href="/" class="active">Home</a>';
+  categoryNav.innerHTML = '<a href="/" class="active">Home</a><a href="/tools.html">🧮 Tools</a>';
   chipRow.innerHTML = "";
 
   const featured = (featuredOrder || []).filter((c) => categories.includes(c));

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial & Consumer Calculators — TIVRA News Utilities</title>
+<meta name="description" content="Free, fast financial and consumer calculators by TIVRA News: Loan EMI Calculator, Fixed Deposit (FD) Maturity, Income Tax Estimator, and Gold Price Value Calculator.">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://tivranews.com/tools.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "TIVRA News Financial & Consumer Utilities",
+  "url": "https://tivranews.com/tools.html",
+  "description": "Free interactive tools for calculating loan EMIs, FD returns, income tax estimates, and precious metal rates.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "All",
+  "publisher": {
+    "@type": "Organization",
+    "name": "TIVRA News",
+    "url": "https://tivranews.com"
+  }
+}
+</script>
+<style>
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin: 28px 0 44px;
+}
+.tool-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.tool-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+.tool-badge {
+  display: inline-block;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+.tool-card h2 {
+  font-size: 1.25rem;
+  color: var(--ink);
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.tool-card p.sub {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+.tool-form-group {
+  margin-bottom: 14px;
+}
+.tool-form-group label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+.tool-form-group label span.val {
+  color: var(--accent);
+  font-weight: 700;
+}
+.tool-form-group input[type="number"],
+.tool-form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--ink);
+  background: #fff;
+}
+.tool-form-group input[type="range"] {
+  width: 100%;
+  margin-top: 6px;
+  accent-color: var(--accent);
+}
+.tool-result-box {
+  margin-top: 18px;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.tool-result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  padding: 5px 0;
+  color: var(--text);
+}
+.tool-result-row.highlight {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--accent);
+  border-top: 1px dashed var(--border);
+  margin-top: 6px;
+  padding-top: 10px;
+}
+.ratio-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+  display: flex;
+  margin: 12px 0 6px;
+}
+.ratio-fill-principal {
+  background: #0284c7;
+  height: 100%;
+}
+.ratio-fill-interest {
+  background: var(--accent);
+  height: 100%;
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="brand"><img src="/logo.svg" alt="TIVRA News" width="158" height="33"></a>
+  <a href="/" class="back" style="color:#94a3b8;text-decoration:none;font-size:0.85rem;">&larr; Back to News</a>
+</header>
+<nav class="site-nav">
+  <a href="/">Home</a>
+  <a href="/tools.html" class="active">🧮 Interactive Tools</a>
+  <a href="/about.html">About</a>
+  <a href="/contact.html">Contact</a>
+  <a href="/editorial-policy.html">Editorial Policy</a>
+</nav>
+
+<div class="container">
+  <div class="breadcrumb" style="font-size:0.78rem;color:#64748b;margin:18px 0 10px;"><a href="/" style="color:#be123c;text-decoration:none;">Home</a> &rsaquo; Interactive Utilities</div>
+  <h1 class="page-title" style="font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:800;color:var(--ink);margin-bottom:8px;">Consumer &amp; Financial Calculators</h1>
+  <p style="color:var(--text-muted);max-width:760px;font-size:0.98rem;">Empowering readers with instant, client-side tools to calculate loan EMIs, savings returns, tax estimates, and precious metal rates. Free to use, private, and calculated instantly in your browser.</p>
+
+  <div class="tools-grid">
+
+    <!-- 1. Loan EMI Calculator -->
+    <div class="tool-card">
+      <span class="tool-badge">Banking &amp; Loans</span>
+      <h2>Loan EMI Calculator</h2>
+      <p class="sub">Calculate monthly EMIs and total interest for home, car, or personal loans.</p>
+      
+      <div class="tool-form-group">
+        <label>Loan Amount (₹) <span class="val" id="emiAmtLabel">₹25,00,000</span></label>
+        <input type="number" id="emiAmt" value="2500000" min="50000" max="10000000" step="50000">
+        <input type="range" id="emiAmtRange" min="50000" max="10000000" step="50000" value="2500000">
+      </div>
+
+      <div class="tool-form-group">
+        <label>Interest Rate (% p.a.) <span class="val" id="emiRateLabel">8.5%</span></label>
+        <input type="number" id="emiRate" value="8.5" min="5" max="25" step="0.1">
+        <input type="range" id="emiRateRange" min="5" max="25" step="0.1" value="8.5">
+      </div>
+
+      <div class="tool-form-group">
+        <label>Tenure (Years) <span class="val" id="emiTenureLabel">20 Years</span></label>
+        <input type="number" id="emiTenure" value="20" min="1" max="30" step="1">
+        <input type="range" id="emiTenureRange" min="1" max="30" step="1" value="20">
+      </div>
+
+      <div class="tool-result-box">
+        <div class="tool-result-row">
+          <span>Principal Amount:</span>
+          <strong id="emiResPrincipal">₹25,00,000</strong>
+        </div>
+        <div class="tool-result-row">
+          <span>Total Interest:</span>
+          <strong id="emiResInterest" style="color:var(--accent);">₹26,60,250</strong>
+        </div>
+        <div class="ratio-bar">
+          <div class="ratio-fill-principal" id="emiRatioPrincipal" style="width:48%;"></div>
+          <div class="ratio-fill-interest" id="emiRatioInterest" style="width:52%;"></div>
+        </div>
+        <div class="tool-result-row highlight">
+          <span>Monthly EMI:</span>
+          <span id="emiResMonthly">₹21,697</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Fixed Deposit (FD) Calculator -->
+    <div class="tool-card">
+      <span class="tool-badge">Savings &amp; Wealth</span>
+      <h2>Fixed Deposit (FD) Calculator</h2>
+      <p class="sub">Estimate compound interest maturity value across major Indian banks.</p>
+
+      <div class="tool-form-group">
+        <label>Deposit Amount (₹) <span class="val" id="fdAmtLabel">₹1,00,000</span></label>
+        <input type="number" id="fdAmt" value="100000" min="5000" max="5000000" step="5000">
+        <input type="range" id="fdAmtRange" min="5000" max="5000000" step="5000" value="100000">
+      </div>
+
+      <div class="tool-form-group">
+        <label>Interest Rate (% p.a.) <span class="val" id="fdRateLabel">7.25%</span></label>
+        <input type="number" id="fdRate" value="7.25" min="3" max="12" step="0.05">
+        <input type="range" id="fdRateRange" min="3" max="12" step="0.05" value="7.25">
+      </div>
+
+      <div class="tool-form-group">
+        <label>Duration (Years) <span class="val" id="fdTimeLabel">3 Years</span></label>
+        <input type="number" id="fdTime" value="3" min="1" max="10" step="1">
+        <input type="range" id="fdTimeRange" min="1" max="10" step="1" value="3">
+      </div>
+
+      <div class="tool-result-box">
+        <div class="tool-result-row">
+          <span>Invested Amount:</span>
+          <strong id="fdResInvested">₹1,00,000</strong>
+        </div>
+        <div class="tool-result-row">
+          <span>Est. Interest Earned:</span>
+          <strong id="fdResInterest" style="color:#0284c7;">₹23,944</strong>
+        </div>
+        <div class="tool-result-row highlight">
+          <span>Maturity Value:</span>
+          <span id="fdResTotal">₹1,23,944</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Gold & Silver Rate Estimator -->
+    <div class="tool-card">
+      <span class="tool-badge">Precious Metals</span>
+      <h2>Gold Rate Value Estimator</h2>
+      <p class="sub">Calculate estimated jewelry value with hallmark purity and 3% GST.</p>
+
+      <div class="tool-form-group">
+        <label>Weight (Grams)</label>
+        <input type="number" id="goldWeight" value="10" min="0.5" max="500" step="0.5">
+      </div>
+
+      <div class="tool-form-group">
+        <label>Purity Standard</label>
+        <select id="goldPurity">
+          <option value="1.0" selected>24 Karat (99.9% Pure Gold)</option>
+          <option value="0.916">22 Karat (91.6% Hallmark Jewelry)</option>
+          <option value="0.750">18 Karat (75.0% Diamond Jewelry)</option>
+        </select>
+      </div>
+
+      <div class="tool-form-group">
+        <label>Base 24K Rate per 10g (₹)</label>
+        <input type="number" id="goldBaseRate" value="76500" min="40000" max="120000" step="100">
+      </div>
+
+      <div class="tool-result-box">
+        <div class="tool-result-row">
+          <span>Pure Metal Cost:</span>
+          <strong id="goldResMetal">₹70,074</strong>
+        </div>
+        <div class="tool-result-row">
+          <span>Making Charges (8% est):</span>
+          <strong id="goldResMaking">₹5,606</strong>
+        </div>
+        <div class="tool-result-row">
+          <span>GST (3%):</span>
+          <strong id="goldResGst">₹2,270</strong>
+        </div>
+        <div class="tool-result-row highlight">
+          <span>Est. Final Retail Cost:</span>
+          <span id="goldResTotal">₹77,950</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Income Tax Estimator (FY 2026-27) -->
+    <div class="tool-card">
+      <span class="tool-badge">Taxation</span>
+      <h2>Income Tax Estimator (FY 2026-27)</h2>
+      <p class="sub">Compare tax liability between the New and Old Tax Regimes.</p>
+
+      <div class="tool-form-group">
+        <label>Annual Gross Salary (₹)</label>
+        <input type="number" id="taxIncome" value="1200000" min="300000" max="10000000" step="25000">
+      </div>
+
+      <div class="tool-form-group">
+        <label>Old Regime Deductions (80C, 80D, HRA in ₹)</label>
+        <input type="number" id="taxDeductions" value="200000" min="0" max="1500000" step="10000">
+      </div>
+
+      <div class="tool-result-box">
+        <div class="tool-result-row">
+          <span>New Regime Tax (Standard ₹75k):</span>
+          <strong id="taxResNew" style="color:var(--accent);">₹78,000</strong>
+        </div>
+        <div class="tool-result-row">
+          <span>Old Regime Tax (Standard ₹50k):</span>
+          <strong id="taxResOld">₹1,06,600</strong>
+        </div>
+        <div class="tool-result-row highlight">
+          <span>Recommended Choice:</span>
+          <span id="taxResChoice" style="color:#059669;">New Regime (Saves ₹28,600)</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div style="margin-bottom:10px;">
+    <a href="/about.html">About Us</a>
+    <a href="/contact.html">Contact</a>
+    <a href="/tools.html">Tools</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="/disclaimer.html">Disclaimer</a>
+    <a href="/editorial-policy.html">Editorial Policy</a>
+    <a href="/sitemap-index.xml">Sitemap</a>
+  </div>
+  <div>&copy; 2026 TIVRA News. All rights reserved.</div>
+  <div class="disclaimer">Calculators provide estimates for informational planning only. Consult a certified financial advisor or chartered accountant for official decisions.</div>
+</footer>
+
+<script>
+// ---------- 1. EMI Calculator ----------
+function calcEMI() {
+  const p = parseFloat(document.getElementById('emiAmt').value) || 0;
+  const rAnnual = parseFloat(document.getElementById('emiRate').value) || 0;
+  const years = parseFloat(document.getElementById('emiTenure').value) || 0;
+  const n = years * 12;
+  const r = (rAnnual / 12) / 100;
+
+  if (p <= 0 || n <= 0 || r <= 0) return;
+
+  const emi = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+  const totalPay = emi * n;
+  const totalInterest = totalPay - p;
+
+  document.getElementById('emiAmtLabel').textContent = '₹' + p.toLocaleString('en-IN');
+  document.getElementById('emiRateLabel').textContent = rAnnual.toFixed(1) + '%';
+  document.getElementById('emiTenureLabel').textContent = years + ' Years';
+
+  document.getElementById('emiResPrincipal').textContent = '₹' + Math.round(p).toLocaleString('en-IN');
+  document.getElementById('emiResInterest').textContent = '₹' + Math.round(totalInterest).toLocaleString('en-IN');
+  document.getElementById('emiResMonthly').textContent = '₹' + Math.round(emi).toLocaleString('en-IN');
+
+  const pPct = Math.round((p / totalPay) * 100);
+  const iPct = 100 - pPct;
+  document.getElementById('emiRatioPrincipal').style.width = pPct + '%';
+  document.getElementById('emiRatioInterest').style.width = iPct + '%';
+}
+
+function syncEmiRange(input, range) {
+  input.addEventListener('input', () => { range.value = input.value; calcEMI(); });
+  range.addEventListener('input', () => { input.value = range.value; calcEMI(); });
+}
+syncEmiRange(document.getElementById('emiAmt'), document.getElementById('emiAmtRange'));
+syncEmiRange(document.getElementById('emiRate'), document.getElementById('emiRateRange'));
+syncEmiRange(document.getElementById('emiTenure'), document.getElementById('emiTenureRange'));
+
+// ---------- 2. FD Calculator ----------
+function calcFD() {
+  const p = parseFloat(document.getElementById('fdAmt').value) || 0;
+  const r = (parseFloat(document.getElementById('fdRate').value) || 0) / 100;
+  const t = parseFloat(document.getElementById('fdTime').value) || 0;
+  const n = 4; // Quarterly compounding standard
+
+  if (p <= 0 || t <= 0) return;
+
+  const a = p * Math.pow(1 + (r / n), n * t);
+  const interest = a - p;
+
+  document.getElementById('fdAmtLabel').textContent = '₹' + p.toLocaleString('en-IN');
+  document.getElementById('fdRateLabel').textContent = (r * 100).toFixed(2) + '%';
+  document.getElementById('fdTimeLabel').textContent = t + ' Years';
+
+  document.getElementById('fdResInvested').textContent = '₹' + Math.round(p).toLocaleString('en-IN');
+  document.getElementById('fdResInterest').textContent = '₹' + Math.round(interest).toLocaleString('en-IN');
+  document.getElementById('fdResTotal').textContent = '₹' + Math.round(a).toLocaleString('en-IN');
+}
+syncEmiRange(document.getElementById('fdAmt'), document.getElementById('fdAmtRange'));
+syncEmiRange(document.getElementById('fdRate'), document.getElementById('fdRateRange'));
+syncEmiRange(document.getElementById('fdTime'), document.getElementById('fdTimeRange'));
+
+// ---------- 3. Gold Calculator ----------
+function calcGold() {
+  const grams = parseFloat(document.getElementById('goldWeight').value) || 0;
+  const purity = parseFloat(document.getElementById('goldPurity').value) || 1.0;
+  const baseRate10g = parseFloat(document.getElementById('goldBaseRate').value) || 76500;
+
+  const ratePerGram24K = baseRate10g / 10;
+  const pureMetalCost = grams * ratePerGram24K * purity;
+  const makingCharges = pureMetalCost * 0.08;
+  const subtotal = pureMetalCost + makingCharges;
+  const gst = subtotal * 0.03;
+  const total = subtotal + gst;
+
+  document.getElementById('goldResMetal').textContent = '₹' + Math.round(pureMetalCost).toLocaleString('en-IN');
+  document.getElementById('goldResMaking').textContent = '₹' + Math.round(makingCharges).toLocaleString('en-IN');
+  document.getElementById('goldResGst').textContent = '₹' + Math.round(gst).toLocaleString('en-IN');
+  document.getElementById('goldResTotal').textContent = '₹' + Math.round(total).toLocaleString('en-IN');
+}
+document.getElementById('goldWeight').addEventListener('input', calcGold);
+document.getElementById('goldPurity').addEventListener('change', calcGold);
+document.getElementById('goldBaseRate').addEventListener('input', calcGold);
+
+// ---------- 4. Income Tax Estimator ----------
+function calcTax() {
+  const income = parseFloat(document.getElementById('taxIncome').value) || 0;
+  const deductions = parseFloat(document.getElementById('taxDeductions').value) || 0;
+
+  // New Regime FY 26-27 (Standard Deduction ₹75,000, 0-3L nil, 3-7L 5%, 7-10L 10%, 10-12L 15%, 12-15L 20%, >15L 30%. Section 87A rebate up to 7L taxable)
+  const taxableNew = Math.max(0, income - 75000);
+  let taxNew = 0;
+  if (taxableNew <= 700000) {
+    taxNew = 0; // Section 87A rebate
+  } else {
+    if (taxableNew > 300000) taxNew += Math.min(400000, taxableNew - 300000) * 0.05;
+    if (taxableNew > 700000) taxNew += Math.min(300000, taxableNew - 700000) * 0.10;
+    if (taxableNew > 1000000) taxNew += Math.min(200000, taxableNew - 1000000) * 0.15;
+    if (taxableNew > 1200000) taxNew += Math.min(300000, taxableNew - 1200000) * 0.20;
+    if (taxableNew > 1500000) taxNew += (taxableNew - 1500000) * 0.30;
+    taxNew = taxNew * 1.04; // 4% cess
+  }
+
+  // Old Regime (Standard Deduction ₹50,000 + deductions)
+  const taxableOld = Math.max(0, income - 50000 - deductions);
+  let taxOld = 0;
+  if (taxableOld <= 500000) {
+    taxOld = 0; // Section 87A rebate
+  } else {
+    if (taxableOld > 250000) taxOld += Math.min(250000, taxableOld - 250000) * 0.05;
+    if (taxableOld > 500000) taxOld += Math.min(500000, taxableOld - 500000) * 0.20;
+    if (taxableOld > 1000000) taxOld += (taxableOld - 1000000) * 0.30;
+    taxOld = taxOld * 1.04; // 4% cess
+  }
+
+  document.getElementById('taxResNew').textContent = '₹' + Math.round(taxNew).toLocaleString('en-IN');
+  document.getElementById('taxResOld').textContent = '₹' + Math.round(taxOld).toLocaleString('en-IN');
+
+  const choiceEl = document.getElementById('taxResChoice');
+  if (taxNew < taxOld) {
+    const diff = Math.round(taxOld - taxNew);
+    choiceEl.textContent = 'New Regime (Saves ₹' + diff.toLocaleString('en-IN') + ')';
+    choiceEl.style.color = '#059669';
+  } else if (taxOld < taxNew) {
+    const diff = Math.round(taxNew - taxOld);
+    choiceEl.textContent = 'Old Regime (Saves ₹' + diff.toLocaleString('en-IN') + ')';
+    choiceEl.style.color = '#0284c7';
+  } else {
+    choiceEl.textContent = 'Both Regimes Result in Equal Tax';
+    choiceEl.style.color = '#64748b';
+  }
+}
+document.getElementById('taxIncome').addEventListener('input', calcTax);
+document.getElementById('taxDeductions').addEventListener('input', calcTax);
+
+// Initial triggers
+calcEMI();
+calcFD();
+calcGold();
+calcTax();
+</script>
+</body>
+</html>
