@@ -45,28 +45,66 @@ export class ProviderPool {
 
     console.log(`[Providers] Pre-flight checking Pollinations community models at ${baseUrl}...`);
 
-    // 1. Fetch live active catalog from gen.pollinations.ai to verify model presence
+    // 1. Fetch live active catalog from gen.pollinations.ai to verify model presence & pricing
     let liveCatalog = new Set();
+    let dynamicFreeCommunity = [];
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6000);
-      const res = await fetch(`${baseUrl}/models`, { signal: controller.signal });
+      const res = await fetch(`https://gen.pollinations.ai/models`, { signal: controller.signal });
       clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
-        for (const m of (data.data || [])) {
-          if (m.id) liveCatalog.add(m.id);
+        const allModels = Array.isArray(data) ? data : (data.data || []);
+        for (const m of allModels) {
+          const id = m.name || m.id;
+          if (id) liveCatalog.add(id);
         }
-        console.log(`[Providers] Live Pollinations catalog contains ${liveCatalog.size} models.`);
+        dynamicFreeCommunity = allModels.filter((m) => {
+          if (m.category !== "text") return false;
+          const promptPrice = parseFloat(m.pricing?.promptTextTokens || "0");
+          const compPrice = parseFloat(m.pricing?.completionTextTokens || "0");
+          return promptPrice === 0 && compPrice === 0 && !m.paid_only && (m.health?.status === "healthy" || m.health?.status === "degraded");
+        });
+        console.log(`[Providers] Live Pollinations catalog contains ${liveCatalog.size} models (${dynamicFreeCommunity.length} zero-price community models).`);
       }
     } catch (err) {
       console.warn(`[Providers] Could not reach Pollinations live catalog: ${err.message}. Relying on config definitions.`);
     }
 
+    // 2. Discover live free models from OpenRouter dynamically
+    try {
+      const orRes = await fetch("https://openrouter.ai/api/v1/models");
+      if (orRes.ok) {
+        const orData = await orRes.json();
+        const orFree = (orData.data || []).filter((m) => m.id && m.id.endsWith(":free"));
+        const orKey = (process.env.OPENROUTER_API_KEY || "").trim();
+        if (orKey && orFree.length > 0) {
+          const orProviders = orFree.slice(0, 5).map((m) => ({
+            name: `openrouter-${m.id.split("/")[1] || m.id}`,
+            baseUrl: "https://openrouter.ai/api/v1",
+            model: m.id,
+            apiKey: orKey,
+            tier: "free",
+            rpm: 15,
+            minIntervalMs: 4000,
+            lastCallTime: 0,
+            cooldownUntil: 0,
+            ok: 0,
+            failed: 0,
+          }));
+          this.providers = [...orProviders, ...this.providers];
+          console.log(`[Providers] Wired ${orProviders.length} dynamic free OpenRouter models.`);
+        }
+      }
+    } catch (err) {
+      // Non-fatal fallback
+    }
+
     const validCapable = capableConfigs.filter((m) => liveCatalog.size === 0 || liveCatalog.has(m.id));
     const validFallback = fallbackConfigs.filter((m) => liveCatalog.size === 0 || liveCatalog.has(m.id));
 
-    // 2. Pre-flight handshake ping on top capable candidates (with multi-candidate resilience)
+    // 3. Pre-flight handshake ping on top capable candidates
     let gatewayHealthy = false;
     let verifiedCandidate = null;
     const probeCandidates = validCapable.slice(0, 3);
@@ -94,10 +132,10 @@ export class ProviderPool {
           console.log(`  ✔ [Pollinations Pre-flight] Handshake verified with ${candidate.id}.`);
           break;
         } else if (res.status === 402) {
-          console.warn(`  ⚠ [Pollinations Pre-flight] Account balance exhausted (HTTP 402). Gracefully cascading to Tier 3 free providers.`);
+          console.warn(`  ⚠ [Pollinations Pre-flight] Account balance exhausted (HTTP 402). Gracefully cascading to Tier 1 free providers.`);
           break;
         } else if (res.status === 401) {
-          console.warn(`  ⚠ [Pollinations Pre-flight] Unauthorized (HTTP 401). Gracefully cascading to Tier 3 free providers.`);
+          console.warn(`  ⚠ [Pollinations Pre-flight] Unauthorized (HTTP 401). Gracefully cascading to Tier 1 free providers.`);
           break;
         } else {
           console.warn(`  ⚠ [Pollinations Pre-flight] Candidate ${candidate.id} returned HTTP ${res.status}. Checking next...`);
@@ -107,7 +145,7 @@ export class ProviderPool {
       }
     }
 
-    // 3. If gateway is healthy, wire Capable Models (Tier 1) and Fallback Models (Tier 2) to the front
+    // 4. If gateway is healthy, wire Pollinations as low-cost secondary fallback AFTER free providers
     if (gatewayHealthy) {
       const sortedCapable = verifiedCandidate
         ? [verifiedCandidate, ...validCapable.filter((m) => m.id !== verifiedCandidate.id)]
@@ -141,10 +179,11 @@ export class ProviderPool {
         failed: 0,
       }));
 
-      this.providers = [...capableProviders, ...fallbackProviders, ...this.providers];
-      console.log(`[Providers] Successfully wired ${capableProviders.length} Capable Models (Tier 1) + ${fallbackProviders.length} Fallback Models (Tier 2) + Tier 3 Free Models.`);
+      // Free providers stay at the front! Pollinations operates as secondary fallback
+      this.providers = [...this.providers, ...capableProviders, ...fallbackProviders];
+      console.log(`[Providers] Successfully wired ${this.providers.length} total providers (Free providers prioritized first, Pollinations secondary).`);
     } else {
-      console.log(`[Providers] Operating on Tier 3 verified free providers.`);
+      console.log(`[Providers] Operating on verified free providers.`);
     }
   }
 
