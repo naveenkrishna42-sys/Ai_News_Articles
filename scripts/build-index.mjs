@@ -67,6 +67,7 @@ const PUBLIC_DIR = path.join(ROOT, "public");
 
 const STATIC_FILES = [
   "index.html",
+  "tools.html",
   "category.html",
   "archive.html",
   "404.html",
@@ -89,6 +90,7 @@ const STATIC_FILES = [
   "googlef491165cc2b344ea.html",
   "BingSiteAuth.xml",
   "OneSignalSDKWorker.js",
+  "_redirects",
 ];
 
 function copyDir(src, dest) {
@@ -679,6 +681,12 @@ ${rssItems}
   writeFileSync(
     path.join(PUBLIC_DIR, "robots.txt"),
     `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\nSitemap: ${SITE_URL}/news-sitemap.xml\nSitemap: ${SITE_URL}/sitemap-index.xml\n`
+  );
+
+  // Cloudflare Pages clean URL routing for static pages
+  writeFileSync(
+    path.join(PUBLIC_DIR, "_redirects"),
+    `/tools /tools.html 200\n/about /about.html 200\n/contact /contact.html 200\n/editorial-policy /editorial-policy.html 200\n/privacy /privacy.html 200\n/terms /terms.html 200\n/disclaimer /disclaimer.html 200\n/archive /archive.html 200\n`
   );
 
   // Real-time ping to Google WebSub hub (fire-and-forget)
