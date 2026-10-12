@@ -12,13 +12,20 @@ export class ProviderPool {
   constructor(providerConfigs, communityConfig = null) {
     this.providers = (providerConfigs || [])
       .map((p) => {
-        const rpm = p.rpm || 10;
+        // Enforce strict upper bound clamps: Gemini max 14 RPM (4.28s), Groq max 2 RPM (30s due to 6,000 TPM)
+        let safeRpm = p.rpm || 10;
+        if (p.name === "gemini" || p.model?.includes("gemini")) {
+          safeRpm = Math.min(safeRpm, 14);
+        } else if (p.name === "groq" || p.baseUrl?.includes("groq.com")) {
+          safeRpm = Math.min(safeRpm, 2);
+        }
         return {
           ...p,
           apiKey: (process.env[p.envKey] || "").trim(),
-          rpm,
-          minIntervalMs: Math.ceil(60_000 / rpm),
+          rpm: safeRpm,
+          minIntervalMs: Math.ceil(60_000 / safeRpm),
           lastCallTime: 0,
+          nextSlotAvailableMs: 0,
           cooldownUntil: 0,
           ok: 0,
           failed: 0,
@@ -118,6 +125,7 @@ export class ProviderPool {
             rpm: 15,
             minIntervalMs: 4000,
             lastCallTime: 0,
+            nextSlotAvailableMs: 0,
             cooldownUntil: 0,
             ok: 0,
             failed: 0,
@@ -205,13 +213,37 @@ export class ProviderPool {
         model: m.id,
         apiKey,
         tier: "community-zero-cost",
-        rpm: m.rpm || 15,
-        minIntervalMs: Math.ceil(60_000 / (m.rpm || 15)),
+        rpm: m.rpm || 12,
+        minIntervalMs: Math.ceil(60_000 / (m.rpm || 12)),
         lastCallTime: 0,
+        nextSlotAvailableMs: 0,
         cooldownUntil: 0,
         ok: 0,
         failed: 0,
       }));
+
+      // Dynamically discover and wire top healthy zero-price models from the catalog
+      const autoDiscovered = dynamicFreeCommunity
+        .filter((m) => !sortedCapable.some((c) => c.id === (m.name || m.id)))
+        .slice(0, 5)
+        .map((m) => {
+          const modelId = m.name || m.id;
+          const shortName = modelId.split("/").pop() || "comm";
+          return {
+            name: `pollinations-${shortName}-free`,
+            baseUrl,
+            model: modelId,
+            apiKey,
+            tier: "community-zero-cost",
+            rpm: 12,
+            minIntervalMs: Math.ceil(60_000 / 12),
+            lastCallTime: 0,
+            nextSlotAvailableMs: 0,
+            cooldownUntil: 0,
+            ok: 0,
+            failed: 0,
+          };
+        });
 
       const fallbackProviders = zeroCostFallback.map((m) => ({
         name: m.name || m.id,
@@ -219,16 +251,17 @@ export class ProviderPool {
         model: m.id,
         apiKey,
         tier: "community-zero-cost",
-        rpm: m.rpm || 15,
-        minIntervalMs: Math.ceil(60_000 / (m.rpm || 15)),
+        rpm: m.rpm || 12,
+        minIntervalMs: Math.ceil(60_000 / (m.rpm || 12)),
         lastCallTime: 0,
+        nextSlotAvailableMs: 0,
         cooldownUntil: 0,
         ok: 0,
         failed: 0,
       }));
 
       // Append community zero-cost providers strictly AFTER primary free providers
-      this.providers = [...this.providers, ...capableProviders, ...fallbackProviders];
+      this.providers = [...this.providers, ...capableProviders, ...autoDiscovered, ...fallbackProviders];
       console.log(`[Providers] Successfully wired ${this.providers.length} zero-cost providers (Primary free prioritized first, Pollinations 0-Pollen secondary).`);
     } else {
       console.log(`[Providers] Operating strictly on primary zero-cost free providers.`);
@@ -239,55 +272,42 @@ export class ProviderPool {
     return this.providers.filter((p) => Date.now() >= p.cooldownUntil);
   }
 
-  next() {
+  /**
+   * Atomically reserves a rate-limit slot from the provider available earliest.
+   * Advances provider.nextSlotAvailableMs immediately so parallel async workers
+   * never collide or breach RPM / TPM limits.
+   */
+  acquireSlot() {
     const now = Date.now();
     const live = this.available;
     if (live.length === 0) return null;
 
-    // Tier 1 Priority: Primary free providers (Gemini, OpenRouter, Groq)
+    // Prioritize Tier 1: Primary free providers (Gemini, OpenRouter)
     const primary = live.filter((p) => p.tier === "primary-free");
-    for (let i = 0; i < primary.length; i++) {
-      const idx = (this.cursor + i) % primary.length;
-      const candidate = primary[idx];
-      const elapsed = now - (candidate.lastCallTime || 0);
-      if (elapsed >= (candidate.minIntervalMs || 0)) {
-        this.cursor = (idx + 1) % primary.length;
-        return candidate;
-      }
-    }
+    const candidates = primary.length > 0 ? primary : live;
 
-    // If primary providers are ready within 3 seconds, prefer waiting over secondary
-    if (primary.length > 0) {
-      const sortedPrimary = [...primary].sort((a, b) => {
-        const waitA = (a.lastCallTime || 0) + (a.minIntervalMs || 0) - now;
-        const waitB = (b.lastCallTime || 0) + (b.minIntervalMs || 0) - now;
-        return waitA - waitB;
-      });
-      const bestWait = (sortedPrimary[0].lastCallTime || 0) + (sortedPrimary[0].minIntervalMs || 0) - now;
-      if (bestWait <= 3000) {
-        return sortedPrimary[0];
-      }
-    }
-
-    // Tier 2: Community verified zero-cost models (Pollinations)
-    const secondary = live.filter((p) => p.tier === "community-zero-cost");
-    for (let i = 0; i < secondary.length; i++) {
-      const candidate = secondary[i];
-      const elapsed = now - (candidate.lastCallTime || 0);
-      if (elapsed >= (candidate.minIntervalMs || 0)) {
-        return candidate;
-      }
-    }
-
-    // Fallback: Pick whichever ready provider has minimum remaining wait
-    const sorted = [...live].sort((a, b) => {
-      const waitA = (a.lastCallTime || 0) + (a.minIntervalMs || 0) - now;
-      const waitB = (b.lastCallTime || 0) + (b.minIntervalMs || 0) - now;
+    // Pick candidate whose next available slot is earliest
+    const sorted = [...candidates].sort((a, b) => {
+      const waitA = Math.max(0, (a.nextSlotAvailableMs || 0) - now);
+      const waitB = Math.max(0, (b.nextSlotAvailableMs || 0) - now);
       return waitA - waitB;
     });
-    const p = sorted[0];
-    this.cursor = (this.cursor + 1) % live.length;
-    return p;
+
+    const chosen = sorted[0];
+    const scheduledTime = Math.max(now, chosen.nextSlotAvailableMs || 0);
+    // Atomically claim the slot
+    chosen.nextSlotAvailableMs = scheduledTime + (chosen.minIntervalMs || 4000);
+    chosen.lastCallTime = scheduledTime;
+
+    return {
+      provider: chosen,
+      delayMs: Math.max(0, scheduledTime - now),
+    };
+  }
+
+  next() {
+    const slot = this.acquireSlot();
+    return slot ? slot.provider : null;
   }
 
   stats() {
@@ -298,20 +318,21 @@ export class ProviderPool {
     let lastError = null;
     const maxAttempts = Math.max(attempts, this.providers.length);
     for (let i = 0; i < maxAttempts; i++) {
-      const provider = this.next();
-      if (!provider) break;
+      const slot = this.acquireSlot();
+      if (!slot) break;
+      const { provider, delayMs } = slot;
       try {
-        // Enforce strict RPM tier pacing to prevent HTTP 429
-        const now = Date.now();
-        const waitMs = Math.max(0, ((provider.lastCallTime || 0) + (provider.minIntervalMs || 0)) - now);
-        if (waitMs > 0 && waitMs <= 30_000) {
-          await new Promise((resolve) => setTimeout(resolve, waitMs));
+        // Enforce strict rate-limit pacing before dispatching HTTP call
+        if (delayMs > 0) {
+          await new Promise((resolve) => setTimeout(resolve, Math.min(delayMs, 35_000)));
         }
+
         // Hard safety barrier: Never allow any metered Pollinations call
         if (provider.baseUrl.includes("pollinations.ai") && this.isZeroCostModel) {
           if (!this.isZeroCostModel(provider.model)) {
             console.error(`  ⛔ [CRITICAL SAFETY GUARD] Refusing to call metered Pollinations model ${provider.model}. Dropping permanently.`);
             provider.cooldownUntil = Infinity;
+            provider.nextSlotAvailableMs = Infinity;
             continue;
           }
         }
@@ -353,6 +374,7 @@ export class ProviderPool {
         if (res.status === 429 || res.status >= 500) {
           const body = await res.text().catch(() => "");
           provider.cooldownUntil = Date.now() + COOLDOWN_MS;
+          provider.nextSlotAvailableMs = Date.now() + COOLDOWN_MS;
           provider.failed++;
           lastError = new Error(`${provider.name} HTTP ${res.status}: ${body.slice(0, 150)}`);
           console.warn(`  ⚠ [${provider.name}] HTTP ${res.status}: ${body.slice(0, 150)}`);
@@ -362,12 +384,14 @@ export class ProviderPool {
           const body = await res.text().catch(() => "");
           if (res.status === 402 || /insufficient balance/i.test(body)) {
             provider.cooldownUntil = Infinity; // Permanently skip exhausted accounts for this run
+            provider.nextSlotAvailableMs = Infinity;
             provider.failed++;
             lastError = new Error(`${provider.name} HTTP 402: Insufficient Balance`);
             console.warn(`  ⚠ [${provider.name}] HTTP 402: Account balance exhausted. Deactivated for this run.`);
             continue;
           }
           provider.cooldownUntil = Date.now() + COOLDOWN_MS;
+          provider.nextSlotAvailableMs = Date.now() + COOLDOWN_MS;
           provider.failed++;
           lastError = new Error(`${provider.name} HTTP ${res.status}: ${body.slice(0, 150)}`);
           console.warn(`  ⚠ [${provider.name}] HTTP ${res.status}: ${body.slice(0, 150)}`);
@@ -389,9 +413,11 @@ export class ProviderPool {
           continue;
         }
         provider.ok++;
+        provider.lastCallTime = Date.now();
         return { text, provider: provider.name };
       } catch (err) {
         provider.cooldownUntil = Date.now() + COOLDOWN_MS;
+        provider.nextSlotAvailableMs = Date.now() + COOLDOWN_MS;
         provider.failed++;
         lastError = err;
         console.warn(`  ⚠ [${provider.name}] Error: ${err.message}`);

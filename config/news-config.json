@@ -5,9 +5,9 @@
     "url": "https://tivranews.com"
   },
   "volume": {
-    "perCategoryPerRun": 12,
+    "perCategoryPerRun": 2,
     "dailyCap": 600,
-    "concurrency": 8
+    "concurrency": 4
   },
   "newCategoryVolume": {
     "Gadget Comparisons": 4,
@@ -30,9 +30,9 @@
     "baseUrl": "https://gen.pollinations.ai/v1",
     "envKey": "POLLINATIONS_API_KEY",
     "capableModels": [
-      { "id": "community/YoannDev90/poolside-laguna-s-2.1:free", "name": "pollinations-laguna-free", "rpm": 15 },
-      { "id": "community/chirag-gamer/gpt-oss-120b", "name": "pollinations-gpt-oss-free", "rpm": 15 },
-      { "id": "community/ZapGaming/llama3.1-8b-xturbo", "name": "pollinations-llama-free", "rpm": 20 }
+      { "id": "community/YoannDev90/poolside-laguna-s-2.1:free", "name": "pollinations-laguna-free", "rpm": 12 },
+      { "id": "community/gggff123/qwen3.8-27b:free", "name": "pollinations-qwen-free", "rpm": 12 },
+      { "id": "community/morriszdweck/glm-5.3-flash-free", "name": "pollinations-glm-free", "rpm": 12 }
     ],
     "fallbackModels": []
   },
@@ -41,7 +41,8 @@
       "name": "gemini",
       "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
       "model": "gemini-2.5-flash",
-      "envKey": "GEMINI_API_KEY"
+      "envKey": "GEMINI_API_KEY",
+      "rpm": 14
     },
     {
       "name": "openrouter-nemotron",
@@ -66,18 +67,6 @@
       "baseUrl": "https://openrouter.ai/api/v1",
       "model": "liquid/lfm-2.5-2.6b:free",
       "envKey": "OPENROUTER_API_KEY"
-    },
-    {
-      "name": "groq",
-      "baseUrl": "https://api.groq.com/openai/v1",
-      "model": "llama-3.1-8b-instant",
-      "envKey": "GROQ_API_KEY"
-    },
-    {
-      "name": "deepseek",
-      "baseUrl": "https://api.deepseek.com/v1",
-      "model": "deepseek-chat",
-      "envKey": "DEEPSEEK_API_KEY"
     },
     {
       "name": "vercel-ling-flash-fin",

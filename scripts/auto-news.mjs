@@ -419,24 +419,16 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
   const isNonCommercial = STRICT_NON_COMMERCIAL_CATEGORIES.has(item.category);
 
   if (!isNonCommercial) {
-    // Commercial and monetizable categories get inline listicle buttons
+    // Confine affiliate buy boxes & listicle buttons strictly to high-intent commercial categories
+    // Standard news categories remain 100% clean for Google AdSense compliance
     const commercialCats = new Set([
       "Product Deals & Offers",
       "Credit Cards & Cashback",
       "Gadget Comparisons",
-      "Education",
-      "AI Tips & Tools"
     ]);
     if (commercialCats.has(item.category)) {
       finalBodyHtml = injectInlineListicleButtons(bodyHtml, config, item.category, title, item.directUrl || item.sourceUrl || "");
-    }
 
-    const isExplicitReviewOrDeal = commercialCats.has(item.category) || 
-      (item.category === "Technology" && /\b(review|unboxing|launch price|specifications|discount|price drop)\b/i.test(title)) ||
-      (item.category === "Business" && /\b(web hosting|cloud hosting|global payroll|software discount|credit card|bank|savings|loan)\b/i.test(title)) ||
-      (item.category === "Lifestyle" && /\b(travel|flight|hotel|vacation|resort|fashion|clothes|shoes|apparel)\b/i.test(title));
-
-    if (isExplicitReviewOrDeal) {
       const validDirectUrl = (item.directUrl && !item.directUrl.includes("news.google.com")) ? item.directUrl : "";
       const buyBoxHtml = renderBuyBox([title], config, item.category, validDirectUrl, title);
       if (buyBoxHtml) finalBodyHtml += `\n${buyBoxHtml}`;

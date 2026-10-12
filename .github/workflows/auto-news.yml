@@ -68,7 +68,7 @@ jobs:
           if [ -n "${{ github.event.inputs.per_category }}" ]; then
             EXTRA="--per-category ${{ github.event.inputs.per_category }}"
           fi
-          node scripts/auto-news.mjs --target 200 $EXTRA
+          node scripts/auto-news.mjs --target 26 $EXTRA
 
       - name: Publish incoming uploads with TIVRA branding
         env:
