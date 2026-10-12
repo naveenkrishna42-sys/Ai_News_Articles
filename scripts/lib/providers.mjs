@@ -45,31 +45,60 @@ export class ProviderPool {
 
     console.log(`[Providers] Pre-flight checking Pollinations community models at ${baseUrl}...`);
 
-    // 1. Fetch live active catalog from gen.pollinations.ai to verify model presence & pricing
-    let liveCatalog = new Set();
+    // 1. Fetch live active catalog from gen.pollinations.ai (both main and community) to audit pricing
+    const catalogMap = new Map();
     let dynamicFreeCommunity = [];
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
-      const res = await fetch(`https://gen.pollinations.ai/models`, { signal: controller.signal });
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const [resMain, resComm] = await Promise.all([
+        fetch(`https://gen.pollinations.ai/models`, { signal: controller.signal }).catch(() => null),
+        fetch(`https://gen.pollinations.ai/models?community=true&reliability=all`, { signal: controller.signal }).catch(() => null),
+      ]);
       clearTimeout(timeoutId);
-      if (res.ok) {
-        const data = await res.json();
-        const allModels = Array.isArray(data) ? data : (data.data || []);
-        for (const m of allModels) {
-          const id = m.name || m.id;
-          if (id) liveCatalog.add(id);
-        }
-        dynamicFreeCommunity = allModels.filter((m) => {
-          if (m.category !== "text") return false;
-          const promptPrice = parseFloat(m.pricing?.promptTextTokens || "0");
-          const compPrice = parseFloat(m.pricing?.completionTextTokens || "0");
-          return promptPrice === 0 && compPrice === 0 && !m.paid_only && (m.health?.status === "healthy" || m.health?.status === "degraded");
-        });
-        console.log(`[Providers] Live Pollinations catalog contains ${liveCatalog.size} models (${dynamicFreeCommunity.length} zero-price community models).`);
+
+      const allModels = [];
+      if (resMain && resMain.ok) {
+        const d1 = await resMain.json();
+        allModels.push(...(Array.isArray(d1) ? d1 : (d1.data || [])));
       }
+      if (resComm && resComm.ok) {
+        const d2 = await resComm.json();
+        allModels.push(...(Array.isArray(d2) ? d2 : (d2.data || [])));
+      }
+
+      for (const m of allModels) {
+        const id = m.name || m.id;
+        if (id && !catalogMap.has(id)) catalogMap.set(id, m);
+        if (m.aliases) {
+          for (const a of m.aliases) {
+            if (!catalogMap.has(a)) catalogMap.set(a, m);
+          }
+        }
+      }
+
+      // Helper: Mathematical zero-cost check
+      this.isZeroCostModel = (modelId) => {
+        const meta = catalogMap.get(modelId);
+        if (!meta) return false;
+        if (meta.category !== "text") return false;
+        if (meta.paid_only === true) return false;
+        const pIn = parseFloat(meta.pricing?.promptTextTokens || "0");
+        const pOut = parseFloat(meta.pricing?.completionTextTokens || "0");
+        if (pIn > 0 || pOut > 0) return false; // STRICT REJECTION OF METERED MODELS
+        const status = meta.health?.status || "unknown";
+        const rate = typeof meta.health?.success_rate === "number" ? meta.health.success_rate : 0;
+        return status !== "down" && rate >= 75;
+      };
+
+      dynamicFreeCommunity = allModels.filter((m) => {
+        const id = m.name || m.id;
+        return this.isZeroCostModel(id);
+      });
+      console.log(`[Providers] Audited ${catalogMap.size} Pollinations models (${dynamicFreeCommunity.length} verified zero-price community models).`);
     } catch (err) {
-      console.warn(`[Providers] Could not reach Pollinations live catalog: ${err.message}. Relying on config definitions.`);
+      console.warn(`[Providers] Could not reach Pollinations live catalog: ${err.message}.`);
+      this.isZeroCostModel = () => false; // Safe default: never assume a model is free without catalog proof
     }
 
     // 2. Discover live free models from OpenRouter dynamically
@@ -85,7 +114,7 @@ export class ProviderPool {
             baseUrl: "https://openrouter.ai/api/v1",
             model: m.id,
             apiKey: orKey,
-            tier: "free",
+            tier: "primary-free",
             rpm: 15,
             minIntervalMs: 4000,
             lastCallTime: 0,
@@ -101,13 +130,32 @@ export class ProviderPool {
       // Non-fatal fallback
     }
 
-    const validCapable = capableConfigs.filter((m) => liveCatalog.size === 0 || liveCatalog.has(m.id));
-    const validFallback = fallbackConfigs.filter((m) => liveCatalog.size === 0 || liveCatalog.has(m.id));
+    // Tag existing primary providers
+    for (const p of this.providers) {
+      if (!p.tier) p.tier = "primary-free";
+    }
 
-    // 3. Pre-flight handshake ping on top capable candidates
+    // 3. Filter candidate models strictly through zero-cost verification
+    const zeroCostCapable = capableConfigs.filter((m) => {
+      const isFree = this.isZeroCostModel ? this.isZeroCostModel(m.id) : false;
+      if (!isFree) {
+        console.warn(`  ⚠ [Zero-Cost Guard] Discarded Pollinations model ${m.id} — not verified 0 Pollen in catalog. Never charging balance.`);
+      }
+      return isFree;
+    });
+
+    const zeroCostFallback = fallbackConfigs.filter((m) => {
+      const isFree = this.isZeroCostModel ? this.isZeroCostModel(m.id) : false;
+      if (!isFree) {
+        console.warn(`  ⚠ [Zero-Cost Guard] Discarded Pollinations fallback model ${m.id}. Never charging balance.`);
+      }
+      return isFree;
+    });
+
+    // 4. Pre-flight handshake ping on top zero-cost candidates
     let gatewayHealthy = false;
     let verifiedCandidate = null;
-    const probeCandidates = validCapable.slice(0, 3);
+    const probeCandidates = zeroCostCapable.slice(0, 3);
     for (const candidate of probeCandidates) {
       try {
         const controller = new AbortController();
@@ -129,13 +177,13 @@ export class ProviderPool {
         if (res.status === 200) {
           gatewayHealthy = true;
           verifiedCandidate = candidate;
-          console.log(`  ✔ [Pollinations Pre-flight] Handshake verified with ${candidate.id}.`);
+          console.log(`  ✔ [Pollinations Pre-flight] Zero-cost handshake verified with ${candidate.id}.`);
           break;
         } else if (res.status === 402) {
-          console.warn(`  ⚠ [Pollinations Pre-flight] Account balance exhausted (HTTP 402). Gracefully cascading to Tier 1 free providers.`);
+          console.warn(`  ⚠ [Pollinations Pre-flight] Balance check flag (HTTP 402). Disabling Pollinations for this run.`);
           break;
         } else if (res.status === 401) {
-          console.warn(`  ⚠ [Pollinations Pre-flight] Unauthorized (HTTP 401). Gracefully cascading to Tier 1 free providers.`);
+          console.warn(`  ⚠ [Pollinations Pre-flight] Unauthorized (HTTP 401). Disabling Pollinations for this run.`);
           break;
         } else {
           console.warn(`  ⚠ [Pollinations Pre-flight] Candidate ${candidate.id} returned HTTP ${res.status}. Checking next...`);
@@ -145,45 +193,45 @@ export class ProviderPool {
       }
     }
 
-    // 4. If gateway is healthy, wire Pollinations as low-cost secondary fallback AFTER free providers
+    // 5. Wire ONLY verified zero-cost community models as secondary fallback
     if (gatewayHealthy) {
       const sortedCapable = verifiedCandidate
-        ? [verifiedCandidate, ...validCapable.filter((m) => m.id !== verifiedCandidate.id)]
-        : validCapable;
+        ? [verifiedCandidate, ...zeroCostCapable.filter((m) => m.id !== verifiedCandidate.id)]
+        : zeroCostCapable;
 
       const capableProviders = sortedCapable.map((m) => ({
         name: m.name || m.id,
         baseUrl,
         model: m.id,
         apiKey,
-        tier: "capable",
-        rpm: m.rpm || 10,
-        minIntervalMs: Math.ceil(60_000 / (m.rpm || 10)),
+        tier: "community-zero-cost",
+        rpm: m.rpm || 15,
+        minIntervalMs: Math.ceil(60_000 / (m.rpm || 15)),
         lastCallTime: 0,
         cooldownUntil: 0,
         ok: 0,
         failed: 0,
       }));
 
-      const fallbackProviders = validFallback.map((m) => ({
+      const fallbackProviders = zeroCostFallback.map((m) => ({
         name: m.name || m.id,
         baseUrl,
         model: m.id,
         apiKey,
-        tier: "fallback",
-        rpm: m.rpm || 10,
-        minIntervalMs: Math.ceil(60_000 / (m.rpm || 10)),
+        tier: "community-zero-cost",
+        rpm: m.rpm || 15,
+        minIntervalMs: Math.ceil(60_000 / (m.rpm || 15)),
         lastCallTime: 0,
         cooldownUntil: 0,
         ok: 0,
         failed: 0,
       }));
 
-      // Free providers stay at the front! Pollinations operates as secondary fallback
+      // Append community zero-cost providers strictly AFTER primary free providers
       this.providers = [...this.providers, ...capableProviders, ...fallbackProviders];
-      console.log(`[Providers] Successfully wired ${this.providers.length} total providers (Free providers prioritized first, Pollinations secondary).`);
+      console.log(`[Providers] Successfully wired ${this.providers.length} zero-cost providers (Primary free prioritized first, Pollinations 0-Pollen secondary).`);
     } else {
-      console.log(`[Providers] Operating on verified free providers.`);
+      console.log(`[Providers] Operating strictly on primary zero-cost free providers.`);
     }
   }
 
@@ -196,18 +244,42 @@ export class ProviderPool {
     const live = this.available;
     if (live.length === 0) return null;
 
-    // 1. Look for a provider whose RPM rate-limit interval has already elapsed
-    for (let i = 0; i < live.length; i++) {
-      const idx = (this.cursor + i) % live.length;
-      const candidate = live[idx];
+    // Tier 1 Priority: Primary free providers (Gemini, OpenRouter, Groq)
+    const primary = live.filter((p) => p.tier === "primary-free");
+    for (let i = 0; i < primary.length; i++) {
+      const idx = (this.cursor + i) % primary.length;
+      const candidate = primary[idx];
       const elapsed = now - (candidate.lastCallTime || 0);
       if (elapsed >= (candidate.minIntervalMs || 0)) {
-        this.cursor = (idx + 1) % live.length;
+        this.cursor = (idx + 1) % primary.length;
         return candidate;
       }
     }
 
-    // 2. If all are currently cooling down within their RPM spacing, pick the one ready soonest
+    // If primary providers are ready within 3 seconds, prefer waiting over secondary
+    if (primary.length > 0) {
+      const sortedPrimary = [...primary].sort((a, b) => {
+        const waitA = (a.lastCallTime || 0) + (a.minIntervalMs || 0) - now;
+        const waitB = (b.lastCallTime || 0) + (b.minIntervalMs || 0) - now;
+        return waitA - waitB;
+      });
+      const bestWait = (sortedPrimary[0].lastCallTime || 0) + (sortedPrimary[0].minIntervalMs || 0) - now;
+      if (bestWait <= 3000) {
+        return sortedPrimary[0];
+      }
+    }
+
+    // Tier 2: Community verified zero-cost models (Pollinations)
+    const secondary = live.filter((p) => p.tier === "community-zero-cost");
+    for (let i = 0; i < secondary.length; i++) {
+      const candidate = secondary[i];
+      const elapsed = now - (candidate.lastCallTime || 0);
+      if (elapsed >= (candidate.minIntervalMs || 0)) {
+        return candidate;
+      }
+    }
+
+    // Fallback: Pick whichever ready provider has minimum remaining wait
     const sorted = [...live].sort((a, b) => {
       const waitA = (a.lastCallTime || 0) + (a.minIntervalMs || 0) - now;
       const waitB = (b.lastCallTime || 0) + (b.minIntervalMs || 0) - now;
@@ -235,7 +307,14 @@ export class ProviderPool {
         if (waitMs > 0 && waitMs <= 30_000) {
           await new Promise((resolve) => setTimeout(resolve, waitMs));
         }
-        provider.lastCallTime = Date.now();
+        // Hard safety barrier: Never allow any metered Pollinations call
+        if (provider.baseUrl.includes("pollinations.ai") && this.isZeroCostModel) {
+          if (!this.isZeroCostModel(provider.model)) {
+            console.error(`  ⛔ [CRITICAL SAFETY GUARD] Refusing to call metered Pollinations model ${provider.model}. Dropping permanently.`);
+            provider.cooldownUntil = Infinity;
+            continue;
+          }
+        }
 
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 90_000);

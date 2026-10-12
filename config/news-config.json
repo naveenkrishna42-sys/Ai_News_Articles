@@ -30,7 +30,9 @@
     "baseUrl": "https://gen.pollinations.ai/v1",
     "envKey": "POLLINATIONS_API_KEY",
     "capableModels": [
-      { "id": "openai/gpt-5.4-nano", "name": "pollinations-gpt-5.4-nano", "rpm": 60 }
+      { "id": "community/YoannDev90/poolside-laguna-s-2.1:free", "name": "pollinations-laguna-free", "rpm": 15 },
+      { "id": "community/chirag-gamer/gpt-oss-120b", "name": "pollinations-gpt-oss-free", "rpm": 15 },
+      { "id": "community/ZapGaming/llama3.1-8b-xturbo", "name": "pollinations-llama-free", "rpm": 20 }
     ],
     "fallbackModels": []
   },
@@ -70,12 +72,6 @@
       "baseUrl": "https://api.groq.com/openai/v1",
       "model": "llama-3.1-8b-instant",
       "envKey": "GROQ_API_KEY"
-    },
-    {
-      "name": "pollinations",
-      "baseUrl": "https://text.pollinations.ai/openai",
-      "model": "openai-fast",
-      "envKey": "POLLINATIONS_API_KEY"
     },
     {
       "name": "deepseek",
