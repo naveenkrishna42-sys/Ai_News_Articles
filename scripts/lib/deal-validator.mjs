@@ -84,6 +84,7 @@ export async function generateAndValidateDealArticle(pool, item, directUrl, maxR
         console.warn(`  [Deals] Attempt ${attempt}/${maxRetries} — Failed to extract JSON object.`);
         continue;
       }
+      parsed.provider = response.provider || "gemini";
 
       // Check required fields
       const missing = REQUIRED_DEAL_FIELDS.filter(

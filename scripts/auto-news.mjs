@@ -340,7 +340,7 @@ const results = { written: 0, failed: 0, files: [] };
 async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, maxTokens = 3200, kind = "news" } = {}) {
   const userPrompt = `Headline: ${item.title}\nCategory: ${item.category}\nOriginal reporting by: ${item.sourceName}\nPublished: ${item.pubDate || today}\nSource snippet: ${item.summary || "(headline only — write carefully around unknown details)"}`;
 
-  const { text } = await pool.chat({ system: systemPrompt, user: userPrompt, maxTokens });
+  const { text, provider } = await pool.chat({ system: systemPrompt, user: userPrompt, maxTokens });
   const parsed = extractJson(text);
   const title = (parsed.title || item.title).slice(0, 110);
   let bodyHtml = parsed.content || "";
@@ -460,7 +460,7 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
   writeFileSync(path.join(ARTICLES_DIR, filename), html);
   results.written++;
   results.files.push(filename);
-  registry[item.key] = { t: title.slice(0, 120), d: today, c: item.category, k: kind };
+  registry[item.key] = { t: title.slice(0, 120), d: today, c: item.category, k: kind, p: provider || "gemini" };
   if (results.written % 20 === 0) saveRegistry();
   console.log(`  ✔ [${item.category}] ${title}`);
 }
@@ -490,7 +490,7 @@ function buildProductJsonLd(name, imageUrl) {
 async function writeReviewStory(item) {
   const userPrompt = `Headline: ${item.title}\nCategory: ${item.category}\nOriginal reporting by: ${item.sourceName}\nPublished: ${item.pubDate || today}\nSource snippet: ${item.summary || "(headline only)"}`;
 
-  const { text } = await pool.chat({ system: buildReviewSystemPrompt(), user: userPrompt, maxTokens: 3400 });
+  const { text, provider } = await pool.chat({ system: buildReviewSystemPrompt(), user: userPrompt, maxTokens: 3400 });
   const parsed = extractJson(text);
 
   const title = (parsed.title || item.title).slice(0, 110);
@@ -557,7 +557,7 @@ ${cons.length ? `<div style="flex:1;min-width:220px;"><strong style="color:#be12
   writeFileSync(path.join(ARTICLES_DIR, filename), html);
   results.written++;
   results.files.push(filename);
-  registry[item.key] = { t: title.slice(0, 120), d: today, c: "Gadget Comparisons", k: "review" };
+  registry[item.key] = { t: title.slice(0, 120), d: today, c: "Gadget Comparisons", k: "review", p: provider || "gemini" };
   if (results.written % 20 === 0) saveRegistry();
   console.log(`  ✔ [Gadget Comparisons] ${title} (review)`);
 }
@@ -569,7 +569,7 @@ ${cons.length ? `<div style="flex:1;min-width:220px;"><strong style="color:#be12
 async function writeComparisonStory(item) {
   const userPrompt = `Headline: ${item.title}\nCategory: ${item.category}\nOriginal reporting by: ${item.sourceName}\nPublished: ${item.pubDate || today}\nSource snippet: ${item.summary || "(headline only — pick a realistic rival and do not invent specs)"}`;
 
-  const { text } = await pool.chat({ system: buildComparisonSystemPrompt(), user: userPrompt, maxTokens: 3600 });
+  const { text, provider } = await pool.chat({ system: buildComparisonSystemPrompt(), user: userPrompt, maxTokens: 3600 });
   const parsed = extractJson(text);
 
   const title = (parsed.title || item.title).slice(0, 110);
@@ -646,7 +646,7 @@ async function writeComparisonStory(item) {
   writeFileSync(path.join(ARTICLES_DIR, filename), html);
   results.written++;
   results.files.push(filename);
-  registry[item.key] = { t: title.slice(0, 120), d: today, c: "Gadget Comparisons", k: "comparison" };
+  registry[item.key] = { t: title.slice(0, 120), d: today, c: "Gadget Comparisons", k: "comparison", p: provider || "gemini" };
   if (results.written % 20 === 0) saveRegistry();
   console.log(`  ✔ [Gadget Comparisons] ${title}`);
 }
@@ -873,7 +873,7 @@ async function writeDealStory(item) {
   writeFileSync(path.join(ARTICLES_DIR, filename), html);
   results.written++;
   results.files.push(filename);
-  registry[item.key] = { t: title.slice(0, 120), d: today, c: item.category, k: "deal" };
+  registry[item.key] = { t: title.slice(0, 120), d: today, c: item.category, k: "deal", p: parsed?.provider || "gemini" };
   if (results.written % 20 === 0) saveRegistry();
   console.log(`  ✔ [${item.category}] ${title} (deal)`);
 }
@@ -906,7 +906,7 @@ if (!NO_SPECIALS && pool.providers.length > 0) {
   const horoKey = `horoscopes-${today}`;
   if (config.specials.horoscopesPerDay && !registry[horoKey] && budget - results.written > 0) {
     try {
-      const { text } = await pool.chat({
+      const { text, provider } = await pool.chat({
         system: `You write TIVRA News daily horoscopes. Output STRICT JSON only: {"horoscopes":[{"sign":"Aries","title":"catchy title under 65 chars","description":"140-160 char summary","content":"HTML with <p> tags, 150-200 words covering love, career, health and a lucky colour/number"} , … all 12 zodiac signs]}`,
         user: `Write the 12 daily horoscopes for ${today}. Warm, encouraging, specific-feeling but general. Vary the openings — no two signs may start with the same words.`,
         maxTokens: 7000,
@@ -937,7 +937,7 @@ if (!NO_SPECIALS && pool.providers.length > 0) {
         results.written++;
         results.files.push(filename);
       }
-      registry[horoKey] = { t: "daily horoscopes", d: today, c: "Astrology", k: "special" };
+      registry[horoKey] = { t: "daily horoscopes", d: today, c: "Astrology", k: "special", p: provider || "gemini" };
       console.log(`  ✔ [Astrology] 12 daily horoscopes`);
     } catch (err) {
       console.log(`  ✖ [Astrology] horoscopes failed — ${err.message} (will retry next run)`);
