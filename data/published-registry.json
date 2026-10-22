@@ -34577,5 +34577,19 @@
   "c": "Product Deals & Offers",
   "k": "deal",
   "p": "gemini"
+ },
+ "deal-agoda-worldwide-hotel-booking-2026-10-22": {
+  "t": "...",
+  "d": "2026-10-22",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "c269c90ebaef4102": {
+  "t": "Puzhal Prison Breach: Escapees Apprehended, Seven Staff Suspended",
+  "d": "2026-10-22",
+  "c": "Chennai",
+  "k": "news",
+  "p": "gemini"
  }
 }
