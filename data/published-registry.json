@@ -34570,5 +34570,12 @@
   "c": "Product Deals & Offers",
   "k": "deal",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "deal-choice-hotels-us-&-international-2026-10-22": {
+  "t": "Choice Hotels US & International: A Value-Driven Stay Analysis",
+  "d": "2026-10-22",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "gemini"
  }
 }
