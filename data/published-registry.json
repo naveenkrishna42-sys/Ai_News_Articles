@@ -34486,5 +34486,47 @@
   "c": "World",
   "k": "news",
   "p": "gemini"
+ },
+ "eda5c76caab2f6a3": {
+  "t": "Delhi High Court Reserves Verdict on Neha Bora's Peace Bond Challenge",
+  "d": "2026-10-22",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "deal-kotak-811-zero-balance-savings-account-2026-10-22": {
+  "t": "Kotak 811: India's Zero Balance Digital Savings Account Deep Dive",
+  "d": "2026-10-22",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "gemini"
+ },
+ "deal-makemytrip-flights-&-hotels-2026-10-22": {
+  "t": "MakeMyTrip: Unpacking India's Leading Travel Booking Platform",
+  "d": "2026-10-22",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "gemini"
+ },
+ "5848caa3f5ed3d6f": {
+  "t": "Microsoft Launches Standalone Cloud Playtime Packs for Xbox Insiders",
+  "d": "2026-10-22",
+  "c": "Technology",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "1cbd6eb711dee611": {
+  "t": "Tacrolimus Variability: A Silent Threat to Kidney Transplant Success",
+  "d": "2026-10-22",
+  "c": "Health",
+  "k": "news",
+  "p": "gemini"
+ },
+ "horoscopes-2026-10-22": {
+  "t": "daily horoscopes",
+  "d": "2026-10-22",
+  "c": "Astrology",
+  "k": "special",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
