@@ -29174,5 +29174,19 @@
   "c": "Product Deals & Offers",
   "k": "deal",
   "p": "gemini"
+ },
+ "bb4714b5cb070e7d": {
+  "t": "Mideast Tensions Mount: Houthi Claims on Saudi Oil, Aden Attacks Reported",
+  "d": "2026-10-24",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "da9f77fedc63d5b8": {
+  "t": "Pixel Watch 5, Lenovo Tab Plus Gen 2 Bundle Review",
+  "d": "2026-10-24",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
