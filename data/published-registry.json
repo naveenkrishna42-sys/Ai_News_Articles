@@ -28791,14 +28791,14 @@
   "p": "gemini"
  },
  "0ab39f43e3fcfd31": {
-  "t": "CBI Nabs ED Officer, Constable in ₹5 Lakh Bribery Probe",
+  "t": "CBI Arrests ED Officials in ₹5 Lakh Bribery Case: Integrity Under Scrutiny",
   "d": "2026-10-24",
   "c": "Breaking News",
   "k": "news",
   "p": "gemini"
  },
  "1dfd04454319f348": {
-  "t": "Trump's Cuba Hint: Post-Conflict Geopolitical Maneuvers Emerge",
+  "t": "Trump's Cuba Play: 'Stopover' Hint Signals Post-Conflict Shift",
   "d": "2026-10-24",
   "c": "Breaking News",
   "k": "news",
@@ -28809,6 +28809,20 @@
   "d": "2026-10-24",
   "c": "Bengaluru",
   "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "27c54ef0a7242d57": {
+  "t": "Trump Eases Canada Tariffs: Midterm Strategy or Economic Relief?",
+  "d": "2026-10-24",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "1629254d9bec5bad": {
+  "t": "Samsung Galaxy S26 Ultra Price Drop Review: Worth It?",
+  "d": "2026-10-24",
+  "c": "Product Deals & Offers",
+  "k": "deal",
   "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
