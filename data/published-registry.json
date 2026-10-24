@@ -28824,5 +28824,33 @@
   "c": "Product Deals & Offers",
   "k": "deal",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "4d6a9a79a383c750": {
+  "t": "Melania Trump's Intervention Secures Oleshky Ceasefire Amid Crisis",
+  "d": "2026-10-24",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "8dbfbad41a8d4012": {
+  "t": "Arson Suspected as Fire Engulfs Hitler's Eagle's Nest in Germany",
+  "d": "2026-10-24",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "deal-makemytrip-flights-&-hotels-2026-10-24": {
+  "t": "MakeMyTrip Offers: Decoding Value in India's Travel Deals",
+  "d": "2026-10-24",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "gemini"
+ },
+ "f8bf907c2c347ef1": {
+  "t": "Hoey three-fer, Stirling fifty set up convincing win for Ireland",
+  "d": "2026-10-24",
+  "c": "Sports",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
