@@ -28782,5 +28782,33 @@
   "c": "Bengaluru",
   "k": "news",
   "p": "gemini"
+ },
+ "ef09001c385285f3": {
+  "t": "Critical PHP Flaws Trigger Global Alert: Millions of Services at Risk",
+  "d": "2026-10-24",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "0ab39f43e3fcfd31": {
+  "t": "CBI Nabs ED Officer, Constable in ₹5 Lakh Bribery Probe",
+  "d": "2026-10-24",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "1dfd04454319f348": {
+  "t": "Trump's Cuba Hint: Post-Conflict Geopolitical Maneuvers Emerge",
+  "d": "2026-10-24",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "b14e0896d0c68f79": {
+  "t": "Bengaluru Lakes Shrinking Fast: What Happened and Why",
+  "d": "2026-10-24",
+  "c": "Bengaluru",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
