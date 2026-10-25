@@ -27643,5 +27643,33 @@
   "c": "Science",
   "k": "news",
   "p": "gemini"
+ },
+ "c8589850176ba1c3": {
+  "t": "Hunter's Moon 2026: Observing October's Full Moon & Beyond",
+  "d": "2026-10-25",
+  "c": "Science",
+  "k": "news",
+  "p": "gemini"
+ },
+ "6c2b9a3a3c1846c3": {
+  "t": "Pollution Masks for Kids: Expert Guide to Selection and Fit",
+  "d": "2026-10-25",
+  "c": "Science",
+  "k": "news",
+  "p": "gemini"
+ },
+ "5261999371d0faca": {
+  "t": "iQOO 16R Clears TKDN: Rebrand or New Powerhouse for Global Market?",
+  "d": "2026-10-25",
+  "c": "Technology",
+  "k": "news",
+  "p": "gemini"
+ },
+ "4f1bdb34daafb697": {
+  "t": "Russia, Ukraine Agree on Ceasefire in Oleshky, Plan Talks Next Month",
+  "d": "2026-10-25",
+  "c": "World",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
