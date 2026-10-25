@@ -27328,5 +27328,33 @@
   "c": "Business",
   "k": "news",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "3d5dbb601e3a0a3c": {
+  "t": "Trump's Iran Gambit: Strike Threat, 'Beautiful Deal' Offer",
+  "d": "2026-10-25",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "a0e79f3e624d2ff2": {
+  "t": "Kaul's Memoir: CJI Chandrachud's Pre-Approval Practice Rocks Judiciary",
+  "d": "2026-10-25",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "37d09119aecf839b": {
+  "t": "Chennai Endocrinology Summit: Shaping the Future of Diabetes Care",
+  "d": "2026-10-25",
+  "c": "Chennai",
+  "k": "news",
+  "p": "gemini"
+ },
+ "88eaa58d51ff27ff": {
+  "t": "Amex Cruise Privileges Guide: Worth It?",
+  "d": "2026-10-25",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
