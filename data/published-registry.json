@@ -27531,5 +27531,19 @@
   "c": "Product Deals & Offers",
   "k": "news",
   "p": "gemini"
+ },
+ "d125e81f2a73727e": {
+  "t": "Delhi's BS6 Mandate: Pre-2020 Vehicle Ban Looms",
+  "d": "2026-10-25",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "b8e46f399df5e2ae": {
+  "t": "Stock Market Weekly Wrap: Rs 16 lakh crore mcap wiped out — what lies ahead?",
+  "d": "2026-10-25",
+  "c": "Markets",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
