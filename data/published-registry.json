@@ -27547,7 +27547,7 @@
   "p": "openrouter-xing4.0-29b-a4b:free"
  },
  "292f31a99d44e7b4": {
-  "t": "Cyclone Arnab Threatens AP: 'Very Severe' Storm Expected",
+  "t": "Cyclone Arnab: Andhra Pradesh, Odisha Brace for Very Severe Impact",
   "d": "2026-10-25",
   "c": "Breaking News",
   "k": "news",
@@ -27573,5 +27573,26 @@
   "c": "Product Deals & Offers",
   "k": "deal",
   "p": "gemini"
+ },
+ "12978b72c8ef2191": {
+  "t": "India-EU FTA: The Decisive Sprint Towards a Landmark December Deal",
+  "d": "2026-10-25",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "edcb3f057691bf3d": {
+  "t": "Pentagon's Global War Plan: Resilient Bases, 90-Day Readiness Push",
+  "d": "2026-10-25",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "c0b0fe2dfe8d822c": {
+  "t": "Will Apple Take Over Your Smart Home?",
+  "d": "2026-10-25",
+  "c": "Technology",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
