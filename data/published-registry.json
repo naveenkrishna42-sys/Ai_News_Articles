@@ -27622,5 +27622,26 @@
   "c": "India",
   "k": "news",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "4fc13fc208ccbe09": {
+  "t": "Sensational Shadab Khan scripts one-wicket thriller for Pakistan",
+  "d": "2026-10-25",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "9386e67b2804462f": {
+  "t": "Lunar Outpost Race: NASA, SpaceX, Blue Origin Forge Moon Base Future",
+  "d": "2026-10-25",
+  "c": "Science",
+  "k": "news",
+  "p": "gemini"
+ },
+ "ff7b94a9d53da67d": {
+  "t": "IIT-M Faculty Shapes Global Molecular Electronics Breakthrough",
+  "d": "2026-10-25",
+  "c": "Science",
+  "k": "news",
+  "p": "gemini"
  }
 }
