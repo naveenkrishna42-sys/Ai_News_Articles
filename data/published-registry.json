@@ -26656,5 +26656,26 @@
   "c": "Breaking News",
   "k": "news",
   "p": "gemini"
+ },
+ "2beba7bca6c15c06": {
+  "t": "ECI Defends Unanimity, Form 6 Status to Supreme Court Amidst 'SIR Row'",
+  "d": "2026-10-26",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "faedfb73c00e5afb": {
+  "t": "Anthropic's IPO Filing: Decoding AI's Future, Costs, and Investor Risks",
+  "d": "2026-10-26",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "977e3f7b78e89077": {
+  "t": "Hyderabad Metro Phase-2 Consultancy Rivalry Intensifies",
+  "d": "2026-10-26",
+  "c": "Hyderabad",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
