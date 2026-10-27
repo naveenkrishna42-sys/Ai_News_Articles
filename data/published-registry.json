@@ -24964,5 +24964,19 @@
   "c": "India",
   "k": "news",
   "p": "gemini"
+ },
+ "8d4baae86e1a580b": {
+  "t": "How RBI Governor Malhotra clears doubts over the Sept 11 directive on board approvals",
+  "d": "2026-10-27",
+  "c": "Banking",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "84fcc09fb619ba57": {
+  "t": "NativePHP Mobile: Critical Security Update 4.6.1 Mandates Immediate Action",
+  "d": "2026-10-27",
+  "c": "Technology",
+  "k": "news",
+  "p": "gemini"
  }
 }
