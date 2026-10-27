@@ -24943,5 +24943,26 @@
   "c": "Product Deals & Offers",
   "k": "deal",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "1302310e38e932a4": {
+  "t": "UNSC Reform: India Demands Veto Parity for New Permanent Members",
+  "d": "2026-10-27",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "a487bfb52e889481": {
+  "t": "Hyderabad Farmhouse Tragedy: Death Prompts Foul Play Investigation",
+  "d": "2026-10-27",
+  "c": "India",
+  "k": "news",
+  "p": "gemini"
+ },
+ "e001ca94236cab99": {
+  "t": "ECI's 'Trade Secret' Stance Sparks Electoral Transparency Concerns",
+  "d": "2026-10-27",
+  "c": "India",
+  "k": "news",
+  "p": "gemini"
  }
 }
