@@ -23499,5 +23499,26 @@
   "c": "Credit Cards & Cashback",
   "k": "news",
   "p": "gemini"
+ },
+ "5db1599aada62fe8": {
+  "t": "DNA Typewriter Unlocks Complete Embryonic Development Map",
+  "d": "2026-10-28",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "2d39868aaa4b446a": {
+  "t": "MacBook Pro Gets OLED, Touchscreen: Apple's M6 AI Leap",
+  "d": "2026-10-28",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "0ecee7b8b964e936": {
+  "t": "Betelgeuse’s Atmosphere is Back to Normal after Great Dimming Event, New Radio Observations Show",
+  "d": "2026-10-28",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
