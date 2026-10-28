@@ -23436,5 +23436,26 @@
   "c": "Breaking News",
   "k": "news",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "270c1c4c72533a12": {
+  "t": "Flavio Bolsonaro lands in Miami after losing Brazil’s presidential election",
+  "d": "2026-10-28",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "b14e26bb00381c80": {
+  "t": "PM2.5 Exposure: Unraveling the Brain's Silent Vulnerability",
+  "d": "2026-10-28",
+  "c": "Health",
+  "k": "news",
+  "p": "gemini"
+ },
+ "8fabc42b87fd6dde": {
+  "t": "Cholangiocarcinoma: Navigating Radiotherapy's Local Impact",
+  "d": "2026-10-28",
+  "c": "Health",
+  "k": "news",
+  "p": "gemini"
  }
 }
