@@ -23387,5 +23387,47 @@
   "c": "Product Deals & Offers",
   "k": "deal",
   "p": "gemini"
+ },
+ "5ab276060c23fd48": {
+  "t": "MLC Results: PM Modi's Taunt Signals BJP's Confidence, Congress Defends Ballot",
+  "d": "2026-10-28",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "57bbf541bae4ef76": {
+  "t": "Spain's Second Major Train Crash: 68 Dead, Safety Under Scrutiny",
+  "d": "2026-10-28",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "6b71d384ce264433": {
+  "t": "Cyclone Arnab Aftermath: Andhra Pradesh Grapples with Devastation",
+  "d": "2026-10-28",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "deal-makemytrip-flights-&-hotels-2026-10-28": {
+  "t": "MakeMyTrip Flights & Hotels Review: Unlocking Value in Travel Bookings",
+  "d": "2026-10-28",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "gemini"
+ },
+ "85b9b2e12aa2ff83": {
+  "t": "Hyderabad's Resurgent Spirit: Honoring the 'Devi' Within Women",
+  "d": "2026-10-28",
+  "c": "Hyderabad",
+  "k": "news",
+  "p": "gemini"
+ },
+ "708caeec74e394ea": {
+  "t": "Damp Walls at GCC School After Inauguration Raise Alarms",
+  "d": "2026-10-28",
+  "c": "Chennai",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
