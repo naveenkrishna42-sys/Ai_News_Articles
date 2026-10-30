@@ -20388,5 +20388,19 @@
   "c": "Banking",
   "k": "news",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "718a0a6f904072d7": {
+  "t": "Indian Markets Surge: Nifty Crosses 22,900, Sensex Up 905 Points",
+  "d": "2026-10-30",
+  "c": "Markets",
+  "k": "news",
+  "p": "gemini"
+ },
+ "34c9741f01c4ee3e": {
+  "t": "7 Skywatching Horror Stories Worth Watching This Halloween",
+  "d": "2026-10-30",
+  "c": "Science",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
