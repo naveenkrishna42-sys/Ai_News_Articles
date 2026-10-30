@@ -20311,5 +20311,47 @@
   "c": "Breaking News",
   "k": "news",
   "p": "gemini"
+ },
+ "262cc2130358d00c": {
+  "t": "Jio Platforms Nifty/Sensex Entry: Rs 36,500 Cr Passive Fund Inflow Looms",
+  "d": "2026-10-30",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "bdcce741fe4fc0aa": {
+  "t": "US Midterms: Trump's Campaign Shift Days Before Crucial Vote",
+  "d": "2026-10-30",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "ec97cbbfc4f53459": {
+  "t": "Binance Rocked by $6.3 Billion Heist: A New Benchmark for Crypto Security Failure",
+  "d": "2026-10-30",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "81916e1e8c2238af": {
+  "t": "Retinal Scans: A Window to Your Heart Health",
+  "d": "2026-10-30",
+  "c": "Health",
+  "k": "news",
+  "p": "gemini"
+ },
+ "deal-kiwi-rupay-upi-credit-card-2026-10-30": {
+  "t": "Kiwi RuPay UPI Credit Card Review: Unlocking Seamless Digital Payments",
+  "d": "2026-10-30",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "gemini"
+ },
+ "deal-hdfc-swiggy-cashback-credit-card-2026-10-30": {
+  "t": "HDFC Swiggy Cashback Credit Card Review: Is It Worth It?",
+  "d": "2026-10-30",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
