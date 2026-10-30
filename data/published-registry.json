@@ -20451,5 +20451,26 @@
   "c": "Science",
   "k": "news",
   "p": "gemini"
+ },
+ "a356f554baf8a80f": {
+  "t": "Novaya Gazeta Silenced: Russia's Last Independent Voice Shut Down",
+  "d": "2026-10-30",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "f35e28a530b29651": {
+  "t": "Top Offers Analyzed: Phantom Blade Zero, LEGO Artemis, Pokémon TCG",
+  "d": "2026-10-30",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "gemini"
+ },
+ "49c1e4e7749fdf26": {
+  "t": "'Godzilla' Drug Retatrutide Reverses Sleep Apnea In Diabetes Patients",
+  "d": "2026-10-30",
+  "c": "Health",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
