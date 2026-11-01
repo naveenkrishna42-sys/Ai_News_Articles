@@ -20183,5 +20183,19 @@
   "c": "Top Stories",
   "k": "news",
   "p": "gemini"
+ },
+ "5376690a7d1a54ad": {
+  "t": "France Deploys 70,000 Police as Halloween Protests Turn Volatile",
+  "d": "2026-11-01",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "openrouter-nemotron-3.5-super-vl:free"
+ },
+ "56a883bf955d78cb": {
+  "t": "Binance Absorbs 90% of $6.3 Billion Hack Losses: A Trust Test",
+  "d": "2026-11-01",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "gemini"
  }
 }
