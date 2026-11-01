@@ -20304,7 +20304,7 @@
   "p": "gemini"
  },
  "deal-agoda-worldwide-hotel-booking-2026-11-01": {
-  "t": "Agoda Worldwide Hotel Booking: Is It Your Best Travel Companion?",
+  "t": "Agoda Worldwide Hotel Booking: Is It Your Best Travel Partner?",
   "d": "2026-11-01",
   "c": "Product Deals & Offers",
   "k": "deal",
@@ -20370,6 +20370,13 @@
   "t": "Maruti Suzuki Victoris Aurum Edition: A Premium Play for Hyderabad",
   "d": "2026-11-01",
   "c": "Hyderabad",
+  "k": "news",
+  "p": "gemini"
+ },
+ "323f704617e7dde7": {
+  "t": "Madhavan & Furia Unite: A Deep Dive into India's Next Horror Thriller",
+  "d": "2026-11-01",
+  "c": "Movies",
   "k": "news",
   "p": "gemini"
  }
