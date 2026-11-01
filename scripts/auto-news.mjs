@@ -342,8 +342,13 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
 
   const { text, provider } = await pool.chat({ system: systemPrompt, user: userPrompt, maxTokens });
   const parsed = extractJson(text);
-  const title = (parsed.title || item.title).slice(0, 110);
-  let bodyHtml = parsed.content || "";
+  const rawTitle = (parsed.title || "").trim();
+  const isInvalidTitle = !rawTitle || rawTitle.length < 12 || /^\.+$/.test(rawTitle) || /compelling.*headline|headline under \d+ chars|authoritative headline/i.test(rawTitle);
+  const title = (isInvalidTitle ? item.title : rawTitle).slice(0, 110);
+  if (!title || title.length < 10 || /^\.+$/.test(title)) {
+    throw new Error(`Quality Gate: rejected due to invalid title "${title}"`);
+  }
+  let bodyHtml = (parsed.content || "").replace(/^Full article body HTML using ONLY [^\n<]*\s*/i, "").trim();
 
   // Multi-part generation: if output was cut off or shorter than minWords, request Part 2 continuation
   if (countWords(bodyHtml) < minWords) {
@@ -365,12 +370,20 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
     }
   }
 
+  bodyHtml = bodyHtml.replace(/^Full article body HTML using ONLY [^\n<]*\s*/i, "").trim();
+
   if (countWords(bodyHtml) < minWords) throw new Error(`too short (${countWords(bodyHtml)} words)`);
 
   // FACT-CHECK / QUALITY GATE:
   // Catch severe content mismatches, fabricated retail prices on cards, or anachronisms
   const bodyTextLower = bodyHtml.replace(/<[^>]+>/g, " ").toLowerCase();
   const headlineLower = item.title.toLowerCase();
+
+  // 0. Check for prompt template echoes / placeholder leakage
+  if (/compelling.*headline|headline under \d+ chars/i.test(title) ||
+      /full article body html using only|crucial takeaway \d/i.test(bodyTextLower)) {
+    throw new Error(`Quality Gate: rejected due to prompt placeholder leakage in headline or content`);
+  }
 
   // 1. Check for QuantumX / processor hallucination in non-tech articles
   if (/quantumx|i9-13900k|ryzen 9 7950x/i.test(bodyTextLower) && !/processor|chipset|intel|amd|cpu/i.test(headlineLower)) {
@@ -438,14 +451,21 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
     }
   }
 
+  const rawDesc = (parsed.description || "").trim();
+  const isInvalidDesc = !rawDesc || rawDesc.length < 15 || /^\.+$/.test(rawDesc) || /authoritative meta description|meta description, \d+/i.test(rawDesc);
+  const safeDescription = isInvalidDesc ? title : rawDesc;
+  const safeKeyPoints = (Array.isArray(parsed.key_points) ? parsed.key_points : [])
+    .map((kp) => typeof kp === "string" ? kp.trim() : "")
+    .filter((kp) => kp && kp.length > 5 && !/^\.+$/.test(kp) && !/crucial takeaway|takeaway \d+/i.test(kp));
+
   const html = renderArticlePage({
     title,
-    description: parsed.description || title,
+    description: safeDescription,
     category: item.category,
     date: today,
     heroImage,
     heroCredit,
-    keyPoints: parsed.key_points || [],
+    keyPoints: safeKeyPoints,
     bodyHtml: finalBodyHtml,
     sourceName: item.sourceName,
     sourceUrl: item.sourceUrl,
@@ -812,7 +832,10 @@ async function writeDealStory(item) {
     return writeStory(item, nicheSystem ? { systemPrompt: nicheSystem } : {});
   }
 
-  const title = parsed.title;
+  const title = (parsed.title || item.title || "").trim();
+  if (!title || title.length < 12 || /^\.+$/.test(title) || /authoritative headline/i.test(title)) {
+    throw new Error(`Quality Gate: rejected deal story due to invalid title "${title}"`);
+  }
   const productName = parsed.productName || extractCleanProductName(item.title);
   const ratingBadge = `<div class="rating-badge" style="display:inline-block;background:#059669;color:#fff;font-weight:800;padding:4px 10px;border-radius:6px;font-size:0.9rem;margin-bottom:12px;">★ ${parsed.rating} / 5.0 Value Rating</div>`;
   const ratingText = parsed.ratingReason ? `<p><em>${escapeHtml(parsed.ratingReason)}</em></p>` : "";

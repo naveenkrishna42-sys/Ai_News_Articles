@@ -96,6 +96,26 @@ export async function generateAndValidateDealArticle(pool, item, directUrl, maxR
         continue;
       }
 
+      // Validate title and body content quality
+      if (
+        !parsed.title ||
+        parsed.title.trim().length < 15 ||
+        /^\.+$/.test(parsed.title.trim()) ||
+        /authoritative headline/i.test(parsed.title)
+      ) {
+        console.warn(`  [Deals] Attempt ${attempt}/${maxRetries} — Invalid title: "${parsed.title}"`);
+        continue;
+      }
+
+      if (
+        !parsed.articleBody ||
+        parsed.articleBody.trim().length < 300 ||
+        /^\.+$/.test(parsed.articleBody.trim())
+      ) {
+        console.warn(`  [Deals] Attempt ${attempt}/${maxRetries} — Insufficient article body content`);
+        continue;
+      }
+
       // Coerce & clamp rating
       let ratingNum = parseFloat(parsed.rating);
       if (isNaN(ratingNum)) ratingNum = 4.2;
