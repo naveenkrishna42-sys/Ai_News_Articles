@@ -342,12 +342,13 @@ export function sanitizeProductName(name) {
   if (clean.includes(" — ")) clean = clean.split(" — ")[0].trim();
   if (clean.includes(" - ")) clean = clean.split(" - ")[0].trim();
 
-  const junkPattern = /top\s*\d+|best\s*\d+|shopping\s*sites|sites\s*in\s*india|clothes|fashion|apps|ecommerce|discounts?|schemes?|savings?|republic\s*day|deals?|offers?|sales?|price\s*drops?|worth\s*checking|how\s*to|why/gi;
-  if (junkPattern.test(clean) && clean.split(/\s+/).length > 3) {
+  const genericListiclePattern = /^(top|best)\s*\d+|shopping\s*sites|sites\s*in\s*india|ecommerce|how\s*to|why\s+/i;
+  if (genericListiclePattern.test(clean) && clean.split(/\s+/).length > 3) {
     return "";
   }
 
-  clean = clean.replace(junkPattern, "").trim();
+  const dealBuzzwords = /\b(amazon\s*sale|flipkart\s*sale|great\s*indian\s*festival|big\s*billion\s*days|deal\s*alert|deals?|offers?|sales?|price\s*drops?|price\s*cut|discounts?|massive\s*discount|steep\s*discount|flat\s*off|gets\s*a\s*huge|huge\s*discount|worth\s*the\s*investment|worth\s*buying|is\s*it\s*worth\s*it|review|amazon|flipkart)\b/gi;
+  clean = clean.replace(dealBuzzwords, " ").replace(/\s+/g, " ").trim();
   return (clean.length >= 3 && clean.length <= 35) ? clean : "";
 }
 
@@ -404,11 +405,24 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   if (directUrl && typeof directUrl === "string" && directUrl.startsWith("http") && !directUrl.includes("news.google.com")) {
     const candidateName = (deviceNames && deviceNames[0]) || title || "Featured Offer";
     const cleanProd = sanitizeProductName(candidateName) || candidateName;
+    const amazonTag = config?.affiliate?.amazonTag || DEFAULT_AMAZON_TAG;
     return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:14px;">Verified Direct Deal &amp; Official Store Offer</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
   <a href="${escapeHtml(directUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#e11d48;color:#fff;font-weight:700;font-size:.95rem;text-decoration:none;padding:12px 24px;border-radius:8px;transition:opacity 0.2s;">
     <span>⚡ Claim Verified Deal (${escapeHtml(cleanProd.slice(0, 45))}) &rarr;</span>
+  </a>
+</div>
+<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #e2e8f0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
+  <span style="font-size:.76rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">⚡ Quick Deals &amp; Essentials:</span>
+  <a href="https://www.amazon.in/gp/goldbox?tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
+    <span>🔥 Lightning Deals</span>
+  </a>
+  <a href="https://www.amazon.in/s?k=mobile+accessories+under+499&tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
+    <span>⚡ Tech Under ₹499</span>
+  </a>
+  <a href="https://www.amazon.in/gp/bestsellers?tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
+    <span>⭐ Amazon Bestsellers</span>
   </a>
 </div>
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
@@ -656,6 +670,18 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   </a>
   <a href="${escapeHtml(relianceUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e42529;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛒 Buy at Reliance Digital</span>
+  </a>
+</div>
+<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #e2e8f0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
+  <span style="font-size:.76rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">⚡ Quick Deals &amp; Essentials:</span>
+  <a href="https://www.amazon.in/gp/goldbox?tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
+    <span>🔥 Lightning Deals</span>
+  </a>
+  <a href="https://www.amazon.in/s?k=mobile+accessories+under+499&tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
+    <span>⚡ Tech Under ₹499</span>
+  </a>
+  <a href="https://www.amazon.in/gp/bestsellers?tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
+    <span>⭐ Amazon Bestsellers</span>
   </a>
 </div>
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
