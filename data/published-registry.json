@@ -20701,5 +20701,33 @@
   "c": "Product Deals & Offers",
   "k": "news",
   "p": "gemini"
+ },
+ "608a6035bca0d4a1": {
+  "t": "Houthi Drone Claims: Saudi Air Defense Efficacy & Regional Risks",
+  "d": "2026-11-02",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "c8f75c5479eac1a6": {
+  "t": "Tucker Carlson Warns of Nuclear War Over Iran",
+  "d": "2026-11-02",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "d0836eff2b3b1e3e": {
+  "t": "Hyderabad Pioneers AI Driving Tests: A New Era for Road Safety",
+  "d": "2026-11-02",
+  "c": "Hyderabad",
+  "k": "news",
+  "p": "gemini"
+ },
+ "9e20d02d78e3ead1": {
+  "t": "Market Movers: Deciphering the 10 Key Factors for Tuesday's Stock Action",
+  "d": "2026-11-02",
+  "c": "Markets",
+  "k": "news",
+  "p": "gemini"
  }
 }
