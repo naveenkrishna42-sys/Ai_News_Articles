@@ -20981,5 +20981,33 @@
   "c": "Product Deals & Offers",
   "k": "deal",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "a67b11a5ef310cec": {
+  "t": "Gold's Q3 2026 Paradox: Global Surge, India's Demand Dip",
+  "d": "2026-11-03",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "82b228fe6cfa2b47": {
+  "t": "AP Municipal Polls 2026: Jagan Slams Naidu Amidst Tight Races",
+  "d": "2026-11-03",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "6f926b404c68ac42": {
+  "t": "K-pop's Hyderabad Ascent: NTX Performance Signals Global Cultural Shift",
+  "d": "2026-11-03",
+  "c": "Hyderabad",
+  "k": "news",
+  "p": "gemini"
+ },
+ "cd73df018aa5323c": {
+  "t": "Telangana's Illegal Egg Harvesting Racket: A Deep Dive into Ethical Breaches",
+  "d": "2026-11-03",
+  "c": "Hyderabad",
+  "k": "news",
+  "p": "gemini"
  }
 }
