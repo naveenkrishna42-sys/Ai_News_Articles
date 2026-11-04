@@ -21254,5 +21254,33 @@
   "c": "Breaking News",
   "k": "news",
   "p": "gemini"
+ },
+ "669b12cce75feab4": {
+  "t": "Israeli Elections 2026: Foreign Interference Allegations Cloud Government Formation",
+  "d": "2026-11-04",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "f63857bdab533e03": {
+  "t": "Musk's $474M Midterm Gamble: 'Space Lasers' Didn't Work",
+  "d": "2026-11-04",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "b73633c6ef37368d": {
+  "t": "Riyadh Airport Attack: Second Indian Victim Succumbs to Injuries",
+  "d": "2026-11-04",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "6ce357d61d3143c7": {
+  "t": "New Indian Movies & Shows Added to Netflix in Oct 2026",
+  "d": "2026-11-04",
+  "c": "Movies",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
