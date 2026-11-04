@@ -21282,5 +21282,33 @@
   "c": "Movies",
   "k": "news",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "84e3564a38828e39": {
+  "t": "Abdul El-Sayed Wins Michigan Senate, Marks Historic First for US",
+  "d": "2026-11-04",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "deal-udemy-tech-&-business-courses-2026-11-04": {
+  "t": "Udemy Tech & Business Courses Review: Unlocking Value in Online Learning",
+  "d": "2026-11-04",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "gemini"
+ },
+ "deal-makemytrip-flights-&-hotels-2026-11-04": {
+  "t": "MakeMyTrip Flights & Hotels: A Deep Dive into India's Leading Travel Platform",
+  "d": "2026-11-04",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "gemini"
+ },
+ "51d16d1a6db9e97d": {
+  "t": "Samsung Galaxy Watch6 Price Drop Review: Is It Worth Buying?",
+  "d": "2026-11-04",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
