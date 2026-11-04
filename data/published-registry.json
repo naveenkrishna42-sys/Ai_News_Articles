@@ -21310,5 +21310,33 @@
   "c": "Product Deals & Offers",
   "k": "deal",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "4f5a3e724bb5bd29": {
+  "t": "GOP Midterm Rout: Five Core Reasons Behind the Electoral Setback",
+  "d": "2026-11-04",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "501cc155109ed885": {
+  "t": "Telangana Conductor's Death: A Tragic Call for Public Transport Safety",
+  "d": "2026-11-04",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "2229784444b37da1": {
+  "t": "Oppo Find X9 Ultra: Decoding the ₹18,000+ Discount Value",
+  "d": "2026-11-04",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "gemini"
+ },
+ "387d286ef49d3746": {
+  "t": "IND vs NZ: Virat Kohli's Spectacular Catch Dismisses Nathan Smith",
+  "d": "2026-11-04",
+  "c": "Sports",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
