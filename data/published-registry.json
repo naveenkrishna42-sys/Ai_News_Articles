@@ -21480,14 +21480,14 @@
   "p": "gemini"
  },
  "e3b47f0a6d6d2fbc": {
-  "t": "Israel's Fractured Mandate: Herzog Initiates Critical Coalition Talks",
+  "t": "Herzog Begins Talks to Break Israeli Political Deadlock",
   "d": "2026-11-05",
   "c": "Breaking News",
   "k": "news",
   "p": "gemini"
  },
  "9e3e953f6b6365f7": {
-  "t": "Chawri Bazaar Collapse: Two Dead, Multiple Trapped in Old Delhi",
+  "t": "Chawri Bazaar Collapse: Unauthorised Construction Linked to Delhi Tragedy",
   "d": "2026-11-05",
   "c": "Breaking News",
   "k": "news",
@@ -21609,6 +21609,34 @@
   "t": "Andhra Chainsaw Attack: Rekindling the Cinematic Violence Debate",
   "d": "2026-11-05",
   "c": "Entertainment",
+  "k": "news",
+  "p": "gemini"
+ },
+ "caf2a9c08aa53582": {
+  "t": "2026 US Midterms: Democrats Sweep Congress, Key Outcomes & Global Impact",
+  "d": "2026-11-05",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "dc6a1cbda965cbc9": {
+  "t": "Vietnam's Scholarly Heritage: A Potent Soft Power Asset",
+  "d": "2026-11-05",
+  "c": "Culture & Arts",
+  "k": "news",
+  "p": "gemini"
+ },
+ "798082643bbc415b": {
+  "t": "Maximize Your Hotel Savings: Latest Expedia Discount Strategies",
+  "d": "2026-11-05",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "dee1cc1c062da853": {
+  "t": "Retinal AI: A New Frontier in Early Diabetic Kidney Disease Detection",
+  "d": "2026-11-05",
+  "c": "Health",
   "k": "news",
   "p": "gemini"
  }
