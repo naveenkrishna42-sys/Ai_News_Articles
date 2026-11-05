@@ -21429,5 +21429,40 @@
   "c": "Product Deals & Offers",
   "k": "deal",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "98a5929d6946acd3": {
+  "t": "India's Tax Cut Dilemma: Attracting FPIs vs. Fiscal Prudence",
+  "d": "2026-11-05",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "deal-agoda-worldwide-hotel-booking-2026-11-05": {
+  "t": "Agoda's Global Reach: A Deep Dive into Value and Booking Efficiency",
+  "d": "2026-11-05",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "gemini"
+ },
+ "deal-trip.com-international-flights-&-stays-2026-11-05": {
+  "t": "Trip.com's Global Reach: Strategic Value for Indian International Travellers",
+  "d": "2026-11-05",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "gemini"
+ },
+ "a612bdf638f9c5a8": {
+  "t": "Sophisticated Mobile Exploits Target iOS, Android Via Compromised Sites",
+  "d": "2026-11-05",
+  "c": "Technology",
+  "k": "news",
+  "p": "gemini"
+ },
+ "b250b3eca1ffad84": {
+  "t": "Immune Myths Exposed: Navigating Online Health Misinformation",
+  "d": "2026-11-05",
+  "c": "Health",
+  "k": "news",
+  "p": "gemini"
  }
 }
