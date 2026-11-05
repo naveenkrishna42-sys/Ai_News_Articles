@@ -21408,5 +21408,26 @@
   "c": "World",
   "k": "news",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "013947583148767d": {
+  "t": "NYT Strands: Your Expert Guide to Mastering Daily Puzzles",
+  "d": "2026-11-05",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "4a77b873135edaf5": {
+  "t": "Hakeem Jeffries: The Path to a Historic US House Speakership",
+  "d": "2026-11-05",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "e8bb6a07e00298b2": {
+  "t": "iPhone 17 Pro Price Drop Review: Worth the Hype?",
+  "d": "2026-11-05",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
