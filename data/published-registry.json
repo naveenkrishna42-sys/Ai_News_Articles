@@ -21795,7 +21795,7 @@
   "p": "gemini"
  },
  "9adf202bceabd020": {
-  "t": "Federal Judge Halts Trump's Controversial DC Arch Construction",
+  "t": "Federal Judge Halts Trump's DC Triumphal Arch Construction",
   "d": "2026-11-06",
   "c": "Breaking News",
   "k": "news",
@@ -21912,5 +21912,12 @@
   "c": "India",
   "k": "news",
   "p": "gemini"
+ },
+ "7bc1f6259219976a": {
+  "t": "Silicon chip filters fake signals to expose dark matter ghost particle",
+  "d": "2026-11-06",
+  "c": "Science",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
