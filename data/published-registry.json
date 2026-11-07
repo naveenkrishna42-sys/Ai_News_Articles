@@ -22075,7 +22075,7 @@
   "p": "gemini"
  },
  "d28d63e82f2386b2": {
-  "t": "US Confirms New Strikes on Iran's Qeshm Island Amidst Diplomatic Tensions",
+  "t": "Trump Confirms US Strikes on Iran's Qeshm Island Amid Rising Tensions",
   "d": "2026-11-07",
   "c": "Breaking News",
   "k": "news",
@@ -22227,5 +22227,19 @@
   "c": "Product Deals & Offers",
   "k": "news",
   "p": "gemini"
+ },
+ "deal-makemytrip-flights-&-hotels-2026-11-07": {
+  "t": "MakeMyTrip Flights & Hotels: A Comprehensive Value Analysis for Travelers",
+  "d": "2026-11-07",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "gemini"
+ },
+ "be10aa59449b0265": {
+  "t": "Hyderabad cybercrime tally: 55 arrested across 7 States in October",
+  "d": "2026-11-07",
+  "c": "Hyderabad",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
