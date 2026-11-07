@@ -22045,5 +22045,26 @@
   "c": "Markets",
   "k": "news",
   "p": "gemini"
+ },
+ "82911e8a020eaa57": {
+  "t": "Paraguay's Banking Crisis: Half the Nation Cut Off, President Impeached",
+  "d": "2026-11-07",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "35976125291a0a2f": {
+  "t": "AP Local Polls: TDP Secures Decisive MPTC/ZPTC Victory Amidst Security",
+  "d": "2026-11-07",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "107feb147b5937b3": {
+  "t": "Hyderabad Diwali cracker sales drop 30% amid eco-friendly shift",
+  "d": "2026-11-07",
+  "c": "Hyderabad",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
