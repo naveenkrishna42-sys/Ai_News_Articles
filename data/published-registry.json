@@ -22360,5 +22360,40 @@
   "c": "Markets",
   "k": "news",
   "p": "gemini"
+ },
+ "258fdfa80baf442c": {
+  "t": "Herzog Picks Gadi Eisenkot to Form Israel's Next Government",
+  "d": "2026-11-07",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "d676df78da303fe5": {
+  "t": "Sony MDR-3R: Iconic Walkman Sound Reborn with USB-C",
+  "d": "2026-11-07",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "b71587712314fb94": {
+  "t": "18-year-old killed after crashing new bike into divider in Rajendranagar",
+  "d": "2026-11-07",
+  "c": "Hyderabad",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "92e88b95d8dbbee2": {
+  "t": "Sony Alpha a6100 Review: Is This Early Holiday Camera Deal Worth It?",
+  "d": "2026-11-07",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "gemini"
+ },
+ "b4b20615bf607819": {
+  "t": "Google Pixel 10 Launch Deals: Is Google's Next Flagship Worth the Hype?",
+  "d": "2026-11-07",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "gemini"
  }
 }
