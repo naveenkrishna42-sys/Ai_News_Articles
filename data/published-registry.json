@@ -22772,5 +22772,54 @@
   "c": "Product Deals & Offers",
   "k": "deal",
   "p": "gemini"
+ },
+ "7f07484ead31672a": {
+  "t": "Russell Brand Sentenced to 10.5 Years for Rape, Sexual Assault",
+  "d": "2026-11-09",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "047efabec503e162": {
+  "t": "Canada Eyes Space Reactors: Powering Future Deep-Space Ambitions",
+  "d": "2026-11-09",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "dfa87a53565be5d8": {
+  "t": "White House Lockdown: Car Crash Triggers Urgent Security Response",
+  "d": "2026-11-09",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "e043d85fb4b9edfa": {
+  "t": "Hyderabad's GCC Surge: 515 Hubs and Ambitious Expansion Ahead",
+  "d": "2026-11-09",
+  "c": "Hyderabad",
+  "k": "news",
+  "p": "gemini"
+ },
+ "63a0ba495e0c3773": {
+  "t": "Amazon Great Indian Festival 2026: Best Electronics Deals Under Rs 40,000",
+  "d": "2026-11-09",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "b06e810533243e8e": {
+  "t": "Laurie Evans' Doping Ordeal: A Deep Dive into Sports Integrity",
+  "d": "2026-11-09",
+  "c": "Technology",
+  "k": "news",
+  "p": "gemini"
+ },
+ "358b2baa0e20fa19": {
+  "t": "Streaming's Royalty Rift: Decoding the Future of Video Codecs",
+  "d": "2026-11-09",
+  "c": "Technology",
+  "k": "news",
+  "p": "gemini"
  }
 }
