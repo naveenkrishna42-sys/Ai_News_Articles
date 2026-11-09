@@ -22821,5 +22821,40 @@
   "c": "Technology",
   "k": "news",
   "p": "gemini"
+ },
+ "04a901ed3bc3a4f9": {
+  "t": "Unified AI Model: Simulating Diverse Matter, Accelerating Discovery",
+  "d": "2026-11-09",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "beedd6cdfbcbed64": {
+  "t": "Maximizing Points: Mexico City's Top Hotel Redemptions for 2027",
+  "d": "2026-11-09",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "gemini"
+ },
+ "59b3bb0e45d53967": {
+  "t": "Bentley's Olympia Collection: A Century of 6 1/2-Litre Power",
+  "d": "2026-11-09",
+  "c": "Technology",
+  "k": "news",
+  "p": "gemini"
+ },
+ "7c4cffbc81ab91d4": {
+  "t": "Ranbir & Raha: Inside the Kapoor Family's Relatable Bedtime Rituals",
+  "d": "2026-11-09",
+  "c": "Entertainment",
+  "k": "news",
+  "p": "gemini"
+ },
+ "horoscopes-2026-11-09": {
+  "t": "daily horoscopes",
+  "d": "2026-11-09",
+  "c": "Astrology",
+  "k": "special",
+  "p": "openrouter-xing4.0-29b-a4b:free"
  }
 }
