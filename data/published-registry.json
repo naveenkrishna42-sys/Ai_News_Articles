@@ -22737,5 +22737,40 @@
   "c": "Science",
   "k": "news",
   "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "d6a4a03567db11a0": {
+  "t": "Sensex Dips 700 Pts From High, Nifty Near 24,850 Amid Profit Booking",
+  "d": "2026-11-09",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "0dcaea1884e23959": {
+  "t": "Toshiba Mini-LED TV Deal: Is This Pre-Black Friday Price Worth It?",
+  "d": "2026-11-09",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "gemini"
+ },
+ "a88049ed8e69c525": {
+  "t": "High-Capacity MacBook Air Deals: Black Friday Outlook for M3 Models",
+  "d": "2026-11-09",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "gemini"
+ },
+ "deal-sbi-simply-click-credit-card-2026-11-09": {
+  "t": "SBI Simply Click Credit Card Review: Is It Worth It?",
+  "d": "2026-11-09",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-xing4.0-29b-a4b:free"
+ },
+ "782dbe1d4995341f": {
+  "t": "Samsung Galaxy S25 Ultra Price Drop Review: Is It Worth Buying?",
+  "d": "2026-11-09",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "gemini"
  }
 }
