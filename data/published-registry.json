@@ -22035,11 +22035,11 @@
   "p": "gemini"
  },
  "63265a7e8d76d285": {
-  "t": "Iranians Selling Organs as War Drags On: What Reports Actually Claim",
+  "t": "Iran's Organ Trade: Economic Desperation Deepens",
   "d": "2026-11-15",
   "c": "Breaking News",
   "k": "news",
-  "p": "openrouter-ling-3.2-flash:free"
+  "p": "gemini"
  },
  "c3600c7fdba13555": {
   "t": "Sonakshi Sinha Case: Mumbai Court Holds Delhi Arrest Illegal",
@@ -22180,5 +22180,46 @@
   "c": "Science",
   "k": "news",
   "p": "openrouter-ling-3.2-flash:free"
+ },
+ "592f98a93efb2914": {
+  "t": "Hyderabad's Monetary Legacy: The Nizams' Centralized Minting Power",
+  "d": "2026-11-15",
+  "c": "Hyderabad",
+  "k": "news",
+  "p": "gemini"
+ },
+ "569d048f8153a645": {
+  "t": "LG C5 77-Inch OLED Drops to $1,682: Black Friday Price Review",
+  "d": "2026-11-15",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "5830f2f64dcc7fa0": {
+  "t": "Black Friday Laptop Deals: MacBook Air Discounts Seen Early",
+  "d": "2026-11-15",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "6b2490bf59d61790": {
+  "t": "Man Utd's Bruno Fernandes Contract Dilemma: What the Rejected Deal Means",
+  "d": "2026-11-15",
+  "c": "Sports",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "8bf137f0051aa9ab": {
+  "t": "Parivarik ManuRanjan Review: Tripathi's Bold Romance, Timid Film",
+  "d": "2026-11-15",
+  "c": "Movies",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "analysis-38def1378fb65917": {
+  "t": "IndiGo flight’s landing gear fails to retract after take-off, makes safe emergency landing in Pune",
+  "d": "2026-11-15",
+  "c": "Analysis",
+  "k": "analysis"
  }
 }
