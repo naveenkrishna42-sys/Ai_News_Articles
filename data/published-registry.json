@@ -21657,11 +21657,11 @@
   "p": "openrouter-ernie-5.5-flash-preview:free"
  },
  "7643a0bdb7e6ccdf": {
-  "t": "Rahul Gandhi: India No Longer a Democracy, Destroyed Since 2014",
+  "t": "Rahul Gandhi's Democracy Warning: Unpacking Claims of Decline Since 2014",
   "d": "2026-11-15",
   "c": "Top Stories",
   "k": "news",
-  "p": "openrouter-ernie-5.5-flash-preview:free"
+  "p": "gemini"
  },
  "3c7c0548a1348fc3": {
   "t": "Three Tankers Ablaze in Hormuz After Mine Strikes, Iran Says",
@@ -21678,7 +21678,7 @@
   "p": "openrouter-ernie-5.5-flash-preview:free"
  },
  "deal-trip.com-international-flights-&-stays-2026-11-15": {
-  "t": "Trip.com International Flights & Stays Deal Review: Worth Booking?",
+  "t": "Trip.com International Flights & Stays Review: Worth Booking?",
   "d": "2026-11-15",
   "c": "Product Deals & Offers",
   "k": "deal",
@@ -21753,5 +21753,75 @@
   "c": "Hyderabad",
   "k": "news",
   "p": "gemini"
+ },
+ "85eb256bc9642c99": {
+  "t": "SpaceX Starship's Historic Catch: Reusability Redefines Space Access",
+  "d": "2026-11-15",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "deal-agoda-worldwide-hotel-booking-2026-11-15": {
+  "t": "Agoda Worldwide Hotel Booking Review: Is It the Smartest Way to Book Hotels?",
+  "d": "2026-11-15",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "deal-bob-card-etihad-travel-perks-2026-11-15": {
+  "t": "BOB Card Etihad Travel Perks Review: Is the Offer Worth It?",
+  "d": "2026-11-15",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "281e7151c23d8481": {
+  "t": "Osprey Farpoint 40: Unprecedented 35% Black Friday Travel Deal",
+  "d": "2026-11-15",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "gemini"
+ },
+ "c097c0796a55c64a": {
+  "t": "Term Insurance in 2026: Is ₹1 Crore Cover Still Sufficient?",
+  "d": "2026-11-15",
+  "c": "Credit Cards & Cashback",
+  "k": "news",
+  "p": "gemini"
+ },
+ "160d843be4866c65": {
+  "t": "Term Insurance: 7 Benefits to Prioritise Before You Buy",
+  "d": "2026-11-15",
+  "c": "Credit Cards & Cashback",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "915fdb671cabb139": {
+  "t": "YES Bank Dismisses ₹32 Crore Cyber Fraud Reports, Reinforces Security Assurances",
+  "d": "2026-11-15",
+  "c": "Business",
+  "k": "news",
+  "p": "gemini"
+ },
+ "17f8f267e25f702b": {
+  "t": "5 Anime to Watch If You Love Black Clover's Magic System, Ranked",
+  "d": "2026-11-15",
+  "c": "Entertainment",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "50bf83490c6ef76a": {
+  "t": "Venus and Mercury Share Virgo: What to Watch in the Sky on November 14",
+  "d": "2026-11-15",
+  "c": "Science",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "bd19e4551aef3645": {
+  "t": "Light-Powered Wireless Cell Alignment: What It Actually Enables",
+  "d": "2026-11-15",
+  "c": "Science",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
  }
 }
