@@ -22550,7 +22550,7 @@
   "p": "gemini"
  },
  "7907457dad09ac30": {
-  "t": "South China Sea Code Stalls: Regional Stability at Risk",
+  "t": "ASEAN-China Code of Conduct Stalemate: Geopolitical Implications",
   "d": "2026-11-15",
   "c": "Top Stories",
   "k": "news",
@@ -22564,17 +22564,101 @@
   "p": "gemini"
  },
  "5f4374ca11ec8dd9": {
-  "t": "Modi and Trump at ASEAN Summit: What the Manila Agenda Means for India",
+  "t": "ASEAN Summit 2026: Modi, Trump Converge on Manila Amidst Geopolitical Shifts",
   "d": "2026-11-15",
   "c": "Top Stories",
   "k": "news",
-  "p": "openrouter-ling-3.2-flash:free"
+  "p": "gemini"
  },
  "92f72b7d1381eb74": {
-  "t": "Voyager 1: Humanity's Farthest Reach Marks New Interstellar Milestone",
+  "t": "Voyager 1 Tops One Light-Day, Farthest Object Ever Launched",
   "d": "2026-11-15",
   "c": "Breaking News",
   "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "1e030bedcd47d053": {
+  "t": "Santiniketan Encounter: Accused Ratan Sheikh Killed, Accountability Questions Arise",
+  "d": "2026-11-15",
+  "c": "Top Stories",
+  "k": "news",
   "p": "gemini"
+ },
+ "dc8d900a87002d8b": {
+  "t": "ISI's 'Romance Strategy' Exposed: Rajasthan Blast Arrests Uncover New Threat",
+  "d": "2026-11-15",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "gemini"
+ },
+ "64b106f3d823f342": {
+  "t": "Google Pixel 10 Price Drop on Amazon: Is It Worth Buying?",
+  "d": "2026-11-15",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "c8e6a9de6d39a297": {
+  "t": "₹22.30 Crore Siphoned From Tamil Nadu Govt Account: Seven Held",
+  "d": "2026-11-15",
+  "c": "Chennai",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "4c65bdfa04fa4ea8": {
+  "t": "PS5 Black Friday Deals Review: Best Price Yet on Sony's Console",
+  "d": "2026-11-15",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "47360096537a3161": {
+  "t": "Black Friday Travel Deals: 16 Smart Buys for Winter Trips",
+  "d": "2026-11-15",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "db294aad0c4af24a": {
+  "t": "Stock Market Cues Today: GIFT Nifty, CPI Data, FII Flows, Nvidia Signals",
+  "d": "2026-11-15",
+  "c": "Markets",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "3589d95738270168": {
+  "t": "Sensex, Nifty Plunge: Unpacking Friday the 13th's Market Jitters",
+  "d": "2026-11-15",
+  "c": "Markets",
+  "k": "news",
+  "p": "gemini"
+ },
+ "50c89d2d26dfbb5f": {
+  "t": "Sensex, Nifty Open Lower After Rally: What Drove the Dip",
+  "d": "2026-11-15",
+  "c": "Markets",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "0d07d2c8333f17af": {
+  "t": "Turkey's Defence Pacts Risk Israel, Iran, India Clash: NATO Shield Tested",
+  "d": "2026-11-15",
+  "c": "World",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "9427926acbd87cd2": {
+  "t": "Alzheimer's Brain Shrinkage May Begin Years Before Memory Loss",
+  "d": "2026-11-15",
+  "c": "Health",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "611f61c4ed9e4883": {
+  "t": "Daily Routine Linked to Less Pain and Depression in Older Adults",
+  "d": "2026-11-15",
+  "c": "Health",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
  }
 }
