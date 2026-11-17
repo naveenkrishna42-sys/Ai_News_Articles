@@ -22841,5 +22841,40 @@
   "c": "Breaking News",
   "k": "news",
   "p": "openrouter-ling-3.2-flash:free"
+ },
+ "12372c5bba667898": {
+  "t": "US Court Rejects Arbitrary Visa Limits for Students, Journalists",
+  "d": "2026-11-17",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini"
+ },
+ "dd62396e54d956b6": {
+  "t": "Credit Cards: Your Unsung Hero for Flight Delays & Cancellations",
+  "d": "2026-11-17",
+  "c": "Credit Cards & Cashback",
+  "k": "news",
+  "p": "gemini"
+ },
+ "3cfcb3dbe796c8c6": {
+  "t": "PS5 DualSense Controllers Hit Record Lows in PlayStation Black Friday Sale",
+  "d": "2026-11-17",
+  "c": "Product Deals & Offers",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "60fb2547f39dbaef": {
+  "t": "Today's Best Deals: Ghost of Yōtei, LEGO Darth Vader & DualSense",
+  "d": "2026-11-17",
+  "c": "Product Deals & Offers",
+  "k": "deal",
+  "p": "openrouter-ling-3.2-flash:free"
+ },
+ "4e6260f1e2da5928": {
+  "t": "3.95-Billion-Year-Old Rocks in China Reveal Earth's Earliest Tectonics",
+  "d": "2026-11-17",
+  "c": "Science",
+  "k": "news",
+  "p": "openrouter-ling-3.2-flash:free"
  }
 }
