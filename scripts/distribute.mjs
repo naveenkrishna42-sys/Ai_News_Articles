@@ -68,7 +68,7 @@ export function buildTelegramMessage(article) {
   let icon = '📰';
   let extraCta = '';
 
-  const sbiCplUrl = "https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2FsimplyClickMaster";
+  const sbiCplUrl = "https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2Fcashback";
   const auCplUrl = "https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fcconboarding.au.bank.in%2Fauccself%2F";
   const scapiaCplUrl = "https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fapply.scapia.cards%2Flanding_page";
 
@@ -80,16 +80,16 @@ export function buildTelegramMessage(article) {
     extraCta = `\n\n💳 <b>Top Credit Card Perks:</b> <a href="${sbiCplUrl}">Apply for SBI Simply Click (₹500 Voucher)</a> | <a href="${auCplUrl}">AU Bank Lifetime Free Card</a>`;
   } else if (isTravel) {
     icon = '✈️';
-    extraCta = `\n\n✈️ <b>Travel &amp; Lounge Access:</b> <a href="${scapiaCplUrl}">Get Scapia Zero-Forex Card (Free Lounge)</a> | <a href="https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.makemytrip.com">MakeMyTrip Flight Deals</a>`;
+    extraCta = `\n\n✈️ <b>Travel &amp; Lounge Access:</b> <a href="${scapiaCplUrl}">Get Scapia Zero-Forex Card (Free Lounge)</a> | <a href="https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.makemytrip.com%2Fhotels">MakeMyTrip Hotel Deals</a>`;
   } else if (isEducation) {
     icon = '🎓';
-    extraCta = `\n\n🎓 <b>Top Certifications:</b> <a href="https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.coursera.org">Explore Coursera Certificates</a> | <a href="https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.udemy.com">Udemy Tech Courses</a>`;
+    extraCta = `\n\n🎓 <b>Top Certifications:</b> <a href="https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.coursera.org">Explore Coursera Certificates</a>`;
   } else if (isHosting) {
     icon = '⚡';
-    extraCta = `\n\n⚡ <b>Web Hosting Deal:</b> <a href="https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.hostinger.com">Get 75% Off Hostinger Cloud Hosting</a>`;
+    extraCta = `\n\n⚡ <b>Web Hosting Deal:</b> <a href="https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.bluehost.in">Get Bluehost Cloud &amp; WordPress Hosting</a>`;
   } else if (isFashion) {
     icon = '👗';
-    extraCta = `\n\n🛍️ <b>Fashion Sale:</b> <a href="https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.ajio.com">Shop Ajio Deals (Up to 80% Off)</a> | <a href="https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.myntra.com">Myntra Offers</a>`;
+    extraCta = `\n\n🛍️ <b>Fashion Sale:</b> <a href="https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fajiogram.ajio.com%2F">Shop Ajio Deals (Up to 80% Off)</a> | <a href="https://linksredirect.com/?cid=316413&subid=tivra_distribute&source=api&url=https%3A%2F%2Fwww.myntra.com">Myntra Offers</a>`;
   } else if (isDeal) {
     icon = '🛍️';
     extraCta = `\n\n⚡ <b>Verified Deals &amp; Cashback:</b> <a href="${sbiCplUrl}">Get 10% Extra Cashback with SBI Simply Click</a> | <a href="https://www.amazon.in/deals?tag=sirmohana-21">Amazon Deals</a>`;
@@ -162,7 +162,7 @@ async function sendOneSignal(article, isDryRun) {
 }
 
 async function sendTelegram(article, isDryRun) {
-  const token = process.env.TELEGRAM_BOT_TOKEN || "8725425068:AAE3MzMTEMcu1PjMVqpCbwesPjH_rkV5hLg";
+  const token = (process.env.TELEGRAM_BOT_TOKEN || "").trim();
   const channelId = process.env.TELEGRAM_CHANNEL_ID || process.env.TELEGRAM_CHAT_ID || "@tivranews_official";
 
   if (!token || !channelId) {

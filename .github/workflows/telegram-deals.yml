@@ -34,9 +34,14 @@ jobs:
 
       - name: Broadcast top national & international product deals to Telegram
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || '8725425068:AAE3MzMTEMcu1PjMVqpCbwesPjH_rkV5hLg' }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID || '@tivranews_official' }}
-          CUELINKS_API_KEY: ${{ secrets.CUELINKS_API_KEY || 'xnrsT6vr3TP64MM7FSvCvdwY2jvD_jLrwU7B0zXvReI' }}
+          CUELINKS_BEARER_TOKEN: ${{ secrets.CUELINKS_BEARER_TOKEN }}
+          CUELINKS_API_KEY: ${{ secrets.CUELINKS_API_KEY }}
+          POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
           LIMIT="${{ github.event.inputs.limit || '200' }}"
           node scripts/telegram-deals.mjs --limit "$LIMIT" --digest

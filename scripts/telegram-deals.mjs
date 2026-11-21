@@ -21,7 +21,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const DISPATCHED_FILE = path.join(ROOT, 'data', 'telegram-deals-dispatched.json');
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8725425068:AAE3MzMTEMcu1PjMVqpCbwesPjH_rkV5hLg";
+const TELEGRAM_BOT_TOKEN = (process.env.TELEGRAM_BOT_TOKEN || "").trim();
 const TELEGRAM_CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || process.env.TELEGRAM_CHAT_ID || "@tivranews_official";
 
 /**
@@ -231,6 +231,11 @@ export async function runBroadcast(options = {}) {
 
   console.log(`[TIVRA Deals Telegram] Starting Broadcast (Target: ${targetCount} deals, Dry-Run: ${isDryRun})...`);
 
+  if (!isDryRun && !TELEGRAM_BOT_TOKEN) {
+    console.warn("[TIVRA Deals] TELEGRAM_BOT_TOKEN is not set in environment. Skipping live Telegram broadcast.");
+    return { sent: 0, failed: 0 };
+  }
+
   const allDeals = await getLiveProductDealsQueue();
   console.log(`[TIVRA Deals Engine] Found ${allDeals.length} available product deals.`);
 
@@ -368,6 +373,10 @@ export async function runBroadcast(options = {}) {
         } catch (err) {
           console.error(`✖ Failed to post digest #${i + 1}: ${err.message}`);
           failDigests++;
+          if (err.message.includes("status 401") || err.message.includes("Unauthorized")) {
+            console.error("[TIVRA Deals] Telegram returned 401 Unauthorized — bot token is invalid or revoked. Aborting remaining posts.");
+            break;
+          }
         }
       }
     }
@@ -423,6 +432,10 @@ export async function runBroadcast(options = {}) {
       } catch (err) {
         console.error(`✖ Failed to post "${deal.title}": ${err.message}`);
         failCount++;
+        if (err.message.includes("status 401") || err.message.includes("Unauthorized")) {
+          console.error("[TIVRA Deals] Telegram returned 401 Unauthorized — bot token is invalid or revoked. Aborting remaining posts.");
+          break;
+        }
       }
     }
   }

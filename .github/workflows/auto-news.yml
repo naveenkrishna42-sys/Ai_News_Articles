@@ -17,11 +17,8 @@ name: TIVRA auto news
 
 on:
   schedule:
-    # Staggered cron schedules across the day to ensure GitHub executes multiple runs reliably
+    # 6 runs per day (every 4 hours) to stay within free LLM daily quotas and prevent push contention
     - cron: "15 0,4,8,12,16,20 * * *"
-    - cron: "45 2,6,10,14,18,22 * * *"
-    - cron: "30 1,5,9,13,17,21 * * *"
-    - cron: "0 3,7,11,15,19,23 * * *"
   workflow_dispatch:
     inputs:
       per_category:
@@ -97,7 +94,9 @@ jobs:
           fi
           COUNT=$(git diff --cached --numstat | wc -l)
           git commit -m "TIVRA auto news: $(date -u +'%Y-%m-%d %H:%M UTC') ($COUNT file changes)"
-          # Retry push up to 5 times with conflict-proof re-sync so contention never fails the run
+          # Retry push up to 5 times with conflict-proof re-sync of ONLY files changed in this run
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r --diff-filter=AM HEAD)
+          DELETED_FILES=$(git diff-tree --no-commit-id --name-only -r --diff-filter=D HEAD)
           for i in {1..5}; do
             if git push origin main; then
               echo "Pushed successfully to origin main."
@@ -107,14 +106,21 @@ jobs:
             sleep $((RANDOM % 5 + 2))
             git rebase --abort 2>/dev/null || true
             git fetch origin main
-            # Save newly created/modified articles and data
             rm -rf /tmp/tivra_sync_backup
             mkdir -p /tmp/tivra_sync_backup
-            cp -r articles data /tmp/tivra_sync_backup/ 2>/dev/null || true
-            # Align branch with latest upstream
+            for f in $CHANGED_FILES; do
+              if [ -f "$f" ]; then
+                mkdir -p "/tmp/tivra_sync_backup/$(dirname "$f")"
+                cp "$f" "/tmp/tivra_sync_backup/$f"
+              fi
+            done
             git reset --hard origin/main
-            # Overlay new files
-            cp -r /tmp/tivra_sync_backup/* ./ 2>/dev/null || true
+            if [ -d /tmp/tivra_sync_backup ]; then
+              cp -r /tmp/tivra_sync_backup/* ./ 2>/dev/null || true
+            fi
+            for f in $DELETED_FILES; do
+              rm -f "$f" 2>/dev/null || true
+            done
             # Cleanly merge JSON registry
             node -e "
               import { readFileSync, writeFileSync, existsSync } from 'fs';

@@ -86,6 +86,9 @@ export class ProviderPool {
 
       // Helper: Mathematical zero-cost check
       this.isZeroCostModel = (modelId) => {
+        if (!modelId || /guard|moderation|embed|rerank|classifier|safety|whisper|tts|audio|vision-only|reward/i.test(modelId)) {
+          return false;
+        }
         const meta = catalogMap.get(modelId);
         if (!meta) return false;
         if (meta.category !== "text") return false;
@@ -113,7 +116,13 @@ export class ProviderPool {
       const orRes = await fetch("https://openrouter.ai/api/v1/models");
       if (orRes.ok) {
         const orData = await orRes.json();
-        const orFree = (orData.data || []).filter((m) => m.id && m.id.endsWith(":free"));
+        const orFree = (orData.data || []).filter(
+          (m) =>
+            m.id &&
+            m.id.endsWith(":free") &&
+            !/guard|moderation|embed|rerank|classifier|safety|vl-|vision/i.test(m.id) &&
+            !this.providers.some((p) => p.model === m.id)
+        );
         const orKey = (process.env.OPENROUTER_API_KEY || "").trim();
         if (orKey && orFree.length > 0) {
           const orProviders = orFree.slice(0, 5).map((m) => ({
@@ -130,7 +139,7 @@ export class ProviderPool {
             ok: 0,
             failed: 0,
           }));
-          this.providers = [...orProviders, ...this.providers];
+          this.providers = [...this.providers, ...orProviders];
           console.log(`[Providers] Wired ${orProviders.length} dynamic free OpenRouter models.`);
         }
       }
