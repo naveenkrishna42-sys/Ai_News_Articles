@@ -357,16 +357,38 @@ export default {
           });
         }
 
-        // 6b. HTML pages (homepage, articles, categories)
+        // 6b. HTML pages (homepage, articles, categories) + Edge Amazon Geo-Routing
         if (pathLower.endsWith(".html") || pathLower === "/" || !pathLower.includes(".")) {
           const newHeaders = new Headers(response.headers);
           newHeaders.set("Cache-Control", "public, max-age=0, must-revalidate");
           newHeaders.set("cloudflare-cdn-cache-control", "public, max-age=30, must-revalidate");
-          return new Response(response.body, {
+          newHeaders.append("Vary", "CF-IPCountry");
+
+          const country = (request.cf && request.cf.country) ? String(request.cf.country).toUpperCase() : "IN";
+          const usAmazonTag = env.AMAZON_US_TAG || "";
+          const baseResponse = new Response(response.body, {
             status: response.status,
             statusText: response.statusText,
             headers: newHeaders,
           });
+
+          if (country !== "IN" && typeof HTMLRewriter !== "undefined") {
+            return new HTMLRewriter()
+              .on('a[href*="amazon.in"]', {
+                element(el) {
+                  const href = el.getAttribute("href");
+                  if (!href || !href.includes("amazon.in")) return;
+                  let rewritten = href.replace(/https?:\/\/(www\.)?amazon\.in/i, "https://www.amazon.com");
+                  if (usAmazonTag) {
+                    rewritten = rewritten.replace(/([?&]tag=)[^&]+/i, `$1${encodeURIComponent(usAmazonTag)}`);
+                  }
+                  el.setAttribute("href", rewritten);
+                },
+              })
+              .transform(baseResponse);
+          }
+
+          return baseResponse;
         }
 
         // 6c. Static media, fonts, and assets (immutable cache)

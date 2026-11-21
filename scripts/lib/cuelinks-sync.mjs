@@ -14,9 +14,35 @@
 import fs from 'fs';
 import path from 'path';
 
-const CUELINKS_API_KEY = process.env.CUELINKS_API_KEY || "xnrsT6vr3TP64MM7FSvCvdwY2jvD_jLrwU7B0zXvReI";
+function loadCuelinksApiKey() {
+  if (process.env.CUELINKS_API_KEY) return process.env.CUELINKS_API_KEY.trim();
+  if (process.env.CUELINKS_BEARER_TOKEN) return process.env.CUELINKS_BEARER_TOKEN.trim();
+  try {
+    const envPath = path.resolve('.env');
+    if (fs.existsSync(envPath)) {
+      const envText = fs.readFileSync(envPath, 'utf8');
+      const m = envText.match(/^(?:CUELINKS_API_KEY|CUELINKS_BEARER_TOKEN)\s*=\s*(.+)$/m);
+      if (m && m[1]) return m[1].trim().replace(/^["']|["']$/g, '');
+    }
+  } catch {
+    // ignore .env read errors
+  }
+  return "";
+}
+
+const CUELINKS_API_KEY = loadCuelinksApiKey();
 const CACHE_FILE = path.resolve('data/cuelinks-offers.json');
 const CACHE_TTL_MS = 3 * 60 * 60 * 1000; // 3 hours cache to avoid rate limits
+
+/**
+ * Normalizes Zurich Kotak Car Insurance URLs to avoid the expired iCubesWire /motor-insurance/ offer (#7924).
+ */
+export function normalizeZurichKotakUrl(url = "") {
+  if (!url || !url.includes("zurichkotak.com/motor-insurance/car-insurance")) return url;
+  return url
+    .replace(/zurichkotak\.com%2Fmotor-insurance%2Fcar-insurance/gi, "zurichkotak.com%2Fcar-insurance")
+    .replace(/zurichkotak\.com\/motor-insurance\/car-insurance/gi, "zurichkotak.com/car-insurance");
+}
 
 /**
  * Top High-Yield Fallback Campaigns across India, US, and Worldwide
@@ -38,7 +64,7 @@ export const DEFAULT_CAMPAIGNS = {
     commission: "CPL",
     country: "India",
     category: "Credit Cards & Cashback",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2FsimplyClickMaster",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2Fcashback",
     tier: 1,
   },
   sbiCashback: {
@@ -121,7 +147,7 @@ export const DEFAULT_CAMPAIGNS = {
     commission: "CPS",
     country: "India",
     category: "Travel & Hotels",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.makemytrip.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.makemytrip.com%2Fhotels",
     tier: 2,
   },
   agodaTravel: {
@@ -220,7 +246,7 @@ export const DEFAULT_CAMPAIGNS = {
     payout: "9%",
     country: "India",
     category: "Product Deals & Offers",
-    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fwww.ajio.com",
+    url: "https://linksredirect.com/?cid=316413&source=api&url=https%3A%2F%2Fajiogram.ajio.com%2F",
     tier: 2,
   },
   myntraFashion: {
@@ -316,16 +342,12 @@ export function filterActiveOffers(offers = []) {
         return false; // Expired
       }
     }
-    // Enforce channel ID 316413 on any linksredirect URL
+    // Enforce channel ID 316413 on any linksredirect URL and normalize Zurich Kotak endpoint
     if (item.tracking_url && item.tracking_url.includes("linksredirect.com")) {
-      item.tracking_url = item.tracking_url.replace(/cid=\d+/, "cid=316413");
-      if (item.tracking_url.includes("zurichkotak.com/motor-insurance/car-insurance")) {
-        item.tracking_url = item.tracking_url.replace(/zurichkotak\.com%2Fmotor-insurance%2Fcar-insurance/gi, "zurichkotak.com%2Fcar-insurance")
-                                             .replace(/zurichkotak\.com\/motor-insurance\/car-insurance/gi, "zurichkotak.com/car-insurance");
-      }
+      item.tracking_url = normalizeZurichKotakUrl(item.tracking_url.replace(/cid=\d+/, "cid=316413"));
     }
-    if (item.url && item.url.includes("zurichkotak.com/motor-insurance/car-insurance")) {
-      item.url = item.url.replace(/zurichkotak\.com\/motor-insurance\/car-insurance/gi, "zurichkotak.com/car-insurance");
+    if (item.url) {
+      item.url = normalizeZurichKotakUrl(item.url);
     }
     return true;
   });
@@ -425,11 +447,13 @@ export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "
   }
 }
 
+const UNMONETIZED_CUELINKS_CAMPAIGNS = /\b(udemy|agoda|choice\s*hotels|hostinger|appsumo|zurich\s*kotak)\b|udemy\.com|agoda\.com|choicehotels\.com|hostinger\.com|appsumo\.com|zurichkotak\.com/i;
+
 /**
  * Product-First Verified Deals Selector
  * Returns structured, verified, active commercial stories directly anchored to live products.
  */
-export async function getVerifiedProductDeals(todayStr = new Date().toISOString().slice(0, 10)) {
+export async function getVerifiedProductDeals() {
   const liveOffers = await fetchLiveOffers();
   const verifiedDeals = [];
 
@@ -439,12 +463,12 @@ export async function getVerifiedProductDeals(todayStr = new Date().toISOString(
 
     const merchant = offer.campaign_name || offer.name || "Verified Partner";
     let trackingUrl = offer.tracking_url || offer.url || "";
+    if (UNMONETIZED_CUELINKS_CAMPAIGNS.test(`${merchant} ${trackingUrl}`)) {
+      continue;
+    }
+
     if (trackingUrl.includes("linksredirect.com")) {
-      trackingUrl = trackingUrl.replace(/cid=\d+/, "cid=316413");
-      if (trackingUrl.includes("zurichkotak.com/motor-insurance/car-insurance")) {
-        trackingUrl = trackingUrl.replace(/zurichkotak\.com%2Fmotor-insurance%2Fcar-insurance/gi, "zurichkotak.com%2Fcar-insurance")
-                                 .replace(/zurichkotak\.com\/motor-insurance\/car-insurance/gi, "zurichkotak.com/car-insurance");
-      }
+      trackingUrl = normalizeZurichKotakUrl(trackingUrl.replace(/cid=\d+/, "cid=316413"));
     }
 
     // Clean headline
@@ -454,8 +478,9 @@ export async function getVerifiedProductDeals(todayStr = new Date().toISOString(
     }
     cleanTitle = cleanTitle.replace(/[^\w\s:,\.\-%–—&]/g, "").trim();
 
+    const stableId = offer.id || merchant.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     verifiedDeals.push({
-      key: `deal-${offer.id || merchant.toLowerCase().replace(/\s+/g, '-')}-${todayStr}`,
+      key: `deal-campaign-${stableId}`,
       title: cleanTitle.slice(0, 110),
       productName: merchant,
       category: offer.isCpl ? "Credit Cards & Cashback" : "Product Deals & Offers",

@@ -34,34 +34,45 @@ const CLEAN_NAME_REGEX = /^(.*?)(?:\s*[:â€”â€“-]\s*(?:price|specs|laun
  */
 export function extractCleanProductName(headline) {
   if (!headline) return "";
-  let clean = headline.trim();
+  let clean = String(headline).trim();
 
-  // If colon or dash separates the product name from the action
-  if (clean.includes(":")) {
-    const left = clean.split(":")[0].trim();
-    if (left.length >= 4 && left.length <= 40) clean = left;
-  } else if (clean.includes(" â€” ")) {
-    const left = clean.split(" â€” ")[0].trim();
-    if (left.length >= 4 && left.length <= 40) clean = left;
-  } else if (clean.includes(" - ")) {
-    const left = clean.split(" - ")[0].trim();
-    if (left.length >= 4 && left.length <= 40) clean = left;
-  }
-
-  // Strip common noisy prefix/suffixes
+  // 1. Strip conversational lead-ins
   clean = clean
-    .replace(/^deal alert:\s*/i, "")
-    .replace(/^amazon sale:\s*/i, "")
-    .replace(/^flipkart sale:\s*/i, "")
-    .replace(/\s+price in india.*$/i, "")
-    .replace(/\s+price cut.*$/i, "")
-    .replace(/\s+price drop.*$/i, "")
-    .replace(/\s+discount.*$/i, "")
-    .replace(/\s+under rs.*$/i, "")
-    .replace(/\s+under â‚¹.*$/i, "")
+    .replace(/^(?:these\s+are\s+the\s+(?:\d+\s+)?|the\s+retired\s+|the\s+best\s+|you\s+don['’]t\s+need\s+[^.]+\.\s*(?:these\s+)?|inside\s+|deal\s+alert:\s*|amazon\s+sale:\s*|flipkart\s+sale:\s*)/i, "")
     .trim();
 
-  return clean.length >= 3 ? clean : headline.slice(0, 40).trim();
+  // 2. If colon or dash separates product name from action
+  for (const sep of [":", " — ", " – ", " - "]) {
+    if (clean.includes(sep)) {
+      const left = clean.split(sep)[0].trim();
+      if (left.length >= 3 && left.length <= 45) {
+        clean = left;
+        break;
+      }
+    }
+  }
+
+  // 3. Split before deal action verbs
+  clean = clean.split(/\s+(?:drops?\s+to|falls?\s+to|slashed\s+to|hits?\s+(?:a\s+)?(?:new|record|lowest)|gets?\s+a\s+|is\s+(?:now\s+)?(?:down|available|on\s+sale)|are\s+starting|earlier\s+than|worth\s+snatching|can\s+handle|unveils?\s+debut|at\s+lowest\s+price)\b/i)[0].trim();
+
+  // 4. Strip noisy deal buzzwords and price suffixes
+  clean = clean
+    .replace(/\b(?:black\s+friday|cyber\s+monday|prime\s+day|big\s+billion\s+days|great\s+indian\s+festival|deals?|sales?|offers?|discounts?|price\s+in\s+india.*|price\s+cut.*|price\s+drop.*|under\s+(?:rs\.?|₹|\$)\s*\d+.*|for\s+(?:rs\.?|₹|\$)\s*\d+.*|editor-tested|review|analyzed|unpacked)\b/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // If generic deal headline collapses to only year/preposition filler, return clean commercial search query
+  if (!clean || clean.length < 3 || /^for\s+202\d$/i.test(clean)) {
+    return "Tech Deals";
+  }
+
+  // 5. Cap at 6 words max so Amazon search queries stay tight and high-converting
+  const words = clean.split(/\s+/).filter(Boolean);
+  if (words.length > 6) {
+    clean = words.slice(0, 6).join(" ");
+  }
+
+  return clean.length >= 3 ? clean.slice(0, 45).trim() : String(headline).slice(0, 35).trim();
 }
 
 /**
@@ -131,14 +142,17 @@ export async function fetchAsinFromArticle(articleUrl, timeoutMs = 3500) {
  * 3. Falls back to targeted product search on Amazon India
  */
 
-const CUELINKS_API_KEY = "xnrsT6vr3TP64MM7FSvCvdwY2jvD_jLrwU7B0zXvReI";
-const CUELINKS_REGEX = /(?:flipkart\.com|fkrt\.it|myntra\.com|croma\.com)\/[^\s'"]+/i;
+function getCuelinksApiKey() {
+  return (process.env.CUELINKS_API_KEY || process.env.CUELINKS_BEARER_TOKEN || "").trim();
+}
+const CUELINKS_REGEX = /(?:flipkart\.com|fkrt\.it|myntra\.com|croma\.com|tatacliq\.com|nykaa\.com|vijaysales\.com|boat-lifestyle\.com)\/[^\s'"]+/i;
 
 /**
  * Scans article HTML for Cuelinks-supported merchants and converts them via V3 API
  */
 export async function fetchCuelinksUrlFromArticle(articleUrl, timeoutMs = 4500) {
-  if (!articleUrl || articleUrl.includes("news.google.com")) return null;
+  const cuelinksApiKey = getCuelinksApiKey();
+  if (!cuelinksApiKey || !articleUrl || articleUrl.includes("news.google.com")) return null;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -159,7 +173,7 @@ export async function fetchCuelinksUrlFromArticle(articleUrl, timeoutMs = 4500) 
       const apiRes = await fetch("https://developers.cuelinks.com/pub_api/v3/links/convert", {
         method: "POST",
         headers: {
-          "Authorization": "Token " + CUELINKS_API_KEY,
+          "Authorization": "Token " + cuelinksApiKey,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ url: rawUrl }),

@@ -63,6 +63,8 @@ jobs:
           VERCEL_AI_GATEWAY_KEY: ${{ secrets.VERCEL_AI_GATEWAY_KEY }}
           ADSENSE_PUBLISHER_ID: ${{ secrets.ADSENSE_PUBLISHER_ID }}
           ADSENSE_AD_SLOT: ${{ secrets.ADSENSE_AD_SLOT }}
+          CUELINKS_BEARER_TOKEN: ${{ secrets.CUELINKS_BEARER_TOKEN }}
+          CUELINKS_API_KEY: ${{ secrets.CUELINKS_API_KEY }}
         run: |
           EXTRA=""
           if [ -n "${{ github.event.inputs.per_category }}" ]; then

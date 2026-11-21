@@ -820,7 +820,7 @@ async function runQueue(candidatePool, targetCount, worker) {
 }
 
 async function writeDealStory(item) {
-  const directUrl = item.directUrl || await getBestMonetizedUrl(
+  let directUrl = item.directUrl || await getBestMonetizedUrl(
     item,
     item.title,
     config.affiliate?.amazonTag || "",
@@ -836,8 +836,25 @@ async function writeDealStory(item) {
   if (!title || title.length < 12 || /^\.+$/.test(title) || /authoritative headline/i.test(title)) {
     throw new Error(`Quality Gate: rejected deal story due to invalid title "${title}"`);
   }
-  const productName = parsed.productName || extractCleanProductName(item.title);
+  const productName = extractCleanProductName(parsed.productName || item.title);
+  const cleanQuery = extractCleanProductName(parsed.productName || title || item.title);
+  if (cleanQuery && (!directUrl || directUrl.includes("amazon.in/s?k="))) {
+    const tag = config.affiliate?.amazonTag || process.env.AMAZON_AFFILIATE_TAG || "sirmohana-21";
+    directUrl = `https://www.amazon.in/s?k=${encodeURIComponent(cleanQuery)}&tag=${encodeURIComponent(tag)}`;
+  }
+
   const ratingBadge = `<div class="rating-badge" style="display:inline-block;background:#059669;color:#fff;font-weight:800;padding:4px 10px;border-radius:6px;font-size:0.9rem;margin-bottom:12px;">★ ${parsed.rating} / 5.0 Value Rating</div>`;
+  const topDealBar = directUrl
+    ? `<div class="top-deal-bar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:0 0 18px;padding:12px 16px;background:#fff1f2;border:1px solid #fecdd3;border-radius:10px;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span class="rating-badge" style="display:inline-block;background:#059669;color:#fff;font-weight:800;padding:4px 10px;border-radius:6px;font-size:0.9rem;">★ ${parsed.rating} / 5.0 Value Rating</span>
+        <span style="font-size:0.92rem;font-weight:700;color:#0b1220;">${escapeHtml(productName.slice(0, 48))}</span>
+      </div>
+      <a href="${escapeHtml(directUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:0.88rem;text-decoration:none;padding:8px 16px;border-radius:8px;">
+        <span>🛒 Check Live Deal Price &rarr;</span>
+      </a>
+    </div>`
+    : ratingBadge;
   const ratingText = parsed.ratingReason ? `<p><em>${escapeHtml(parsed.ratingReason)}</em></p>` : "";
   const prosHtml = (parsed.pros || []).map((p) => `<li>✅ ${escapeHtml(p)}</li>`).join("");
   const consHtml = (parsed.cons || []).map((c) => `<li>⚠️ ${escapeHtml(c)}</li>`).join("");
@@ -851,7 +868,7 @@ async function writeDealStory(item) {
   const verdictHtml = parsed.verdict ? `<h3>Final Buying Verdict</h3><p>${escapeHtml(parsed.verdict)}</p>` : "";
   const buyBoxHtml = renderBuyBox([productName], config, item.category, directUrl, title);
 
-  const bodyHtml = `${ratingBadge}\n${ratingText}\n${parsed.articleBody}\n${prosConsBox}\n${verdictHtml}\n${buyBoxHtml}`;
+  const bodyHtml = `${topDealBar}\n${ratingText}\n${parsed.articleBody}\n${prosConsBox}\n${verdictHtml}\n${buyBoxHtml}`;
 
   let heroImage = "";
   let heroCredit = "Pexels";

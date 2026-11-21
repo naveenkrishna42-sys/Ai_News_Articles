@@ -57,7 +57,7 @@ export function cuelinksRedirect(targetUrl, cid = CUELINKS_CID, subid = "tivra_w
 export const HIGH_PAYOUT_CAMPAIGNS = {
   sbiSimplyClick: {
     name: "SBI Simply Click Credit Card",
-    url: cuelinksRedirect("https://www.sbicard.com/sprint/simplyClickMaster"),
+    url: cuelinksRedirect("https://www.sbicard.com/sprint/cashback"),
     payout: "₹1,890 / lead",
     cta: "Apply for SBI Simply Click Card (₹500 Gift Voucher)"
   },
@@ -97,14 +97,14 @@ export const HIGH_PAYOUT_CAMPAIGNS = {
  * Known merchant directory with clean, high-converting action buttons.
  */
 export const KNOWN_MERCHANTS = [
-  // --- HIGH-PAYOUT CREDIT CARDS & BANKING (CPL) ---
+  // --- HIGH-PAYOUT CREDIT CARDS, BANKING & INSURANCE (CPL / High CPA) ---
   {
-    pattern: /sbi\s*card|sbi\s*credit|simplyclick|simply\s*click|simplysave/i,
+    pattern: /sbi\s*card|sbi\s*credit|simplyclick|simply\s*click|simplysave|sbi\s*cashback/i,
     name: "SBI Simply Click",
     url: HIGH_PAYOUT_CAMPAIGNS.sbiSimplyClick.url,
     color: "#0284c7",
     icon: "💳",
-    cta: "Apply for SBI Simply Click (₹500 Voucher)"
+    cta: "Apply for SBI Credit Card Online"
   },
   {
     pattern: /au\s*bank|au\s*small\s*finance/i,
@@ -146,6 +146,14 @@ export const KNOWN_MERCHANTS = [
     icon: "🛡️",
     cta: "Apply for Zurich Kotak Car Insurance"
   },
+  {
+    pattern: /star\s*health/i,
+    name: "Star Health",
+    url: cuelinksRedirect("https://www.starhealth.in/lp/health-insurance/affiliate/"),
+    color: "#0284c7",
+    icon: "🛡️",
+    cta: "Get Star Health Insurance Quote"
+  },
 
   // --- TRAVEL & HOSPITALITY ---
   {
@@ -183,10 +191,26 @@ export const KNOWN_MERCHANTS = [
   {
     pattern: /makemytrip/i,
     name: "MakeMyTrip",
-    url: cuelinksRedirect("https://www.makemytrip.com"),
+    url: cuelinksRedirect("https://www.makemytrip.com/hotels"),
     color: "#eb2026",
     icon: "✈️",
-    cta: "Book on MakeMyTrip"
+    cta: "Book Hotels & Stays on MakeMyTrip"
+  },
+  {
+    pattern: /goibibo/i,
+    name: "Goibibo Hotels",
+    url: cuelinksRedirect("https://www.goibibo.com/hotels"),
+    color: "#2563eb",
+    icon: "🏨",
+    cta: "Book Hotels on Goibibo"
+  },
+  {
+    pattern: /cleartrip/i,
+    name: "Cleartrip",
+    url: cuelinksRedirect("https://www.cleartrip.com/hotels"),
+    color: "#f97316",
+    icon: "✈️",
+    cta: "Book on Cleartrip"
   },
 
   // --- ONLINE EDUCATION & COURSES ---
@@ -208,6 +232,14 @@ export const KNOWN_MERCHANTS = [
   },
 
   // --- WEB HOSTING & SAAS ---
+  {
+    pattern: /bluehost/i,
+    name: "Bluehost",
+    url: cuelinksRedirect("https://www.bluehost.com/"),
+    color: "#2563eb",
+    icon: "⚡",
+    cta: "Get Bluehost Web Hosting Deals"
+  },
   {
     pattern: /hostinger/i,
     name: "Hostinger",
@@ -233,11 +265,43 @@ export const KNOWN_MERCHANTS = [
     cta: "Explore AppSumo Lifetime Deals"
   },
 
-  // --- RETAIL & FASHION ---
+  // --- RETAIL, ELECTRONICS & FASHION ---
+  {
+    pattern: /\bboat\b|airdopes|nirvana/i,
+    name: "boAt",
+    url: cuelinksRedirect("https://www.boat-lifestyle.com/"),
+    color: "#dc2626",
+    icon: "🎧",
+    cta: "Shop Official boAt Store"
+  },
+  {
+    pattern: /healthkart|muscleblaze|whey/i,
+    name: "HealthKart",
+    url: cuelinksRedirect("https://www.healthkart.com/"),
+    color: "#0ea5e9",
+    icon: "💪",
+    cta: "Shop at HealthKart"
+  },
+  {
+    pattern: /lenovo|thinkpad|ideapad|legion/i,
+    name: "Lenovo India",
+    url: cuelinksRedirect("https://www.lenovo.com/in/en/"),
+    color: "#dc2626",
+    icon: "💻",
+    cta: "Shop Official Lenovo Store"
+  },
+  {
+    pattern: /\bacer\b|predator|nitro/i,
+    name: "Acer India",
+    url: cuelinksRedirect("https://store.acer.com/en-in/"),
+    color: "#16a34a",
+    icon: "💻",
+    cta: "Shop Official Acer Store"
+  },
   {
     pattern: /ajio/i,
     name: "Ajio",
-    url: cuelinksRedirect("https://www.ajio.com"),
+    url: cuelinksRedirect("https://ajiogram.ajio.com/"),
     color: "#2c4152",
     icon: "👗",
     cta: "Buy at Ajio (Official Store Deals)"
@@ -364,6 +428,25 @@ export function buyUrl(cleanName, config = {}) {
 }
 
 /**
+ * Shared impulse deals strip linking directly to Amazon deals & under-₹499 picks.
+ */
+function renderQuickDealsStrip(amazonTag) {
+  const encodedTag = encodeURIComponent(amazonTag || DEFAULT_AMAZON_TAG);
+  return `<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #e2e8f0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
+  <span style="font-size:.76rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">⚡ Quick Deals &amp; Essentials:</span>
+  <a href="https://www.amazon.in/gp/goldbox?tag=${encodedTag}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
+    <span>🔥 Lightning Deals</span>
+  </a>
+  <a href="https://www.amazon.in/s?k=mobile+accessories+under+499&tag=${encodedTag}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
+    <span>⚡ Tech Under ₹499</span>
+  </a>
+  <a href="https://www.amazon.in/gp/bestsellers?tag=${encodedTag}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
+    <span>⭐ Amazon Bestsellers</span>
+  </a>
+</div>`;
+}
+
+/**
  * Main Buy Box & Commercial Action Matrix Generator
  */
 export function renderBuyBox(deviceNames = [], config = {}, category = "", directUrl = "", title = "") {
@@ -385,9 +468,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   const isCarInsurance = /car\s*insurance|motor\s*insurance|auto\s*insurance|vehicle\s*insurance/i.test(textContext);
   if (isCarInsurance) {
     const isZurichKotak = /zurich|kotak/i.test(textContext);
-    const insuranceUrl = directUrl || (isZurichKotak
-      ? cuelinksRedirect("https://www.zurichkotak.com/car-insurance")
-      : cuelinksRedirect("https://www.zurichkotak.com/car-insurance"));
+    const insuranceUrl = directUrl || cuelinksRedirect("https://www.zurichkotak.com/car-insurance");
     const label = isZurichKotak ? "Apply for Zurich Kotak Car Insurance (Instant Approval)" : "Compare & Buy Car Insurance Plans";
 
     return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #0284c7;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
@@ -413,18 +494,7 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
     <span>⚡ Claim Verified Deal (${escapeHtml(cleanProd.slice(0, 45))}) &rarr;</span>
   </a>
 </div>
-<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #e2e8f0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
-  <span style="font-size:.76rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">⚡ Quick Deals &amp; Essentials:</span>
-  <a href="https://www.amazon.in/gp/goldbox?tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
-    <span>🔥 Lightning Deals</span>
-  </a>
-  <a href="https://www.amazon.in/s?k=mobile+accessories+under+499&tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
-    <span>⚡ Tech Under ₹499</span>
-  </a>
-  <a href="https://www.amazon.in/gp/bestsellers?tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
-    <span>⭐ Amazon Bestsellers</span>
-  </a>
-</div>
+${renderQuickDealsStrip(amazonTag)}
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
 </div>`;
   }
@@ -432,29 +502,29 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   // 1. CLOTHING, FASHION & FOOTWEAR LISTICLES
   const isClothingListicle = /top\s*\d+.*(shopping|cloth|fashion|apparel|shoe|sneaker)|best.*(shopping sites|clothing sites|fashion sites|sneakers)/i.test(textContext);
   if (isClothingListicle) {
-    const ajioUrl = cuelinksRedirect("https://www.ajio.com");
+    const ajioUrl = cuelinksRedirect("https://ajiogram.ajio.com/");
     const myntraUrl = cuelinksRedirect("https://www.myntra.com");
     const tataUrl = cuelinksRedirect("https://www.tatacliq.com");
+    const nykaaUrl = cuelinksRedirect("https://www.nykaa.com");
     const amazonFashionUrl = buyUrl("clothing fashion", config);
-    const flipkartFashionUrl = cuelinksRedirect("https://www.flipkart.com/clothing-and-accessories");
 
     return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #e11d48;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#be123c;margin-bottom:14px;">Official Fashion Stores &amp; Verified Deals</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+  <a href="${escapeHtml(amazonFashionUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛒 Buy at Amazon Fashion</span>
+  </a>
   <a href="${escapeHtml(ajioUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2c4152;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>👗 Buy at Ajio</span>
-  </a>
-  <a href="${escapeHtml(myntraUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#ff3f6c;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>🛍️ Buy at Myntra</span>
   </a>
   <a href="${escapeHtml(tataUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#da1c5c;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛍️ Buy at Tata CLiQ</span>
   </a>
-  <a href="${escapeHtml(amazonFashionUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>🛒 Buy at Amazon Fashion</span>
+  <a href="${escapeHtml(nykaaUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#fc2779;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>💄 Buy at Nykaa</span>
   </a>
-  <a href="${escapeHtml(flipkartFashionUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2874f0;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>🛍️ Buy at Flipkart</span>
+  <a href="${escapeHtml(myntraUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#ff3f6c;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛍️ Buy at Myntra</span>
   </a>
 </div>
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
@@ -472,17 +542,14 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   <a href="${escapeHtml(amazonDealsUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛒 Buy at Amazon Deals</span>
   </a>
-  <a href="${escapeHtml(cuelinksRedirect("https://www.flipkart.com/offers-store"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2874f0;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>🛍️ Buy at Flipkart</span>
-  </a>
-  <a href="${escapeHtml(cuelinksRedirect("https://www.ajio.com"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2c4152;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+  <a href="${escapeHtml(cuelinksRedirect("https://ajiogram.ajio.com/"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2c4152;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>👗 Buy at Ajio</span>
   </a>
-  <a href="${escapeHtml(cuelinksRedirect("https://www.myntra.com"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#ff3f6c;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>🛍️ Buy at Myntra</span>
+  <a href="${escapeHtml(cuelinksRedirect("https://www.tatacliq.com"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#da1c5c;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛍️ Buy at Tata CLiQ</span>
   </a>
-  <a href="${escapeHtml(cuelinksRedirect("https://www.croma.com"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#00796b;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>🏬 Buy at Croma</span>
+  <a href="${escapeHtml(cuelinksRedirect("https://www.vijaysales.com"))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#d8232a;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛒 Buy at Vijay Sales</span>
   </a>
 </div>
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
@@ -492,13 +559,13 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   // 3. HEALTH & TERM INSURANCE / HEALTHCARE
   const isInsurance = /health\s*insurance|term\s*insurance|life\s*insurance|mediclaim|medical\s*insurance|insurance\s*policy|policybazaar/i.test(textContext);
   if (isInsurance) {
-    const cpcFdUrl = cuelinksRedirect("https://www.bankbazaar.com/fixed-deposit-rate.html");
+    const starHealthUrl = cuelinksRedirect("https://www.starhealth.in/lp/health-insurance/affiliate/");
     const oneMgUrl = cuelinksRedirect("https://www.1mg.com");
 
     return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #0284c7;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#0369a1;margin-bottom:12px;">🛡️ Verified Health Insurance &amp; Healthcare Benefits</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
-  <a href="${escapeHtml(cpcFdUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#0284c7;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
+  <a href="${escapeHtml(starHealthUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#0284c7;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
     <span>🛡️ Compare Health Insurance Plans</span>
   </a>
   <a href="${escapeHtml(oneMgUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#ff6f61;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
@@ -575,7 +642,8 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   const isTravel = /flight|airline|hotel|resort|vacation|cruise|tourism|tourist|getaway|holiday\s*package|staycation|visa|travel/i.test(textContext);
   if (isTravel) {
     const agodaUrl = cuelinksRedirect("https://www.agoda.com");
-    const mmtUrl = cuelinksRedirect("https://www.makemytrip.com");
+    const mmtUrl = cuelinksRedirect("https://www.makemytrip.com/hotels");
+    const goibiboUrl = cuelinksRedirect("https://www.goibibo.com/hotels");
     const tripUrl = cuelinksRedirect("https://www.trip.com");
 
     return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #0284c7;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
@@ -587,11 +655,14 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   <a href="${escapeHtml(mmtUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#eb2026;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
     <span>✈️ Book Flights &amp; Hotels on MakeMyTrip</span>
   </a>
-  <a href="${escapeHtml(agodaUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#2563eb;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
-    <span>🏨 Book Hotels on Agoda (Up to 60% Off)</span>
+  <a href="${escapeHtml(goibiboUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#2563eb;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
+    <span>🏨 Book Hotels on Goibibo</span>
   </a>
   <a href="${escapeHtml(tripUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#0284c7;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
     <span>🌍 Book on Trip.com</span>
+  </a>
+  <a href="${escapeHtml(agodaUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#1d4ed8;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
+    <span>🏨 Book Hotels on Agoda</span>
   </a>
 </div>
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
@@ -621,21 +692,21 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   // 8. WEB HOSTING, CLOUD & SOFTWARE DEALS (Broad Hosting Fallback)
   const isHostingOrSaas = /hosting|cloud\s*server|vps|wordpress\s*hosting|domain\s*name|lifetime\s*deal|saas|software\s*deal/i.test(textContext);
   if (isHostingOrSaas) {
-    const hostingerUrl = cuelinksRedirect("https://www.hostinger.com");
+    const bluehostUrl = cuelinksRedirect("https://www.bluehost.com/");
     const verpexUrl = cuelinksRedirect("https://verpex.com");
-    const appsumoUrl = cuelinksRedirect("https://appsumo.com");
+    const hostingerUrl = cuelinksRedirect("https://www.hostinger.com");
 
     return `<div class="buybox" style="margin:30px 0;padding:22px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #673de6;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 <div style="font-size:.84rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#673de6;margin-bottom:12px;">⚡ Verified Web Hosting &amp; Software Discounts</div>
 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
-  <a href="${escapeHtml(hostingerUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#673de6;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
-    <span>⚡ Get 75% Off Hostinger Cloud Hosting</span>
+  <a href="${escapeHtml(bluehostUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#2563eb;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
+    <span>⚡ Get Bluehost Web Hosting Deals</span>
   </a>
   <a href="${escapeHtml(verpexUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#4f46e5;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
     <span>🚀 Get 70% Off Verpex Cloud Hosting</span>
   </a>
-  <a href="${escapeHtml(appsumoUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#eab308;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
-    <span>💻 Explore AppSumo Lifetime Deals</span>
+  <a href="${escapeHtml(hostingerUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:#673de6;color:#ffffff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:background 0.2s;">
+    <span>⚡ Explore Hostinger Cloud Plans</span>
   </a>
 </div>
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
@@ -651,8 +722,8 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   const flipkartUrl = cleanProd
     ? cuelinksRedirect(`https://www.flipkart.com/search?q=${encodeURIComponent(cleanProd)}`)
     : cuelinksRedirect("https://www.flipkart.com/offers-store");
-  const cromaUrl = cuelinksRedirect(`https://www.croma.com/searchB?q=${encodeURIComponent(cleanProd || "deals")}`);
-  const relianceUrl = cuelinksRedirect("https://www.reliancedigital.in");
+  const vijaySalesUrl = cuelinksRedirect("https://www.vijaysales.com");
+  const tataCliqUrl = cuelinksRedirect("https://www.tatacliq.com");
 
   const prodLabel = cleanProd ? cleanProd : "Trending Gadgets";
 
@@ -662,28 +733,17 @@ export function renderBuyBox(deviceNames = [], config = {}, category = "", direc
   <a href="${escapeHtml(amazonUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛒 Buy at Amazon (${escapeHtml(prodLabel)})</span>
   </a>
+  <a href="${escapeHtml(vijaySalesUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#d8232a;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🏬 Buy at Vijay Sales</span>
+  </a>
+  <a href="${escapeHtml(tataCliqUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#da1c5c;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
+    <span>🛍️ Buy at Tata CLiQ</span>
+  </a>
   <a href="${escapeHtml(flipkartUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#2874f0;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
     <span>🛍️ Buy at Flipkart</span>
   </a>
-  <a href="${escapeHtml(cromaUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#00796b;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>🏬 Buy at Croma</span>
-  </a>
-  <a href="${escapeHtml(relianceUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e42529;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;padding:12px 20px;border-radius:8px;transition:opacity 0.2s;">
-    <span>🛒 Buy at Reliance Digital</span>
-  </a>
 </div>
-<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #e2e8f0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
-  <span style="font-size:.76rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">⚡ Quick Deals &amp; Essentials:</span>
-  <a href="https://www.amazon.in/gp/goldbox?tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
-    <span>🔥 Lightning Deals</span>
-  </a>
-  <a href="https://www.amazon.in/s?k=mobile+accessories+under+499&tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
-    <span>⚡ Tech Under ₹499</span>
-  </a>
-  <a href="https://www.amazon.in/gp/bestsellers?tag=${encodeURIComponent(amazonTag)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;font-size:.80rem;font-weight:600;color:#0369a1;text-decoration:none;background:#f0f9ff;border:1px solid #bae6fd;padding:4px 10px;border-radius:6px;">
-    <span>⭐ Amazon Bestsellers</span>
-  </a>
-</div>
+${renderQuickDealsStrip(amazonTag)}
 <p style="font-size:.76rem;color:#64748b;margin:12px 0 0;line-height:1.4;">${escapeHtml(DISCLOSURE)}</p>
 </div>`;
 }
@@ -723,13 +783,13 @@ export function injectInlineListicleButtons(bodyHtml = "", config = {}, category
       btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(itemDirectUrl)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>⚡ Apply Now (${escapeHtml(title.slice(0, 45))})</span></a></div>`;
     }
 
-    // 2. High-Payout CPL Credit Cards & Finance
-    if (!btnHtml && (isFinanceOrCards || /card|bank|account|loan|elite|rewards|points/i.test(headingLower))) {
+    // 2. High-Payout CPL Credit Cards & Finance (removed false-positive "elite")
+    if (!btnHtml && (isFinanceOrCards || /\b(credit\s*card|debit\s*card|bank\s*account|savings\s*account|personal\s*loan|home\s*loan|reward\s*points)\b/i.test(headingLower))) {
       btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(HIGH_PAYOUT_CAMPAIGNS.sbiSimplyClick.url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#0284c7;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>💳 Apply for Lifetime Free Card (Instant Approval)</span></a></div>`;
     } else if (!btnHtml && /hotel|flight|airline|resort|vacation|cruise|tourism|trip/i.test(headingLower)) {
       // 3. Travel & Stays
       if (!btnHtml) {
-        btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(cuelinksRedirect('https://www.makemytrip.com'))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#eb2026;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>✈️ Book Stays &amp; Flights (Verified Deals)</span></a></div>`;
+        btnHtml = `<div style="margin:10px 0 16px;"><a href="${escapeHtml(cuelinksRedirect('https://www.makemytrip.com/hotels'))}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#eb2026;color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 14px;border-radius:6px;"><span>✈️ Book Stays &amp; Flights (Verified Deals)</span></a></div>`;
       }
     } else if (/course|certificate|certification|degree|learn|tutorial|training/i.test(headingLower)) {
       // 4. Online Courses & Education
