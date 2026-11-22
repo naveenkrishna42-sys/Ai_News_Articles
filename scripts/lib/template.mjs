@@ -344,6 +344,31 @@ ${extraJsonLdHtml}`;
   const gnSearch = `https://news.google.com/search?q=${encodeURIComponent(title)}`;
   const credit = heroCredit ? `<figcaption>${buildHeroCredit(heroCredit)}</figcaption>` : `<figcaption>Representative image</figcaption>`;
 
+  const showTelegramBanner = String(process.env.TELEGRAM_ENABLED || "").toLowerCase() === "true";
+  const telegramBannerHtml = !showTelegramBanner ? "" : (isCommercial ? `  <div class="telegram-alert-banner" style="margin:20px 0 24px;padding:14px 18px;background:linear-gradient(135deg,#0b1220 0%,#1e293b 100%);border-radius:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.06);border-left:4px solid #229ED9;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:1.3rem;">⚡</span>
+      <div>
+        <div style="font-weight:800;font-size:.88rem;color:#38bdf8;letter-spacing:0.5px;text-transform:uppercase;">Verified Deals &amp; Handpicked Discounts</div>
+        <div style="font-size:.8rem;color:#cbd5e1;">Get instant price-drop alerts &amp; verified offers directly on Telegram</div>
+      </div>
+    </div>
+    <a href="https://t.me/tivranews_official" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#229ED9;color:#ffffff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 16px;border-radius:6px;white-space:nowrap;transition:background 0.2s;">
+      <span>Join @tivranews_official &rarr;</span>
+    </a>
+  </div>` : `  <div class="telegram-alert-banner" style="margin:20px 0 24px;padding:14px 18px;background:linear-gradient(135deg,#0b1220 0%,#1e293b 100%);border-radius:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.06);border-left:4px solid #e11d48;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:1.3rem;">📢</span>
+      <div>
+        <div style="font-weight:800;font-size:.88rem;color:#fb7185;letter-spacing:0.5px;text-transform:uppercase;">TIVRA News Alerts &amp; Breaking Updates</div>
+        <div style="font-size:.8rem;color:#cbd5e1;">Get real-time news alerts, verified reports, and daily briefings on Telegram</div>
+      </div>
+    </div>
+    <a href="https://t.me/tivranews_official" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#ffffff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 16px;border-radius:6px;white-space:nowrap;transition:background 0.2s;">
+      <span>Join @tivranews_official &rarr;</span>
+    </a>
+  </div>`);
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -451,29 +476,7 @@ footer.site a:hover{color:#e2e8f0}
   </div>
   ${heroImage ? `<figure class="hero"><img src="${heroImage.replace(/&amp;/g, '&').replace(/w=[0-9]+/, 'w=1200').replace(/h=[0-9]+/, 'h=675')}" alt="${safeTitle}" width="1200" height="675">${credit}</figure>` : ""}
   ${keyPointsHtml}
-  ${isCommercial ? `  <div class="telegram-alert-banner" style="margin:20px 0 24px;padding:14px 18px;background:linear-gradient(135deg,#0b1220 0%,#1e293b 100%);border-radius:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.06);border-left:4px solid #229ED9;">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:1.3rem;">⚡</span>
-      <div>
-        <div style="font-weight:800;font-size:.88rem;color:#38bdf8;letter-spacing:0.5px;text-transform:uppercase;">Verified Deals &amp; Handpicked Discounts</div>
-        <div style="font-size:.8rem;color:#cbd5e1;">Get instant price-drop alerts &amp; verified offers directly on Telegram</div>
-      </div>
-    </div>
-    <a href="https://t.me/tivranews_official" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#229ED9;color:#ffffff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 16px;border-radius:6px;white-space:nowrap;transition:background 0.2s;">
-      <span>Join @tivranews_official &rarr;</span>
-    </a>
-  </div>` : `  <div class="telegram-alert-banner" style="margin:20px 0 24px;padding:14px 18px;background:linear-gradient(135deg,#0b1220 0%,#1e293b 100%);border-radius:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.06);border-left:4px solid #e11d48;">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:1.3rem;">📢</span>
-      <div>
-        <div style="font-weight:800;font-size:.88rem;color:#fb7185;letter-spacing:0.5px;text-transform:uppercase;">TIVRA News Alerts &amp; Breaking Updates</div>
-        <div style="font-size:.8rem;color:#cbd5e1;">Get real-time news alerts, verified reports, and daily briefings on Telegram</div>
-      </div>
-    </div>
-    <a href="https://t.me/tivranews_official" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#e11d48;color:#ffffff;font-weight:700;font-size:.84rem;text-decoration:none;padding:8px 16px;border-radius:6px;white-space:nowrap;transition:background 0.2s;">
-      <span>Join @tivranews_official &rarr;</span>
-    </a>
-  </div>`}
+  ${telegramBannerHtml}
   <div class="body">
 ${bodyHtml}
   </div>
@@ -516,7 +519,7 @@ ${bodyHtml}
     if (!isIndia) {
       var links = document.querySelectorAll('a[href*="amazon.in"]');
       for (var i = 0; i < links.length; i++) {
-        links[i].href = links[i].href.replace(/https?:\/\/(www\.)?amazon\.in/i, "https://www.amazon.com");
+        links[i].href = links[i].href.replace(/https?:\\/\\/(www\\.)?amazon\\.in/i, "https://www.amazon.com");
       }
     }
   } catch(e) {}

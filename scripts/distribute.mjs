@@ -263,18 +263,22 @@ export async function main() {
   }
 
   // 2. Telegram Broadcast: STRICTLY Deals, Offers, Discounts & Monetized Affiliate Posts
-  const telegramDeals = pickTelegramDeals(candidates, 4);
-  if (telegramDeals.length > 0) {
-    console.log(`Found ${telegramDeals.length} fresh monetized deals to broadcast to Telegram.`);
-    for (const deal of telegramDeals) {
-      console.log(`-> Telegram Deal Post: "${deal.title}"`);
-      await sendTelegram(deal, isDryRun);
-      if (!isDryRun) {
-        dispatched.push(deal.slug || deal.url);
+  if (String(process.env.TELEGRAM_ENABLED || '').toLowerCase() === 'true') {
+    const telegramDeals = pickTelegramDeals(candidates, 4);
+    if (telegramDeals.length > 0) {
+      console.log(`Found ${telegramDeals.length} fresh monetized deals to broadcast to Telegram.`);
+      for (const deal of telegramDeals) {
+        console.log(`-> Telegram Deal Post: "${deal.title}"`);
+        await sendTelegram(deal, isDryRun);
+        if (!isDryRun) {
+          dispatched.push(deal.slug || deal.url);
+        }
       }
+    } else {
+      console.log('No fresh deal/discount articles in this run for Telegram (skipping generic news to keep Telegram 100% Deals-focused).');
     }
   } else {
-    console.log('No fresh deal/discount articles in this run for Telegram (skipping generic news to keep Telegram 100% Deals-focused).');
+    console.log('[Telegram] Distribution is currently on hold (set TELEGRAM_ENABLED=true to re-enable).');
   }
 
   if (!isDryRun) {

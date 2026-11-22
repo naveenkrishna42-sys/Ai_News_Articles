@@ -231,6 +231,11 @@ export async function runBroadcast(options = {}) {
 
   console.log(`[TIVRA Deals Telegram] Starting Broadcast (Target: ${targetCount} deals, Dry-Run: ${isDryRun})...`);
 
+  if (!isDryRun && String(process.env.TELEGRAM_ENABLED || '').toLowerCase() !== 'true') {
+    console.log("[TIVRA Deals] Telegram broadcast is currently on hold (set TELEGRAM_ENABLED=true to re-enable). Skipping.");
+    return { sent: 0, failed: 0 };
+  }
+
   if (!isDryRun && !TELEGRAM_BOT_TOKEN) {
     console.warn("[TIVRA Deals] TELEGRAM_BOT_TOKEN is not set in environment. Skipping live Telegram broadcast.");
     return { sent: 0, failed: 0 };
