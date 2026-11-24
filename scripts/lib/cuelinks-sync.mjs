@@ -357,7 +357,8 @@ export function filterActiveOffers(offers = []) {
  * Fetches live offers & campaigns from Cuelinks API with disk caching.
  * Fetches both high-payout CPL campaigns (Credit Cards & Banking) and live retail offers.
  */
-export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "") {
+export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "", options = {}) {
+  const { allowDefaultFallback = true } = options || {};
   try {
     if (fs.existsSync(CACHE_FILE)) {
       const raw = fs.readFileSync(CACHE_FILE, 'utf8');
@@ -371,7 +372,7 @@ export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "
     }
   } catch (e) {}
 
-  if (!apiKey) return Object.values(DEFAULT_CAMPAIGNS);
+  if (!apiKey) return allowDefaultFallback ? Object.values(DEFAULT_CAMPAIGNS) : [];
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 8000);
@@ -440,10 +441,10 @@ export async function fetchLiveOffers(apiKey = CUELINKS_API_KEY, countryCode = "
       } catch (e) {}
     }
 
-    return active.length > 0 ? active : Object.values(DEFAULT_CAMPAIGNS);
+    return active.length > 0 ? active : (allowDefaultFallback ? Object.values(DEFAULT_CAMPAIGNS) : []);
   } catch (err) {
     clearTimeout(timeoutId);
-    return Object.values(DEFAULT_CAMPAIGNS);
+    return allowDefaultFallback ? Object.values(DEFAULT_CAMPAIGNS) : [];
   }
 }
 
@@ -454,10 +455,12 @@ const UNMONETIZED_CUELINKS_CAMPAIGNS = /\b(udemy|agoda|choice\s*hotels|hostinger
  * Returns structured, verified, active commercial stories directly anchored to live products.
  */
 export async function getVerifiedProductDeals() {
-  const liveOffers = await fetchLiveOffers();
+  const liveOffers = await fetchLiveOffers(CUELINKS_API_KEY, "", { allowDefaultFallback: false });
   const verifiedDeals = [];
 
   for (const offer of liveOffers) {
+    // Skip evergreen CPL brochure entries unless they carry an actual time-bound promo code or expiry date
+    if (offer.isCpl && !offer.coupon_code && !offer.end_date) continue;
     const title = offer.title || offer.name || "";
     if (!title || title.length < 10) continue;
 

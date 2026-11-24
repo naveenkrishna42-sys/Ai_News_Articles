@@ -100,8 +100,12 @@ function normalizeSlug(s) {
 }
 
 function processArticles(all) {
+  const normalized = (all || []).map((a) => ({
+    ...a,
+    url: a.url ? a.url.replace(/\.html$/i, "") : `/articles/${a.slug}`,
+  }));
   const targetSlug = normalizeSlug(catSlug);
-  const matching = all.filter((a) => {
+  const matching = normalized.filter((a) => {
     const s = normalizeSlug(a.category);
     return s === targetSlug || s.replace(/-and-/g, "-") === targetSlug.replace(/-and-/g, "-");
   });

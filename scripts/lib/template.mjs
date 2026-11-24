@@ -1,4 +1,9 @@
 
+export function normalizeInlineMarkdown(html = "") {
+  if (!html || typeof html !== "string") return "";
+  return html.replace(/\*\*([^*<\n]{1,120}?)\*\*/g, "<strong>$1</strong>");
+}
+
 export function getAuthorPersona(category = "") {
   const cat = (category || "").toLowerCase();
   if (cat.includes("deal") || cat.includes("gadget") || cat.includes("tech") || cat.includes("phone")) {
@@ -232,7 +237,8 @@ export function renderArticlePage({
   const attrDesc = cleanDesc.replace(/"/g, "&quot;").slice(0, 300);
   const catSlug = slugify(category);
   const year = date.slice(0, 4);
-  const pageUrl = siteUrl ? `${siteUrl}/articles/${slug}.html` : "";
+  const cleanSlug = String(slug || "").replace(/\.html$/i, "");
+  const pageUrl = siteUrl ? `${siteUrl}/articles/${cleanSlug}` : "";
   const isCommercial = new Set([
     "Product Deals & Offers",
     "Gadget Comparisons",
@@ -332,7 +338,7 @@ ${extraJsonLdHtml}`;
   const keyPointsHtml = (keyPoints || []).filter(Boolean).length
     ? `<div class="keypoints"><div class="kp-head">Key points</div><ul>${keyPoints
         .filter(Boolean)
-        .map((p) => `<li>${escapeHtml(p)}</li>`)
+        .map((p) => `<li>${normalizeInlineMarkdown(escapeHtml(p))}</li>`)
         .join("")}</ul></div>`
     : "";
 
@@ -478,7 +484,7 @@ footer.site a:hover{color:#e2e8f0}
   ${keyPointsHtml}
   ${telegramBannerHtml}
   <div class="body">
-${bodyHtml}
+${normalizeInlineMarkdown(bodyHtml)}
   </div>
   ${adBlock}
   ${videoHtml}
@@ -519,7 +525,34 @@ ${bodyHtml}
     if (!isIndia) {
       var links = document.querySelectorAll('a[href*="amazon.in"]');
       for (var i = 0; i < links.length; i++) {
-        links[i].href = links[i].href.replace(/https?:\\/\\/(www\\.)?amazon\\.in/i, "https://www.amazon.com");
+        var h = links[i].href.replace(/https?:\\/\\/(www\\.)?amazon\\.in/i, "https://www.amazon.com");
+        if (h.indexOf("mobile+accessories+under+499") !== -1) {
+          h = h.replace("mobile+accessories+under+499", "tech+accessories+deals");
+          links[i].innerHTML = "<span>⚡ Top Tech Accessories</span>";
+        }
+        links[i].href = h;
+      }
+      var inDomains = ["flipkart.com","vijaysales.com","tatacliq.com","ajio.com","myntra.com","nykaa.com","firstcry.com","1mg.com","starhealth.in","zurichkotak.com","sbicard.com","au.bank.in","hdfc.bank.in","axis.bank.in","scapia.cards","gokiwi.in","kotak811.com","bobcard.in","makemytrip.com","goibibo.com","cleartrip.com","boat-lifestyle.com","healthkart.com","lenovo.com/in","store.acer.com/en-in","bluehost.in"];
+      var allLinks = document.querySelectorAll('a[data-geo="IN"], a[href*="linksredirect.com"]');
+      for (var j = 0; j < allLinks.length; j++) {
+        var el = allLinks[j];
+        var raw = el.getAttribute("href") || "";
+        try { raw = decodeURIComponent(raw).toLowerCase(); } catch(e) { raw = raw.toLowerCase(); }
+        var hide = el.getAttribute("data-geo") === "IN";
+        if (!hide) {
+          for (var k = 0; k < inDomains.length; k++) {
+            if (raw.indexOf(inDomains[k]) !== -1) { hide = true; break; }
+          }
+        }
+        if (hide) {
+          el.style.display = "none";
+          el.setAttribute("data-geo-hidden", "1");
+        }
+      }
+      var boxes = document.querySelectorAll(".buybox, .top-deal-bar");
+      for (var b = 0; b < boxes.length; b++) {
+        var vis = boxes[b].querySelectorAll('a:not([data-geo-hidden="1"])');
+        if (vis.length === 0) boxes[b].style.display = "none";
       }
     }
   } catch(e) {}

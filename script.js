@@ -342,7 +342,7 @@ if (loadMoreBtn) {
 
 /* ---------- Dual-Layer Circuit Breaker & Progressive Loading ---------- */
 function renderFeed(articles, featured) {
-  state.all = articles.map((a) => (a.url ? a : { ...a, url: `/articles/${a.slug}.html` }));
+  state.all = articles.map((a) => ({ ...a, url: a.url ? a.url.replace(/\.html$/i, "") : `/articles/${a.slug}` }));
   state.featured = featured || [];
   buildTicker(state.all);
   buildHero(state.all);
@@ -359,7 +359,7 @@ function loadFullIndex() {
       const all = data.articles || [];
       if (all.length <= state.all.length) return;
       const shown = state.shown;
-      state.all = all.map((a) => (a.url ? a : { ...a, url: `/articles/${a.slug}.html` }));
+      state.all = all.map((a) => ({ ...a, url: a.url ? a.url.replace(/\.html$/i, "") : `/articles/${a.slug}` }));
       applyFilters();
       while (state.shown < shown && state.shown < state.filtered.length) renderNextPage();
     })

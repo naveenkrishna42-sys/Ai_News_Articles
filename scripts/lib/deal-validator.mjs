@@ -22,9 +22,11 @@ export const REQUIRED_DEAL_FIELDS = [
 
 export function buildDealPrompt(item, directUrl) {
   const cleanProduct = extractCleanProductName(item.title);
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const currentYear = new Date().getUTCFullYear();
 
   return {
-    system: `You are the Senior Consumer Tech & Product Review Editor at TIVRA News. 
+    system: `You are the Senior Consumer Tech & Product Review Editor at TIVRA News (current date: ${todayIso}, year: ${currentYear}).
 Write a comprehensive, professional, authoritative buyer's analysis and product review for the featured item following Google's Search Quality E-E-A-T standards.
 
 OUTPUT RULES (STRICT & MANDATORY):
@@ -33,13 +35,13 @@ OUTPUT RULES (STRICT & MANDATORY):
 3. "rating" must be a numeric float between 1.0 and 5.0 representing price-to-performance ratio.
 4. "pros" must be an array of 3 to 4 specific technical strengths.
 5. "cons" must be an array of 2 to 3 genuine product tradeoffs or limitations.
-6. "articleBody" must be in-depth HTML (500 to 750 words) using <h3>, <p>, <table>, <tr>, <th>, <td>, <ul>, <li> tags structured into:
-   - <h3>Deal & Pricing Analysis</h3>: Explain the price drop, current street price, and historical value.
-   - <h3>Key Technical Specifications</h3>: Include a clean HTML <table> comparing display, battery, processor, camera/build, and software.
+6. "articleBody" must be in-depth HTML (500 to 750 words) using <h3>, <p>, <strong>, <table>, <tr>, <th>, <td>, <ul>, <li> tags (NEVER raw Markdown **bold**) structured into:
+   - <h3>Deal & Pricing Analysis</h3>: Explain the price drop, current street price, and historical value. If the source deal is region-specific (e.g. US Black Friday or $USD pricing), state the region/currency clearly and note that pricing/availability varies internationally — NEVER invent fake Rupee conversions.
+   - <h3>Key Technical Specifications</h3>: Include a clean HTML <table> comparing display, battery, processor, camera/build, and software using ONLY verified facts (NEVER guess specs or call 2023/2024 models "current generation" in ${currentYear}).
    - <h3>Real-World Performance & Daily Use</h3>: Explain hands-on user experience, build quality, and battery endurance.
    - <h3>Competition & Market Alternatives</h3>: Compare with 1-2 chief rivals in the same price tier.
    - <h3>Who Should Buy This Deal</h3>: Actionable advice on who benefits most and who should wait.
-7. NEVER mention AI, automated generation, affiliate links, CashKaro, or commission codes. Write with the authoritative voice of the TIVRA News Editorial Desk.
+7. NEVER mention AI, automated generation, affiliate links, CashKaro, or commission codes, and NEVER put stale past years (2024/2025) as the current year in headlines. Write with the authoritative voice of the TIVRA News Editorial Desk.
 
 REQUIRED JSON SCHEMA:
 {
@@ -96,14 +98,17 @@ export async function generateAndValidateDealArticle(pool, item, directUrl, maxR
         continue;
       }
 
-      // Validate title and body content quality
+      // Validate title and body content quality (reject stale past-year headlines)
+      const currentYear = new Date().getUTCFullYear();
+      const staleYearRegex = currentYear >= 2026 ? /\b(?:for|in)\s+202[0-5]\b/i : /\b(?:for|in)\s+202[0-3]\b/i;
       if (
         !parsed.title ||
         parsed.title.trim().length < 15 ||
         /^\.+$/.test(parsed.title.trim()) ||
-        /authoritative headline/i.test(parsed.title)
+        /authoritative headline/i.test(parsed.title) ||
+        staleYearRegex.test(parsed.title)
       ) {
-        console.warn(`  [Deals] Attempt ${attempt}/${maxRetries} — Invalid title: "${parsed.title}"`);
+        console.warn(`  [Deals] Attempt ${attempt}/${maxRetries} — Invalid or stale-year title: "${parsed.title}"`);
         continue;
       }
 

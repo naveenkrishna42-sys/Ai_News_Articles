@@ -84,9 +84,20 @@ export class ProviderPool {
         }
       }
 
-      // Helper: Mathematical zero-cost check
+      const PAID_PREFIXES = [
+        "openai/", "deepseek/", "mistralai/", "qwen/", "anthropic/",
+        "google/", "stepfun/", "x-ai/", "meta-llama/", "cohere/",
+        "amazon/", "microsoft/", "elevenlabs/", "alibaba/", "bytedance/"
+      ];
+      const PAID_ALIASES = new Set(["openai", "openai-fast", "deepseek", "mistral", "qwen-coder"]);
+
+      // Helper: Mathematical zero-cost check (synced with Jetri zero-pollen rules)
       this.isZeroCostModel = (modelId) => {
-        if (!modelId || /guard|moderation|embed|rerank|classifier|safety|whisper|tts|audio|vision-only|reward/i.test(modelId)) {
+        if (!modelId || /guard|moderation|embed|rerank|classifier|safety|whisper|tts|audio|vision-only|reward|triage-router|tiered-health-router|polyrouter|\bfrugal\b|08b\b|0\.8b\b/i.test(modelId)) {
+          return false;
+        }
+        const idLower = String(modelId).toLowerCase();
+        if (PAID_PREFIXES.some((p) => idLower.startsWith(p)) || PAID_ALIASES.has(idLower)) {
           return false;
         }
         const meta = catalogMap.get(modelId);
@@ -147,9 +158,11 @@ export class ProviderPool {
       // Non-fatal fallback
     }
 
-    // Tag existing primary providers
+    // Tag existing providers (Tier 1 unlimited vs Tier 2 daily-capped free)
     for (const p of this.providers) {
-      if (!p.tier) p.tier = "primary-free";
+      if (!p.tier) {
+        p.tier = p.baseUrl?.includes("ai-gateway.vercel.sh") ? "tier1-unlimited-free" : "tier2-daily-free";
+      }
     }
 
     // 3. Filter candidate models strictly through zero-cost verification
@@ -169,14 +182,18 @@ export class ProviderPool {
       return isFree;
     });
 
-    // 4. Pre-flight handshake ping on top zero-cost candidates
+    // 4. Pre-flight handshake ping on top zero-cost candidates (configured + live catalog)
     let gatewayHealthy = false;
     let verifiedCandidate = null;
-    const probeCandidates = zeroCostCapable.slice(0, 3);
+    const dynamicProbeExtras = dynamicFreeCommunity
+      .map((m) => ({ id: m.name || m.id, name: `pollinations-${(m.name || m.id).split("/").pop()}-free`, rpm: 20 }))
+      .filter((m) => m.id && !zeroCostCapable.some((c) => c.id === m.id))
+      .slice(0, 3);
+    const probeCandidates = apiKey ? [...zeroCostCapable.slice(0, 4), ...dynamicProbeExtras] : zeroCostCapable.slice(0, 3);
     for (const candidate of probeCandidates) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000);
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         const res = await fetch(`${baseUrl}/chat/completions`, {
           method: "POST",
           headers: {
@@ -185,17 +202,29 @@ export class ProviderPool {
           },
           body: JSON.stringify({
             model: candidate.id,
-            max_tokens: 16,
-            messages: [{ role: "user", content: "hi" }],
+            max_tokens: 64,
+            temperature: 0.1,
+            messages: [{ role: "user", content: "Reply with the single word: READY" }],
           }),
           signal: controller.signal,
         });
         clearTimeout(timeoutId);
         if (res.status === 200) {
-          gatewayHealthy = true;
-          verifiedCandidate = candidate;
-          console.log(`  ✔ [Pollinations Pre-flight] Zero-cost handshake verified with ${candidate.id}.`);
-          break;
+          const probeJson = await res.json().catch(() => ({}));
+          const probeReply = String(
+            probeJson?.choices?.[0]?.message?.content ||
+            probeJson?.choices?.[0]?.message?.reasoning_content ||
+            ""
+          ).trim();
+          if (
+            probeReply &&
+            !/account behind this api key|doesn't have enough credits|insufficient/i.test(probeReply)
+          ) {
+            gatewayHealthy = true;
+            verifiedCandidate = candidate;
+            console.log(`  ✔ [Pollinations Pre-flight] Zero-cost Tier-1 handshake verified with ${candidate.id}.`);
+            break;
+          }
         } else if (res.status === 402) {
           console.warn(`  ⚠ [Pollinations Pre-flight] Balance check flag (HTTP 402). Disabling Pollinations for this run.`);
           break;
@@ -210,20 +239,23 @@ export class ProviderPool {
       }
     }
 
-    // 5. Wire ONLY verified zero-cost community models as secondary fallback
+    // 5. Wire verified zero-cost Pollinations models as Tier 1 Unlimited Free (prioritized first, RPM-paced)
     if (gatewayHealthy) {
+      const baseCapable = zeroCostCapable.some((c) => c.id === verifiedCandidate?.id)
+        ? zeroCostCapable
+        : (verifiedCandidate ? [verifiedCandidate, ...zeroCostCapable] : zeroCostCapable);
       const sortedCapable = verifiedCandidate
-        ? [verifiedCandidate, ...zeroCostCapable.filter((m) => m.id !== verifiedCandidate.id)]
-        : zeroCostCapable;
+        ? [verifiedCandidate, ...baseCapable.filter((m) => m.id !== verifiedCandidate.id)]
+        : baseCapable;
 
       const capableProviders = sortedCapable.map((m) => ({
         name: m.name || m.id,
         baseUrl,
         model: m.id,
         apiKey,
-        tier: "community-zero-cost",
-        rpm: m.rpm || 12,
-        minIntervalMs: Math.ceil(60_000 / (m.rpm || 12)),
+        tier: "tier1-unlimited-free",
+        rpm: m.rpm || 20,
+        minIntervalMs: Math.ceil(60_000 / (m.rpm || 20)),
         lastCallTime: 0,
         nextSlotAvailableMs: 0,
         cooldownUntil: 0,
@@ -231,37 +263,39 @@ export class ProviderPool {
         failed: 0,
       }));
 
-      // Dynamically discover and wire top healthy zero-price models from the catalog
-      const autoDiscovered = dynamicFreeCommunity
-        .filter((m) => !sortedCapable.some((c) => c.id === (m.name || m.id)))
-        .slice(0, 5)
-        .map((m) => {
-          const modelId = m.name || m.id;
-          const shortName = modelId.split("/").pop() || "comm";
-          return {
-            name: `pollinations-${shortName}-free`,
-            baseUrl,
-            model: modelId,
-            apiKey,
-            tier: "community-zero-cost",
-            rpm: 12,
-            minIntervalMs: Math.ceil(60_000 / 12),
-            lastCallTime: 0,
-            nextSlotAvailableMs: 0,
-            cooldownUntil: 0,
-            ok: 0,
-            failed: 0,
-          };
+      // Deduplicate catalog IDs and wire top healthy zero-price models
+      const seenIds = new Set(sortedCapable.map((c) => c.id));
+      const autoDiscovered = [];
+      for (const m of dynamicFreeCommunity) {
+        const modelId = m.name || m.id;
+        if (!modelId || seenIds.has(modelId)) continue;
+        seenIds.add(modelId);
+        const shortName = modelId.split("/").pop() || "comm";
+        autoDiscovered.push({
+          name: `pollinations-${shortName}-free`,
+          baseUrl,
+          model: modelId,
+          apiKey,
+          tier: "tier1-unlimited-free",
+          rpm: 15,
+          minIntervalMs: Math.ceil(60_000 / 15),
+          lastCallTime: 0,
+          nextSlotAvailableMs: 0,
+          cooldownUntil: 0,
+          ok: 0,
+          failed: 0,
         });
+        if (autoDiscovered.length >= 4) break;
+      }
 
       const fallbackProviders = zeroCostFallback.map((m) => ({
         name: m.name || m.id,
         baseUrl,
         model: m.id,
         apiKey,
-        tier: "community-zero-cost",
-        rpm: m.rpm || 12,
-        minIntervalMs: Math.ceil(60_000 / (m.rpm || 12)),
+        tier: "tier1-unlimited-free",
+        rpm: m.rpm || 15,
+        minIntervalMs: Math.ceil(60_000 / (m.rpm || 15)),
         lastCallTime: 0,
         nextSlotAvailableMs: 0,
         cooldownUntil: 0,
@@ -269,11 +303,11 @@ export class ProviderPool {
         failed: 0,
       }));
 
-      // Append community zero-cost providers strictly AFTER primary free providers
-      this.providers = [...this.providers, ...capableProviders, ...autoDiscovered, ...fallbackProviders];
-      console.log(`[Providers] Successfully wired ${this.providers.length} zero-cost providers (Primary free prioritized first, Pollinations 0-Pollen secondary).`);
+      // Prepend Tier 1 unlimited 0-Pollen Pollinations models BEFORE daily-capped Tier 2 providers
+      this.providers = [...capableProviders, ...autoDiscovered, ...fallbackProviders, ...this.providers];
+      console.log(`[Providers] Wired ${this.providers.length} zero-cost providers (Tier 1 Unlimited 0-Pollen prioritized first, Tier 2 daily-free secondary).`);
     } else {
-      console.log(`[Providers] Operating strictly on primary zero-cost free providers.`);
+      console.log(`[Providers] Operating strictly on configured zero-cost free providers.`);
     }
   }
 
@@ -283,17 +317,18 @@ export class ProviderPool {
 
   /**
    * Atomically reserves a rate-limit slot from the provider available earliest.
-   * Advances provider.nextSlotAvailableMs immediately so parallel async workers
-   * never collide or breach RPM / TPM limits.
+   * Prioritizes Tier 1 unlimited 0-Pollen models (Pollinations & Vercel) whenever
+   * their RPM pacing wait is <= 12s, spilling over to Tier 2 daily-capped providers
+   * only when Tier 1 lanes are busy or on cooldown.
    */
   acquireSlot() {
     const now = Date.now();
     const live = this.available;
     if (live.length === 0) return null;
 
-    // Prioritize Tier 1: Primary free providers (Gemini, OpenRouter)
-    const primary = live.filter((p) => p.tier === "primary-free");
-    const candidates = primary.length > 0 ? primary : live;
+    const tier1 = live.filter((p) => p.tier === "tier1-unlimited-free");
+    const tier1ReadySoon = tier1.filter((p) => Math.max(0, (p.nextSlotAvailableMs || 0) - now) <= 12_000);
+    const candidates = tier1ReadySoon.length > 0 ? tier1ReadySoon : live;
 
     // Pick candidate whose next available slot is earliest
     const sorted = [...candidates].sort((a, b) => {
@@ -382,8 +417,18 @@ export class ProviderPool {
 
         if (res.status === 429 || res.status >= 500) {
           const body = await res.text().catch(() => "");
-          provider.cooldownUntil = Date.now() + COOLDOWN_MS;
-          provider.nextSlotAvailableMs = Date.now() + COOLDOWN_MS;
+          const isOrDailyCap = res.status === 429 && provider.baseUrl.includes("openrouter.ai") && /free-models-per-day/i.test(body);
+          const cooldownWindow = isOrDailyCap ? 15 * 60_000 : COOLDOWN_MS;
+          provider.cooldownUntil = Date.now() + cooldownWindow;
+          provider.nextSlotAvailableMs = Date.now() + cooldownWindow;
+          if (res.status === 429 && provider.baseUrl.includes("openrouter.ai") && provider.model?.endsWith(":free")) {
+            for (const other of this.providers) {
+              if (other.baseUrl.includes("openrouter.ai") && other.model?.endsWith(":free")) {
+                other.cooldownUntil = Math.max(other.cooldownUntil || 0, Date.now() + cooldownWindow);
+                other.nextSlotAvailableMs = Math.max(other.nextSlotAvailableMs || 0, Date.now() + cooldownWindow);
+              }
+            }
+          }
           provider.failed++;
           lastError = new Error(`${provider.name} HTTP ${res.status}: ${body.slice(0, 150)}`);
           console.warn(`  ⚠ [${provider.name}] HTTP ${res.status}: ${body.slice(0, 150)}`);
@@ -391,12 +436,12 @@ export class ProviderPool {
         }
         if (!res.ok) {
           const body = await res.text().catch(() => "");
-          if (res.status === 402 || /insufficient balance/i.test(body)) {
-            provider.cooldownUntil = Infinity; // Permanently skip exhausted accounts for this run
+          if (res.status === 401 || res.status === 402 || res.status === 404 || /insufficient balance|no longer available|unavailable for free/i.test(body)) {
+            provider.cooldownUntil = Infinity; // Permanently retire dead/unauthorized/paid models for this run
             provider.nextSlotAvailableMs = Infinity;
             provider.failed++;
-            lastError = new Error(`${provider.name} HTTP 402: Insufficient Balance`);
-            console.warn(`  ⚠ [${provider.name}] HTTP 402: Account balance exhausted. Deactivated for this run.`);
+            lastError = new Error(`${provider.name} HTTP ${res.status}: ${body.slice(0, 120)}`);
+            console.warn(`  ⚠ [${provider.name}] HTTP ${res.status}: Permanently retired for this run.`);
             continue;
           }
           provider.cooldownUntil = Date.now() + COOLDOWN_MS;
@@ -412,7 +457,7 @@ export class ProviderPool {
           text = await res.text();
         } else {
           const data = await res.json();
-          text = data?.choices?.[0]?.message?.content || "";
+          text = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.message?.reasoning_content || "";
         }
 
         if (!text.trim()) {

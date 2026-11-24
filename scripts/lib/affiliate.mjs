@@ -396,24 +396,97 @@ export const KNOWN_MERCHANTS = [
   }
 ];
 
+export const INDIA_ONLY_MERCHANT_DOMAINS = [
+  "flipkart.com",
+  "vijaysales.com",
+  "tatacliq.com",
+  "ajiogram.ajio.com",
+  "ajio.com",
+  "myntra.com",
+  "nykaa.com",
+  "firstcry.com",
+  "1mg.com",
+  "starhealth.in",
+  "zurichkotak.com",
+  "sbicard.com",
+  "au.bank.in",
+  "hdfc.bank.in",
+  "axis.bank.in",
+  "scapia.cards",
+  "gokiwi.in",
+  "kotak811.com",
+  "bobcard.in",
+  "makemytrip.com",
+  "goibibo.com",
+  "cleartrip.com",
+  "boat-lifestyle.com",
+  "healthkart.com",
+  "lenovo.com/in",
+  "store.acer.com/en-in",
+  "bluehost.in"
+];
+
+export function isIndiaOnlyUrl(url = "") {
+  if (!url) return false;
+  let decoded = String(url);
+  try { decoded = decodeURIComponent(decoded); } catch {}
+  const lower = decoded.toLowerCase();
+  return INDIA_ONLY_MERCHANT_DOMAINS.some((d) => lower.includes(d));
+}
+
+export function tagIndiaOnlyLinks(html = "") {
+  if (!html) return html;
+  return html.replace(/<a\s+href="([^"]+)"(?![^>]*\bdata-geo)/gi, (match, href) => {
+    const rawHref = href.replace(/&amp;/g, "&");
+    if (rawHref.includes("mobile+accessories+under+499")) {
+      return `<a href="${href}" data-geo-price="IN"`;
+    }
+    if (isIndiaOnlyUrl(rawHref)) {
+      return `<a href="${href}" data-geo="IN"`;
+    }
+    return match;
+  });
+}
+
 /**
  * Strict product name sanitizer.
  */
 export function sanitizeProductName(name) {
   if (!name) return "";
-  let clean = name.trim();
+  const rawName = String(name).trim();
+  let clean = rawName;
+
+  clean = clean.replace(/^(?:tivra\s+alert:\s*|deal\s+alert:\s*|buyer['’]?s\s+guide:\s*)/i, "").trim();
+
   if (clean.includes(":")) clean = clean.split(":")[0].trim();
   if (clean.includes(" — ")) clean = clean.split(" — ")[0].trim();
+  if (clean.includes(" – ")) clean = clean.split(" – ")[0].trim();
   if (clean.includes(" - ")) clean = clean.split(" - ")[0].trim();
 
-  const genericListiclePattern = /^(top|best)\s*\d+|shopping\s*sites|sites\s*in\s*india|ecommerce|how\s*to|why\s+/i;
-  if (genericListiclePattern.test(clean) && clean.split(/\s+/).length > 3) {
+  const genericListiclePattern = /^(top|best)\s*\d+|shopping\s*sites|sites\s*in\s*india|ecommerce|how\s*to|why\s+|what\s+to\s+expect|^(?:i|we|this|these|that|staring|prepare|impressive|ultimate|decode|decoding|navigating|maximizing|evaluating|unpacking|anticipating)\b|^\[award/i;
+  if (genericListiclePattern.test(clean)) {
     return "";
   }
 
-  const dealBuzzwords = /\b(amazon\s*sale|flipkart\s*sale|great\s*indian\s*festival|big\s*billion\s*days|deal\s*alert|deals?|offers?|sales?|price\s*drops?|price\s*cut|discounts?|massive\s*discount|steep\s*discount|flat\s*off|gets\s*a\s*huge|huge\s*discount|worth\s*the\s*investment|worth\s*buying|is\s*it\s*worth\s*it|review|amazon|flipkart)\b/gi;
-  clean = clean.replace(dealBuzzwords, " ").replace(/\s+/g, " ").trim();
-  return (clean.length >= 3 && clean.length <= 35) ? clean : "";
+  const dealBuzzwords = /\b(pre-black\s*friday|early\s*black\s*friday|black\s*friday|cyber\s*monday|prime\s*day|amazon\s*sale|flipkart\s*sale|great\s*indian\s*festival|big\s*billion\s*days|festive\s*sale|diwali\s*sale|mega[- ]sale|deal\s*alert|deals?|offers?|sales?|price\s*drops?|price\s*cut|discounts?|massive\s*discount|steep\s*discount|flat\s*off|gets\s*a\s*huge|huge\s*discount|worth\s*the\s*investment|worth\s*the\s*money|worth\s*buying|is\s*it\s*worth\s*it|worth\s*it|full\s*review|value\s*review|price\s*review|deal\s*review|review|outlook|decoded|roundup|buying\s*guide|buyer['’]?s\s*guide|guide|value\s*analysis|analysis|forecast|strategies|strategy|amazon|flipkart)\b/gi;
+  clean = clean
+    .replace(dealBuzzwords, " ")
+    .replace(/\b202\d\b/g, " ")
+    .replace(/^['"‘’“”:\-\s]+|['"‘’“”:\-\s]+$/g, "")
+    .replace(/\b(?:for|in|on|at|of|from|with|and|&|the|a|an)\s*$/i, "")
+    .replace(/^(?:early|the)\s+/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (/^pixel(?:\s+\d+|\s+pro|\s+watch|\s+buds|\s+fold|\s+tablet|$)/i.test(clean) && !/\bgoogle\b/i.test(clean) && /\bgoogle\b/i.test(rawName)) {
+    clean = `Google ${clean}`;
+  }
+
+  if (!clean || /^(?:tech|premium\s+tech|smart\s+buys|holiday\s+savings|\d+)$/i.test(clean)) {
+    return "";
+  }
+
+  return (clean.length >= 3 && clean.length <= 38) ? clean : "";
 }
 
 /**
@@ -450,6 +523,10 @@ function renderQuickDealsStrip(amazonTag) {
  * Main Buy Box & Commercial Action Matrix Generator
  */
 export function renderBuyBox(deviceNames = [], config = {}, category = "", directUrl = "", title = "") {
+  return tagIndiaOnlyLinks(_renderBuyBoxInner(deviceNames, config, category, directUrl, title));
+}
+
+function _renderBuyBoxInner(deviceNames = [], config = {}, category = "", directUrl = "", title = "") {
   const catLower = (category || "").toLowerCase();
   const textContext = `${title} ${category} ${(deviceNames || []).join(" ")}`.toLowerCase();
 
@@ -815,6 +892,6 @@ export function injectInlineListicleButtons(bodyHtml = "", config = {}, category
       }
     }
 
-    return `<h3>${fullHeading}</h3>${btnHtml}`;
+    return `<h3>${fullHeading}</h3>${tagIndiaOnlyLinks(btnHtml)}`;
   });
 }

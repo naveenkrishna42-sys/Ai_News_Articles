@@ -31,6 +31,11 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
 
+    if (url.pathname.startsWith("/articles/") && url.pathname.endsWith(".html")) {
+      url.pathname = url.pathname.slice(0, -5);
+      return Response.redirect(url.toString(), 301);
+    }
+
     // 2. CORS Preflight (OPTIONS)
     if (request.method === "OPTIONS") {
       return new Response(null, {
@@ -73,7 +78,10 @@ export default {
         const total = articles.length;
         const totalPages = Math.ceil(total / limit);
         const start = (page - 1) * limit;
-        const pagedArticles = articles.slice(start, start + limit);
+        const pagedArticles = articles.slice(start, start + limit).map((a) => ({
+          ...a,
+          url: a.url ? a.url.replace(/\.html$/i, "") : `/articles/${a.slug}`,
+        }));
 
         const responsePayload = {
           status: "ok",
@@ -147,7 +155,7 @@ export default {
                   category: m.metadata?.category || "General",
                   image: m.metadata?.image || "",
                   date: m.metadata?.date || "",
-                  url: m.metadata?.url || `/articles/${m.id}.html`,
+                  url: m.metadata?.url ? m.metadata.url.replace(/\.html$/i, "") : `/articles/${m.id}`,
                   score: m.score,
                 }));
 
@@ -219,7 +227,10 @@ export default {
         const total = scoredMatches.length;
         const totalPages = Math.ceil(total / limit);
         const start = (page - 1) * limit;
-        const pagedMatches = scoredMatches.slice(start, start + limit);
+        const pagedMatches = scoredMatches.slice(start, start + limit).map((a) => ({
+          ...a,
+          url: a.url ? a.url.replace(/\.html$/i, "") : `/articles/${a.slug}`,
+        }));
 
         const responsePayload = {
           status: "ok",
@@ -309,7 +320,7 @@ export default {
                 category: batch[idx].category || "General",
                 image: batch[idx].image || "",
                 date: batch[idx].date || "",
-                url: `/articles/${batch[idx].slug}.html`,
+                url: `/articles/${batch[idx].slug}`,
               },
             }));
 
@@ -373,16 +384,48 @@ export default {
           });
 
           if (country !== "IN" && typeof HTMLRewriter !== "undefined") {
+            const inOnlyDomains = [
+              "flipkart.com", "vijaysales.com", "tatacliq.com", "ajio.com", "myntra.com",
+              "nykaa.com", "firstcry.com", "1mg.com", "starhealth.in", "zurichkotak.com",
+              "sbicard.com", "au.bank.in", "hdfc.bank.in", "axis.bank.in", "scapia.cards",
+              "gokiwi.in", "kotak811.com", "bobcard.in", "makemytrip.com", "goibibo.com",
+              "cleartrip.com", "boat-lifestyle.com", "healthkart.com", "lenovo.com/in",
+              "store.acer.com/en-in", "bluehost.in"
+            ];
             return new HTMLRewriter()
               .on('a[href*="amazon.in"]', {
                 element(el) {
                   const href = el.getAttribute("href");
                   if (!href || !href.includes("amazon.in")) return;
                   let rewritten = href.replace(/https?:\/\/(www\.)?amazon\.in/i, "https://www.amazon.com");
+                  if (rewritten.includes("mobile+accessories+under+499")) {
+                    rewritten = rewritten.replace("mobile+accessories+under+499", "tech+accessories+deals");
+                  }
                   if (usAmazonTag) {
                     rewritten = rewritten.replace(/([?&]tag=)[^&]+/i, `$1${encodeURIComponent(usAmazonTag)}`);
                   }
                   el.setAttribute("href", rewritten);
+                },
+              })
+              .on('a[data-geo-price="IN"] span, a[href*="mobile+accessories+under+499"] span', {
+                text(chunk) {
+                  if (chunk.text.includes("499")) {
+                    chunk.replace(chunk.text.replace(/Tech Under ₹499/g, "Top Tech Accessories"));
+                  }
+                },
+              })
+              .on('a[data-geo="IN"], a[href*="linksredirect.com"]', {
+                element(el) {
+                  const isTaggedIn = el.getAttribute("data-geo") === "IN";
+                  let rawHref = el.getAttribute("href") || "";
+                  try { rawHref = decodeURIComponent(rawHref).toLowerCase(); } catch { rawHref = rawHref.toLowerCase(); }
+                  const matchesInDomain = inOnlyDomains.some((d) => rawHref.includes(d));
+                  if (isTaggedIn || matchesInDomain) {
+                    el.setAttribute("hidden", "");
+                    el.setAttribute("data-geo-hidden", "1");
+                    const prevStyle = el.getAttribute("style") || "";
+                    el.setAttribute("style", `${prevStyle};display:none !important;`);
+                  }
                 },
               })
               .transform(baseResponse);

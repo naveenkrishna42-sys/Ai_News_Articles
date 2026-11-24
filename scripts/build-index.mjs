@@ -379,7 +379,7 @@ function parseArticle(filename) {
     image,
     date,
     category: categoryRaw.trim() || "General",
-    url: `/articles/${slug}.html`,
+    url: `/articles/${slug}`,
     scheduled,
   };
 }
@@ -528,20 +528,20 @@ function main() {
   // FRESH_WINDOW_DAYS does not remove it from the sitemap or from search. ----
   const staticPages = [
     "",
-    "tools.html",
-    "archive.html",
-    "about.html",
-    "contact.html",
-    "privacy.html",
-    "terms.html",
-    "disclaimer.html",
-    "editorial-policy.html",
-    "cookie-policy.html",
-    "dmca.html",
+    "tools",
+    "archive",
+    "about",
+    "contact",
+    "privacy",
+    "terms",
+    "disclaimer",
+    "editorial-policy",
+    "cookie-policy",
+    "dmca",
   ];
   // uses global slugifyCategory(cat)
   const categorySlugs = [...new Set(published.map((a) => slugifyCategory(a.category)))];
-  const categoryUrls = categorySlugs.map((slug) => `${SITE_URL}/category.html?cat=${slug}`);
+  const categoryUrls = categorySlugs.map((slug) => `${SITE_URL}/category?cat=${slug}`);
 
   const staticUrls = [...staticPages.map((p) => `${SITE_URL}/${p}`), ...categoryUrls];
   const todayIso = new Date().toISOString().slice(0, 10);

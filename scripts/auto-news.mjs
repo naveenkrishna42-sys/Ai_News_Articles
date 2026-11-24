@@ -36,9 +36,9 @@ import { fetchAllFeeds, storyKey, significantWords, titlesOverlap } from "./lib/
 import { findImage, findYouTubeVideo, mediaPreflight, findWikipediaPortrait } from "./lib/images.mjs";
 import { findDeviceImage } from "./lib/images/index.mjs";
 import { renderArticlePage, renderComparisonTable, specTableHasData, buildAwaitingSpecsNotice, slugify, escapeHtml } from "./lib/template.mjs";
-import { renderBuyBox, injectInlineListicleButtons } from "./lib/affiliate.mjs";
+import { renderBuyBox, injectInlineListicleButtons, sanitizeProductName } from "./lib/affiliate.mjs";
 import { buildComparisonSystemPrompt, buildRankingSystemPrompt, buildReviewSystemPrompt, buildNichePrompt } from "./lib/gadget-prompts.mjs";
-import { getBestMonetizedUrl, extractCleanProductName } from "./lib/deal-extractor.mjs";
+import { getBestMonetizedUrl, extractCleanProductName, isUnmonetizableRegionalDeal } from "./lib/deal-extractor.mjs";
 import { generateAndValidateDealArticle } from "./lib/deal-validator.mjs";
 import { getVerifiedProductDeals } from "./lib/cuelinks-sync.mjs";
 
@@ -149,18 +149,19 @@ function isDuplicate(item) {
     const commercialKeywords = [
       "sbi simply", "simplyclick", "kiwi rupay", "scapia", "swiggy cashback",
       "hdfc swiggy", "au bank", "axis bank", "kotak 811", "betterhelp", "coursera",
-      "hostinger", "verpex", "appsumo", "choice hotels", "airwallex"
+      "hostinger", "verpex", "appsumo", "choice hotels", "airwallex",
+      "bob card", "bobcard", "bob etihad", "makemytrip", "trip.com", "ajio", "myntra", "vijaysales", "tatacliq"
     ];
 
     for (const kw of commercialKeywords) {
       if (titleLower.includes(kw)) {
-        // Check if published in registry in the last 7 days
+        // Check if published in registry in the last 30 days
         for (const [regKey, regData] of Object.entries(registry)) {
           if (!regData || !regData.d) continue;
           const regTitle = (regData.t || "").toLowerCase();
           if (regTitle.includes(kw)) {
             const daysDiff = (new Date(today) - new Date(regData.d)) / (1000 * 60 * 60 * 24);
-            if (daysDiff < 7) {
+            if (daysDiff < 30) {
               return true; // Cooldown active, skip duplicate review!
             }
           }
@@ -241,6 +242,7 @@ for (const category of priority) {
     if (picked >= categoryCap) break;
     if (item.title.length < 25) continue;
     if (isStaleSeasonalStory(item.title, today)) continue;
+    if (isUnmonetizableRegionalDeal(item.title, item.summary, category)) continue;
     if (isDuplicate(item)) continue;
     claim(item);
     candidatePool.push(item);
@@ -276,6 +278,7 @@ for (const category of HIGH_MONETIZATION_ORDER) {
     if (candidatePool.length >= reserveLimit) break;
     if (item.title.length < 25) continue;
     if (isStaleSeasonalStory(item.title, today)) continue;
+    if (isUnmonetizableRegionalDeal(item.title, item.summary, category)) continue;
     if (isDuplicate(item)) continue;
     claim(item);
     candidatePool.push(item);
@@ -290,12 +293,14 @@ if (DRY_RUN) {
 }
 
 // ---------- Writing ----------
-const SYSTEM_PROMPT = `You are a senior investigative journalist, tech authority, and commercial buyer guide expert at TIVRA News (tivranews.com). Rewrite the given headline and snippet into an authoritative, 500-700 word in-depth article following strict E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) quality standards.
+const currentYearNum = Number(today.slice(0, 4));
+const SYSTEM_PROMPT = `You are a senior investigative journalist, tech authority, and commercial buyer guide expert at TIVRA News (tivranews.com). Today's date is ${today} (current year: ${currentYearNum}). Rewrite the given headline and snippet into an authoritative, 500-700 word in-depth article following strict E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) quality standards.
 
 Non-negotiable formatting and depth requirements:
-- Length: 500 to 750 words. Divide logically into 3-5 structured <h2> and <h3> subheadings with concise paragraphs (2-4 sentences each).
+- Length: 500 to 750 words. Divide logically into 3-5 structured <h2> and <h3> subheadings with concise paragraphs (2-4 sentences each). Use <strong> for bold text — NEVER output raw Markdown **asterisks** inside HTML.
 - Technical Depth: Do not just summarize. Explain real-world buyer implications, practical benchmarks, pricing context, and value justification.
-- Mandatory Spec / Data Table: For tech hardware or finance articles with concrete metrics, include a clean HTML table (<table><tr><th>Feature / Metric</th><th>Details</th></tr>...) summarizing verifiable figures. DO NOT invent fictional processors, chipsets, or benchmark stats.
+- Temporal & Regional Accuracy: Today's year is ${currentYearNum}. NEVER label older 2023/2024/2025 hardware (such as Pixel 8 / Tensor G3) as the "current generation" in ${currentYearNum}, and NEVER write "for 2024" or "in 2025" as the current year in commercial headlines. If a sale event (e.g. Black Friday) or price ($USD) applies to a specific market such as the US, state that regional context clearly and note that availability varies internationally — NEVER fabricate fake Rupee conversions for US-only promotions.
+- Mandatory Spec / Data Table: For tech hardware or finance articles with concrete metrics, include a clean HTML table (<table><tr><th>Feature / Metric</th><th>Details</th></tr>...) summarizing ONLY verifiable figures. DO NOT invent fictional processors, chipsets, or benchmark stats.
 - Financial Products Rule: Credit cards, bank accounts, and loans are NOT gadgets! NEVER invent a retail purchase price, "price drop", or "₹149,990 cost" for a credit card. Structure financial reviews strictly around Annual Fee, Joining Fee, Rewards Rate, Cashback Categories, Lounge Access, and Eligibility Criteria.
 - Health & Services Rule: If an article is about healthcare, mental health, or online services, focus strictly on therapy sessions, professional counseling, subscription plans, and medical guidelines. NEVER inject unrelated computer processors, hardware specs, or chipsets.
 - Pros & Cons / Key Insights: You MUST include a bulleted list (<ul><li>) of clear Pros/Cons or Key Real-World Highlights.
@@ -395,9 +400,12 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
     throw new Error(`Quality Gate: rejected due to retail price hallucination on financial credit card`);
   }
 
-  // 3. Check for War Department / Secretary of War anachronism
+  // 3. Check for War Department / Secretary of War anachronism or stale commercial year
   if (/secretary of war|war department release/i.test(bodyTextLower) && !/194[0-7]|world war/i.test(headlineLower)) {
     throw new Error(`Quality Gate: rejected due to historical War Department anachronism`);
+  }
+  if (COMMERCIAL_CATEGORIES.has(item.category) && currentYearNum >= 2026 && /\b(?:for|in)\s+202[0-5]\b/i.test(title)) {
+    throw new Error(`Quality Gate: rejected stale past-year commercial title "${title}"`);
   }
 
   // Image strategy: real Wikipedia portrait when the story is about one
@@ -443,10 +451,11 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
       finalBodyHtml = injectInlineListicleButtons(bodyHtml, config, item.category, title, item.directUrl || item.sourceUrl || "");
 
       const validDirectUrl = (item.directUrl && !item.directUrl.includes("news.google.com")) ? item.directUrl : "";
-      const buyBoxHtml = renderBuyBox([title], config, item.category, validDirectUrl, title);
+      const cleanTitleProd = sanitizeProductName(title) || extractCleanProductName(title);
+      const buyBoxHtml = renderBuyBox([cleanTitleProd], config, item.category, validDirectUrl, title);
       if (buyBoxHtml) finalBodyHtml += `\n${buyBoxHtml}`;
 
-      const prodLd = buildProductJsonLd(title, heroImage);
+      const prodLd = buildProductJsonLd(cleanTitleProd, heroImage);
       if (prodLd) extraJsonLd.push(prodLd);
     }
   }
@@ -492,14 +501,32 @@ async function writeStory(item, { systemPrompt = SYSTEM_PROMPT, minWords = 220, 
 // wrong numbers on a monetized site. Product-only structured data is a
 // smaller SEO win than a full Review rich-result, but it's the honest one —
 // we skip the rich-result eligibility rather than invent a rating.
+const GENERIC_NON_BRAND_WORDS = new Set([
+  "black", "early", "best", "top", "new", "the", "ultimate", "fully",
+  "budget", "premium", "smart", "wireless", "gaming", "portable", "digital",
+  "tech", "deals", "deal", "high", "modern", "vintage", "shared", "staring"
+]);
+
 function buildProductJsonLd(name, imageUrl) {
-  if (!name) return null;
+  const cleanName = sanitizeProductName(name);
+  if (!cleanName || cleanName.length < 3) return null;
+  if (/card|account|deposit|insurance|loan|hotel|flight|cruise|course|certificate|hosting|streaming|subscription|concierge|award|points/i.test(cleanName)) {
+    return null;
+  }
+  const firstToken = (cleanName.split(/\s+/)[0] || "").replace(/[^A-Za-z0-9+&-]/g, "");
+  if (!firstToken || /^\d+$/.test(firstToken) || GENERIC_NON_BRAND_WORDS.has(firstToken.toLowerCase())) {
+    return null;
+  }
   return {
     "@context": "https://schema.org",
     "@type": "Product",
-    name,
+    name: cleanName,
     image: imageUrl ? [imageUrl] : undefined,
-    brand: { "@type": "Brand", name: (name.split(/\s+/)[0] || name) },
+    brand: { "@type": "Brand", name: firstToken },
+    review: {
+      "@type": "Review",
+      author: { "@type": "Organization", name: "TIVRA News" },
+    },
   };
 }
 
@@ -789,6 +816,7 @@ async function runQueue(candidatePool, targetCount, worker) {
       for (const item of items) {
         if (item.title.length < 25) continue;
         if (isStaleSeasonalStory(item.title, today)) continue;
+        if (isUnmonetizableRegionalDeal(item.title, item.summary, cat)) continue;
         if (isDuplicate(item)) continue;
         claim(item);
         return item;
@@ -985,10 +1013,10 @@ if (!NO_SPECIALS && pool.providers.length > 0) {
   }
 
   // Daily AI Analysis — original commentary on the biggest stories (clearly labeled).
-  const ANALYSIS_SYSTEM = SYSTEM_PROMPT.replace("500 to 700 words", "700 to 900 words").replace(
-    "You are a senior desk journalist",
-    "You are the analysis editor. Write an original ANALYSIS piece (context, background, why it matters, what to watch) about the given story — clearly analytical, still strictly factual,"
-  );
+  const ANALYSIS_SYSTEM = `${SYSTEM_PROMPT.replace(/500\s*(?:to|-)\s*7[05]0\s*words?/gi, "700 to 900 words")}
+
+CATEGORY-SPECIFIC EDITORIAL MANDATE (ANALYSIS):
+- Role override: Act as the Senior Analysis Editor at TIVRA News. Write an original analytical briefing (context, historical background, why it matters, and key indicators to watch next) grounded strictly in verified facts.`;
   const analysisWanted = Number(config.specials.analysisPerDay || 0);
   const analysisDone = Object.values(registry).filter((r) => r.d === today && r.k === "analysis").length;
   const analysisCandidates = (byCategory.get("Top Stories") || byCategory.get("Breaking News") || []).slice(0, 6);
@@ -1014,10 +1042,10 @@ if (!NO_SPECIALS && pool.providers.length > 0) {
     const topTitles = (byCategory.get("Top Stories") || []).slice(0, 10).map((i) => i.title).join("\n");
     if (topTitles) {
       try {
-        const FEATURE_SYSTEM = SYSTEM_PROMPT.replace("500 to 700 words", "1400 to 1800 words").replace(
-          "You are a senior desk journalist",
-          "You are the long-form features editor. Pick the single biggest ongoing theme from the provided headlines and write an in-depth backgrounder (history, key players, timeline, what it means for ordinary readers),"
-        );
+        const FEATURE_SYSTEM = `${SYSTEM_PROMPT.replace(/500\s*(?:to|-)\s*7[05]0\s*words?/gi, "1400 to 1800 words")}
+
+CATEGORY-SPECIFIC EDITORIAL MANDATE (LONG-FORM FEATURE):
+- Role override: Act as the Long-Form Features Editor at TIVRA News. Pick the single biggest ongoing theme from the provided headlines and write a comprehensive backgrounder (history, key stakeholders, timeline, and real-world impact on readers).`;
         const item = {
           key: weekKey, category: "Features",
           title: `This week's biggest story, explained`,

@@ -29,23 +29,61 @@ export function extractAsinFromHtml(html) {
 
 const CLEAN_NAME_REGEX = /^(.*?)(?:\s*[:â€”â€“-]\s*(?:price|specs|launch|deal|discount|sale|review|unveil|offers|buy).*$)/i;
 
+const UNMONETIZABLE_REGIONAL_PATTERN = /\b(?:verizon|at&t|t-mobile|mint\s+mobile|visible\s+wireless|xfinity\s+mobile|boost\s+mobile|cricket\s+wireless|walmart|best\s+buy|costco|sam['’]?s\s+club|kohl['’]?s|macy['’]?s|nordstrom|home\s+depot|lowe['’]?s|b&h\s+photo|micro\s+center|gamestop|hulu|paramount\+|peacock|sling\s+tv|fubo|directv|espn\+|new\s+england\s+(?:black\s+friday|hotel)|sandals\s*(?:&|and)?\s*beaches|disney\s+(?:world|land|destination))\b/i;
+
+const US_STREAMING_BUNDLE_PATTERN = /\b(?:streaming\s+deals?.*\b(?:max|apple\s+tv\+|paramount|hulu|peacock)|\b(?:max|paramount\+|hulu|peacock)\b.*streaming\s+deals?)\b/i;
+
+/**
+ * Filters out hyper-local / carrier-locked / US-only brick-and-mortar or streaming deals
+ * in commercial categories while allowing global hardware & Amazon tech deals (Option A).
+ */
+export function isUnmonetizableRegionalDeal(title = "", summary = "", category = "") {
+  const cat = String(category || "").trim();
+  const commercialCats = new Set([
+    "Product Deals & Offers",
+    "Credit Cards & Cashback",
+    "Gadget Comparisons",
+  ]);
+  if (cat && !commercialCats.has(cat)) return false;
+
+  const combined = `${title} ${summary}`;
+  if (UNMONETIZABLE_REGIONAL_PATTERN.test(title) || US_STREAMING_BUNDLE_PATTERN.test(title)) {
+    return true;
+  }
+  if (/\b(?:verizon|at&t|t-mobile)\s+(?:trade-in|bill\s+credits?|new\s+line)\b/i.test(combined)) {
+    return true;
+  }
+  return false;
+}
+
+const EDITORIAL_PREFIX_ONLY = /^(?:tivra\s+alert|deal\s+alert|amazon\s+sale|flipkart\s+sale|early\s+black\s+friday(?:\s+202\d)?|black\s+friday(?:\s+202\d)?|cyber\s+monday(?:\s+202\d)?|buyer['’]?s\s+guide|strategic\s+guide|expert\s+guide|prepare\s+for\s+\w+)$/i;
+
+const CONVERSATIONAL_FRAGMENT = /^(?:i\s+|we\s+|you\s+|this\s+|these\s+|that\s+|why\s+|how\s+|what\s+|when\s+|where\s+|who\s+|is\s+|are\s+|can\s+|should\s+|staring\s+|prepare\s+|impressive\s+|ultimate\s+|decode\s+|decoding\s+|navigating\s+|maximizing\s+|evaluating\s+|unpacking\s+|anticipating\s+|exploring\s+|\[award)/i;
+
 /**
  * Clean product name from noisy news headlines
  */
 export function extractCleanProductName(headline) {
   if (!headline) return "";
-  let clean = String(headline).trim();
+  const rawHeadline = String(headline).trim();
+  let clean = rawHeadline;
 
   // 1. Strip conversational lead-ins
   clean = clean
-    .replace(/^(?:these\s+are\s+the\s+(?:\d+\s+)?|the\s+retired\s+|the\s+best\s+|you\s+don['’]t\s+need\s+[^.]+\.\s*(?:these\s+)?|inside\s+|deal\s+alert:\s*|amazon\s+sale:\s*|flipkart\s+sale:\s*)/i, "")
+    .replace(/^(?:tivra\s+alert:\s*|deal\s+alert:\s*|amazon\s+sale:\s*|flipkart\s+sale:\s*|buyer['’]?s\s+guide:\s*|these\s+are\s+the\s+(?:\d+\s+)?|the\s+retired\s+|the\s+best\s+|you\s+don['’]t\s+need\s+[^.]+\.\s*(?:these\s+)?|inside\s+)/i, "")
     .trim();
 
-  // 2. If colon or dash separates product name from action
+  // 2. If colon or dash separates product name from action, pick the product side
   for (const sep of [":", " — ", " – ", " - "]) {
     if (clean.includes(sep)) {
-      const left = clean.split(sep)[0].trim();
-      if (left.length >= 3 && left.length <= 45) {
+      const parts = clean.split(sep).map((s) => s.trim()).filter(Boolean);
+      const left = parts[0] || "";
+      const right = parts[1] || "";
+      if (EDITORIAL_PREFIX_ONLY.test(left) && right.length >= 3) {
+        clean = right;
+        break;
+      }
+      if (left.length >= 3 && left.length <= 55) {
         clean = left;
         break;
       }
@@ -53,16 +91,30 @@ export function extractCleanProductName(headline) {
   }
 
   // 3. Split before deal action verbs
-  clean = clean.split(/\s+(?:drops?\s+to|falls?\s+to|slashed\s+to|hits?\s+(?:a\s+)?(?:new|record|lowest)|gets?\s+a\s+|is\s+(?:now\s+)?(?:down|available|on\s+sale)|are\s+starting|earlier\s+than|worth\s+snatching|can\s+handle|unveils?\s+debut|at\s+lowest\s+price)\b/i)[0].trim();
+  clean = clean.split(/\s+(?:drops?\s+to|falls?\s+to|slashed\s+to|slashes\s+|hits?\s+(?:a\s+)?(?:new|record|lowest|\$|\d)|gets?\s+a\s+|is\s+(?:now\s+)?(?:down|available|on\s+sale|this|it)|are\s+(?:starting|they)|earlier\s+than|worth\s+(?:snatching|buying|it|booking)|can\s+handle|unveils?\s+debut|at\s+(?:lowest\s+price|up\s+to))\b/i)[0].trim();
 
-  // 4. Strip noisy deal buzzwords and price suffixes
+  // 4. Strip noisy sale events, standalone years, editorial nouns, and price suffixes
   clean = clean
-    .replace(/\b(?:black\s+friday|cyber\s+monday|prime\s+day|big\s+billion\s+days|great\s+indian\s+festival|deals?|sales?|offers?|discounts?|price\s+in\s+india.*|price\s+cut.*|price\s+drop.*|under\s+(?:rs\.?|₹|\$)\s*\d+.*|for\s+(?:rs\.?|₹|\$)\s*\d+.*|editor-tested|review|analyzed|unpacked)\b/gi, " ")
+    .replace(/\b(?:pre-black\s+friday|early\s+black\s+friday|black\s+friday|cyber\s+monday|prime\s+day|big\s+billion\s+days|great\s+indian\s+festival|festive\s+sale|diwali\s+sale|mega[- ]sale|deals?|sales?|offers?|discounts?|price\s+in\s+india.*|price\s+cut.*|price\s+drop.*|under\s+(?:rs\.?|₹|\$)\s*[\d,]+.*|for\s+(?:rs\.?|₹|\$)\s*[\d,]+.*|starting\s+at\s+(?:rs\.?|₹|\$)\s*[\d,]+.*|editor-tested|full\s+review|value\s+review|price\s+review|deal\s+review|review|analyzed|unpacked|decoded|outlook|roundup|buying\s+guide|buyer['’]?s\s+guide|guide|value\s+analysis|analysis|forecast|strategies|strategy|what\s+to\s+expect)\b/gi, " ")
+    .replace(/\b202\d\b/g, " ")
+    .replace(/^['"‘’“”:\-\s]+|['"‘’“”:\-\s]+$/g, "")
+    .replace(/\b(?:for|in|on|at|of|from|with|and|&|the|a|an)\s*$/i, "")
+    .replace(/^(?:early|new|top|best)\s+/i, "")
     .replace(/\s+/g, " ")
     .trim();
 
-  // If generic deal headline collapses to only year/preposition filler, return clean commercial search query
-  if (!clean || clean.length < 3 || /^for\s+202\d$/i.test(clean)) {
+  // Recover parent brand when sub-brand "Pixel" stands alone in a Google Pixel headline
+  if (/^pixel(?:\s+\d+|\s+pro|\s+watch|\s+buds|\s+fold|\s+tablet|$)/i.test(clean) && !/\bgoogle\b/i.test(clean) && /\bgoogle\b/i.test(rawHeadline)) {
+    clean = `Google ${clean}`;
+  }
+
+  // Reject conversational fragments or generic filler
+  if (
+    !clean ||
+    clean.length < 3 ||
+    CONVERSATIONAL_FRAGMENT.test(clean) ||
+    /^(?:for|in|on|tech|premium\s+tech|smart\s+buys|holiday\s+savings)$/i.test(clean)
+  ) {
     return "Tech Deals";
   }
 
@@ -72,7 +124,7 @@ export function extractCleanProductName(headline) {
     clean = words.slice(0, 6).join(" ");
   }
 
-  return clean.length >= 3 ? clean.slice(0, 45).trim() : String(headline).slice(0, 35).trim();
+  return clean.length >= 3 ? clean.slice(0, 45).trim() : "Tech Deals";
 }
 
 /**

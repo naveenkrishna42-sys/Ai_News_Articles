@@ -30,46 +30,71 @@
     "baseUrl": "https://gen.pollinations.ai/v1",
     "envKey": "POLLINATIONS_API_KEY",
     "capableModels": [
-      { "id": "community/YoannDev90/poolside-laguna-s-2.1:free", "name": "pollinations-laguna-free", "rpm": 12 },
-      { "id": "community/gggff123/qwen3.8-27b:free", "name": "pollinations-qwen-free", "rpm": 12 },
-      { "id": "community/morriszdweck/glm-5.3-flash-free", "name": "pollinations-glm-free", "rpm": 12 }
+      { "id": "community/morriszdweck/glm-5.3-flash-free", "name": "pollinations-glm-flash-free", "rpm": 20 },
+      { "id": "community/scriptsnsenses-sys/glm-5.3-flash-free", "name": "pollinations-glm53-free", "rpm": 20 },
+      { "id": "community/chirag-gamer/gpt-oss-120b", "name": "pollinations-gpt-oss-120b-free", "rpm": 15 },
+      { "id": "community/YoannDev90/vercel-nemotron-3.5-lightning:free", "name": "pollinations-nemotron-free", "rpm": 20 },
+      { "id": "community/YoannDev90/poolside-laguna-s-2.1:free", "name": "pollinations-laguna-free", "rpm": 20 },
+      { "id": "community/vendouple/laguna-s-2.1:free", "name": "pollinations-vendouple-laguna-free", "rpm": 20 }
     ],
     "fallbackModels": []
   },
   "providers": [
     {
-      "name": "gemini",
-      "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
-      "model": "gemini-2.5-flash",
-      "envKey": "GEMINI_API_KEY",
-      "rpm": 14
-    },
-    {
-      "name": "openrouter-gemma",
-      "baseUrl": "https://openrouter.ai/api/v1",
-      "model": "google/gemma-4-26b-a4b-it:free",
-      "envKey": "OPENROUTER_API_KEY"
-    },
-    {
       "name": "vercel-ling-flash-fin",
       "baseUrl": "https://ai-gateway.vercel.sh/v1",
       "model": "inclusionai/ling-3.0-flash-fin",
       "envKey": "VERCEL_AI_GATEWAY_KEY",
-      "rpm": 2
+      "tier": "tier1-unlimited-free",
+      "rpm": 4
     },
     {
       "name": "vercel-ling-fin-free",
       "baseUrl": "https://ai-gateway.vercel.sh/v1",
       "model": "inclusionai/ling-3.0-flash-fin-free",
       "envKey": "VERCEL_AI_GATEWAY_KEY",
-      "rpm": 2
+      "tier": "tier1-unlimited-free",
+      "rpm": 4
     },
     {
       "name": "vercel-laguna-free",
       "baseUrl": "https://ai-gateway.vercel.sh/v1",
       "model": "poolside/laguna-s-2.1-free",
       "envKey": "VERCEL_AI_GATEWAY_KEY",
+      "tier": "tier1-unlimited-free",
+      "rpm": 4
+    },
+    {
+      "name": "gemini",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "model": "gemini-2.5-flash",
+      "envKey": "GEMINI_API_KEY",
+      "tier": "tier2-daily-free",
+      "rpm": 14
+    },
+    {
+      "name": "gemini-flash-lite",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "model": "gemini-2.5-flash-lite",
+      "envKey": "GEMINI_API_KEY",
+      "tier": "tier2-daily-free",
+      "rpm": 14
+    },
+    {
+      "name": "groq",
+      "baseUrl": "https://api.groq.com/openai/v1",
+      "model": "llama-3.3-70b-versatile",
+      "envKey": "GROQ_API_KEY",
+      "tier": "tier2-daily-free",
       "rpm": 2
+    },
+    {
+      "name": "openrouter-gemma",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "model": "google/gemma-4-26b-a4b-it:free",
+      "envKey": "OPENROUTER_API_KEY",
+      "tier": "tier2-daily-free",
+      "rpm": 12
     }
   ],
   "featuredCategories": [
@@ -284,11 +309,11 @@
     },
     {
       "category": "Product Deals & Offers",
-      "url": "https://news.google.com/rss/search?q=hotel+discounts+resort+booking+deals+flight+travel+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=hotel+discounts+flight+booking+deals+india+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Product Deals & Offers",
-      "url": "https://news.google.com/rss/search?q=cruise+vacation+deals+luxury+ship+travel+discounts+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
+      "url": "https://news.google.com/rss/search?q=international+flight+holiday+package+deals+india+when:3d&hl=en-IN&gl=IN&ceid=IN:en"
     },
     {
       "category": "Business",
@@ -459,10 +484,10 @@
     "cuelinks": {
       "enabled": true,
       "cid": "316413",
-      "cpcUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.bankbazaar.com%2Fcredit-card.html",
+      "cpcUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.sbicard.com%2Fsprint%2Fcashback",
       "megaHighTicketUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.riseworks.io",
       "b2bGrowthUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.airwallex.com",
-      "ajioFashionUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fwww.ajio.com"
+      "ajioFashionUrl": "https://linksredirect.com/?cid=316413&subid=tivra_web&source=api&url=https%3A%2F%2Fajiogram.ajio.com%2F"
     },
     "products": {}
   }

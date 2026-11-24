@@ -44,10 +44,22 @@ const PEXELS_BUDGET = budgetIdx !== -1 ? Number(process.argv[budgetIdx + 1]) : 1
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const NO_PERSON_CATEGORIES = new Set(["Crime & Law", "Wars & Conflicts"]);
-const fallbackSet = new Set(Object.values(config.fallbackImages).flat());
+const fallbackList = Object.values(config.fallbackImages).flat();
+const fallbackSet = new Set(fallbackList);
+const fallbackBaseUrls = new Set(fallbackList.map((u) => String(u).split("?")[0]));
+const fallbackPhotoIds = new Set(
+  fallbackList
+    .map((u) => (String(u).match(/pexels-photo-\d+/) || [])[0])
+    .filter(Boolean)
+);
 
 function needsRepair(src) {
-  return src.includes("pixabay.com/get") || fallbackSet.has(src);
+  if (!src) return false;
+  if (src.includes("pixabay.com/get") || fallbackSet.has(src)) return true;
+  const base = src.split("?")[0];
+  if (fallbackBaseUrls.has(base)) return true;
+  const pid = (src.match(/pexels-photo-\d+/) || [])[0];
+  return Boolean(pid && fallbackPhotoIds.has(pid));
 }
 
 const files = readdirSync(ARTICLES_DIR).filter((f) => f.endsWith(".html"));
