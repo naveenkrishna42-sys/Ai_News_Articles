@@ -83,6 +83,21 @@ jobs:
       - name: Sanity-check the site still builds
         run: npm run build
 
+      - name: Dispatch top stories to distribution channels
+        env:
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+          TELEGRAM_ENABLED: "false"
+          # ON HOLD: Telegram channel promotion is paused.
+          # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          # TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+        run: |
+          if [ -n "$(git status --porcelain articles/)" ]; then
+            node scripts/distribute.mjs
+          else
+            echo "No new articles generated in this run — skipping duplicate push notifications."
+          fi
+
       - name: Commit and push
         run: |
           git config user.name "tivra-news-bot"
@@ -190,13 +205,3 @@ jobs:
             -H "Content-Type: application/x-www-form-urlencoded" \
             -d "hub.mode=publish&hub.url=https://tivranews.com/feed.xml" || true
           echo "WebSub ping sent to Google."
-
-      - name: Dispatch top stories to distribution channels
-        env:
-          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
-          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
-          TELEGRAM_ENABLED: "false"
-          # ON HOLD: Telegram channel promotion is paused.
-          # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          # TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
-        run: node scripts/distribute.mjs

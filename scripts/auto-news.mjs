@@ -1110,11 +1110,12 @@ const fileMeta = allFiles.map((f) => {
   return { f, p, date: articleDate(p, f), category: articleCategory(p) };
 });
 
-let deleted = 0;
-const survivors = [];
-for (const m of fileMeta) {
-  if (m.date < cutoff) { unlinkSync(m.p); deleted++; } else survivors.push(m);
-}
+  let deleted = 0;
+  const survivors = [];
+  for (const m of fileMeta) {
+    // Never delete existing live articles on a 0-write run so upstream AI outages cannot drain site inventory
+    if (results.written > 0 && m.date < cutoff) { unlinkSync(m.p); deleted++; } else survivors.push(m);
+  }
 
 const byCat = new Map();
 for (const m of survivors) {

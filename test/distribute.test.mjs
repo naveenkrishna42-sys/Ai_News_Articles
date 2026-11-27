@@ -7,7 +7,7 @@ console.log('Running Distribution Module test...');
 const scriptPath = path.resolve('scripts/distribute.mjs');
 assert(fs.existsSync(scriptPath), 'scripts/distribute.mjs must exist');
 
-const { pickTelegramDeals, isMonetizedDeal, buildOneSignalPayload, buildTelegramMessage } = await import('../scripts/distribute.mjs');
+const { pickTelegramDeals, isMonetizedDeal, buildOneSignalPayload, buildTelegramMessage, resolveCleanArticleUrl, normalizeDispatchKey } = await import('../scripts/distribute.mjs');
 
 const sampleArticles = [
   { slug: 'story-1', title: 'Political Debate Update', category: 'Politics', date: '2026-08-31', url: '/articles/story-1.html' },
@@ -34,5 +34,12 @@ assert.ok(ajioMsg.includes('cid=316413') && ajioMsg.includes('ajiogram.ajio.com'
 
 const saasMsg = buildTelegramMessage(sampleArticles[2]);
 assert.ok(saasMsg.includes('cid=316413') && saasMsg.includes('www.riseworks.io'), 'Payroll post must include Rise Works Cuelinks CTA');
+
+// Test 4: Clean extensionless URL resolution & dispatch key normalization
+const osPayload = buildOneSignalPayload('app-123', { slug: 'deal-1', title: 'Test Deal', category: 'Product Deals & Offers', url: '/articles/deal-1' });
+assert.strictEqual(osPayload.url, 'https://tivranews.com/articles/deal-1', 'OneSignal payload must use clean extensionless URL');
+assert.strictEqual(resolveCleanArticleUrl({ slug: 'deal-1.html', url: '/articles/deal-1.html' }), 'https://tivranews.com/articles/deal-1');
+assert.strictEqual(normalizeDispatchKey('https://tivranews.com/articles/deal-1.html'), 'deal-1');
+assert.strictEqual(normalizeDispatchKey('/articles/deal-1'), 'deal-1');
 
 console.log('✅ Distribution Module tests passed.');

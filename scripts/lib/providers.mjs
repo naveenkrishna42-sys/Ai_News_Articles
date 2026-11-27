@@ -183,6 +183,8 @@ export class ProviderPool {
     });
 
     // 4. Pre-flight handshake ping on top zero-cost candidates (configured + live catalog)
+    // Uses a unique timestamp nonce to bypass Pollinations' static prompt cache so depleted API keys are caught immediately.
+    const INBAND_CREDIT_ERROR_RE = /account behind this api key|doesn['’]?t have enough credits|insufficient\s+(?:credits|balance|pollen|funds|quota)|please\s+\[?top\s*up|complete\s+a\s+quest/i;
     let gatewayHealthy = false;
     let verifiedCandidate = null;
     const dynamicProbeExtras = dynamicFreeCommunity
@@ -194,6 +196,7 @@ export class ProviderPool {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const nonce = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
         const res = await fetch(`${baseUrl}/chat/completions`, {
           method: "POST",
           headers: {
@@ -202,9 +205,9 @@ export class ProviderPool {
           },
           body: JSON.stringify({
             model: candidate.id,
-            max_tokens: 64,
-            temperature: 0.1,
-            messages: [{ role: "user", content: "Reply with the single word: READY" }],
+            max_tokens: 96,
+            temperature: 0.2,
+            messages: [{ role: "user", content: `Reply with strict JSON only: {"ready":true,"nonce":"${nonce}"}` }],
           }),
           signal: controller.signal,
         });
@@ -214,12 +217,15 @@ export class ProviderPool {
           const probeReply = String(
             probeJson?.choices?.[0]?.message?.content ||
             probeJson?.choices?.[0]?.message?.reasoning_content ||
+            probeJson?.choices?.[0]?.message?.reasoning ||
             ""
           ).trim();
-          if (
-            probeReply &&
-            !/account behind this api key|doesn't have enough credits|insufficient/i.test(probeReply)
-          ) {
+          if (INBAND_CREDIT_ERROR_RE.test(probeReply)) {
+            console.warn(`  ⚠ [Pollinations Pre-flight] In-band credit/balance exhaustion detected on ${candidate.id}. Disabling Pollinations for this run.`);
+            gatewayHealthy = false;
+            break;
+          }
+          if (probeReply) {
             gatewayHealthy = true;
             verifiedCandidate = candidate;
             console.log(`  ✔ [Pollinations Pre-flight] Zero-cost Tier-1 handshake verified with ${candidate.id}.`);
@@ -228,8 +234,8 @@ export class ProviderPool {
         } else if (res.status === 402) {
           console.warn(`  ⚠ [Pollinations Pre-flight] Balance check flag (HTTP 402). Disabling Pollinations for this run.`);
           break;
-        } else if (res.status === 401) {
-          console.warn(`  ⚠ [Pollinations Pre-flight] Unauthorized (HTTP 401). Disabling Pollinations for this run.`);
+        } else if (res.status === 401 || res.status === 403) {
+          console.warn(`  ⚠ [Pollinations Pre-flight] Unauthorized (HTTP ${res.status}). Disabling Pollinations for this run.`);
           break;
         } else {
           console.warn(`  ⚠ [Pollinations Pre-flight] Candidate ${candidate.id} returned HTTP ${res.status}. Checking next...`);
@@ -397,6 +403,9 @@ export class ProviderPool {
           headers["HTTP-Referer"] = "https://tivranews.com";
           headers["X-Title"] = "TIVRA News";
         }
+        const isReasoningModel = /nemotron|gpt-oss|glm|qwen3|deepseek-r1|thinking/i.test(provider.model || "");
+        const effectiveMaxTokens = isReasoningModel ? Math.max(maxTokens, 4500) : maxTokens;
+        const expectsJson = /strict\s+json|json\s+only|single\s+json\s+object|matching\s+this\s+exact\s+schema/i.test(`${system}\n${user}`);
         const bodyObj = {
           model: provider.model,
           messages: [
@@ -406,7 +415,7 @@ export class ProviderPool {
         };
         if (!isTextPollinations) {
           bodyObj.temperature = temperature;
-          bodyObj.max_tokens = maxTokens;
+          bodyObj.max_tokens = effectiveMaxTokens;
         }
         const res = await fetch(url, {
           method: "POST",
@@ -436,7 +445,7 @@ export class ProviderPool {
         }
         if (!res.ok) {
           const body = await res.text().catch(() => "");
-          if (res.status === 401 || res.status === 402 || res.status === 404 || /insufficient balance|no longer available|unavailable for free/i.test(body)) {
+          if (res.status === 401 || res.status === 402 || res.status === 403 || res.status === 404 || /insufficient balance|no longer available|unavailable for free|do not have access|model_not_found/i.test(body)) {
             provider.cooldownUntil = Infinity; // Permanently retire dead/unauthorized/paid models for this run
             provider.nextSlotAvailableMs = Infinity;
             provider.failed++;
@@ -457,15 +466,59 @@ export class ProviderPool {
           text = await res.text();
         } else {
           const data = await res.json();
-          text = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.message?.reasoning_content || "";
+          const msg = data?.choices?.[0]?.message || {};
+          const primaryContent = String(msg.content || "").trim();
+          const reasoningFallback = String(msg.reasoning_content || msg.reasoning || "").trim();
+          if (primaryContent) {
+            text = primaryContent;
+          } else if (reasoningFallback && (!expectsJson || reasoningFallback.includes("{"))) {
+            text = reasoningFallback;
+          }
+        }
+
+        // Guard against HTTP 200 in-band credit/billing exhaustion (e.g. Pollinations 0-credit notices)
+        if (/account behind this api key|doesn['’]?t have enough credits|insufficient\s+(?:credits|balance|pollen|funds|quota)|please\s+\[?top\s*up|complete\s+a\s+quest/i.test(text)) {
+          provider.cooldownUntil = Infinity;
+          provider.nextSlotAvailableMs = Infinity;
+          provider.failed++;
+          if (provider.baseUrl.includes("pollinations.ai")) {
+            for (const other of this.providers) {
+              if (other.baseUrl.includes("pollinations.ai")) {
+                other.cooldownUntil = Infinity;
+                other.nextSlotAvailableMs = Infinity;
+              }
+            }
+          }
+          lastError = new Error(`${provider.name} returned in-band credit exhaustion message`);
+          console.warn(`  ⚠ [${provider.name}] In-band credit exhaustion detected — permanently retired for this run.`);
+          continue;
         }
 
         if (!text.trim()) {
           provider.failed++;
+          provider.consecutiveFailures = (provider.consecutiveFailures || 0) + 1;
+          if (provider.consecutiveFailures >= 2) {
+            provider.cooldownUntil = Date.now() + COOLDOWN_MS * 2;
+            provider.nextSlotAvailableMs = Date.now() + COOLDOWN_MS * 2;
+          }
           lastError = new Error(`${provider.name} returned empty content`);
           console.warn(`  ⚠ [${provider.name}] Returned empty content`);
           continue;
         }
+
+        if (expectsJson && !text.includes("{")) {
+          provider.failed++;
+          provider.consecutiveFailures = (provider.consecutiveFailures || 0) + 1;
+          if (provider.consecutiveFailures >= 2) {
+            provider.cooldownUntil = Date.now() + COOLDOWN_MS * 3;
+            provider.nextSlotAvailableMs = Date.now() + COOLDOWN_MS * 3;
+          }
+          lastError = new Error(`${provider.name} returned non-JSON output: ${text.slice(0, 120)}`);
+          console.warn(`  ⚠ [${provider.name}] Returned non-JSON text when JSON was required — rotating to next provider.`);
+          continue;
+        }
+
+        provider.consecutiveFailures = 0;
         provider.ok++;
         provider.lastCallTime = Date.now();
         return { text, provider: provider.name };

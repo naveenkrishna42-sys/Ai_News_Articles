@@ -37,8 +37,28 @@ export function pickTopStories(articles, limit = 3) {
   return [...articles].slice(0, limit);
 }
 
+export function resolveCleanArticleUrl(article = {}) {
+  const rawUrl = String(article.url || "").trim();
+  const rawSlug = String(article.slug || "").trim().replace(/^\/?articles\//i, "").replace(/\.html$/i, "");
+  if (rawUrl.startsWith("http")) {
+    return rawUrl.replace(/\.html$/i, "");
+  }
+  if (rawUrl.startsWith("/")) {
+    return `${SITE_URL}${rawUrl.replace(/\.html$/i, "")}`;
+  }
+  return `${SITE_URL}/articles/${rawSlug}`;
+}
+
+export function normalizeDispatchKey(val = "") {
+  return String(val || "")
+    .trim()
+    .replace(/^https?:\/\/[^/]+/i, "")
+    .replace(/^\/?articles\//i, "")
+    .replace(/\.html$/i, "");
+}
+
 export function buildOneSignalPayload(appId, article) {
-  const fullUrl = (article.url && article.url.startsWith("http")) ? article.url : `${SITE_URL}/articles/${article.slug}.html`;
+  const fullUrl = resolveCleanArticleUrl(article);
   const isDeal = (article.category || '').toLowerCase().includes('deal') || /deal|sale|price/i.test(article.title);
   const heading = isDeal ? `🔥 Top Deal: ${article.title}` : `⚡ Breaking: ${article.title}`;
 
@@ -54,7 +74,7 @@ export function buildOneSignalPayload(appId, article) {
 }
 
 export function buildTelegramMessage(article) {
-  const fullUrl = (article.url && article.url.startsWith("http")) ? article.url : `${SITE_URL}/articles/${article.slug}.html`;
+  const fullUrl = resolveCleanArticleUrl(article);
   const cat = (article.category || '').toLowerCase();
   const title = article.title || '';
   const isFashion = /ajio|fashion|clothing|shoes|sneaker|kurta|shirt|myntra/i.test(title) || cat.includes('lifestyle');
@@ -244,9 +264,12 @@ export async function main() {
   }
 
   const dispatched = loadDispatched();
-  const dispatchedSet = new Set(dispatched);
+  const dispatchedSet = new Set(dispatched.map(normalizeDispatchKey).filter(Boolean));
 
-  const candidates = articles.filter(a => !dispatchedSet.has(a.slug || a.url));
+  const candidates = articles.filter(a => {
+    const key = normalizeDispatchKey(a.slug || a.url);
+    return key && !dispatchedSet.has(key);
+  });
   const topPicks = pickTopStories(candidates, 3);
 
   if (topPicks.length === 0) {
@@ -259,7 +282,12 @@ export async function main() {
   // 1. OneSignal Web Push: Top 2 stories (Deals or Breaking News)
   for (const article of topPicks.slice(0, 2)) {
     console.log(`-> OneSignal Push: "${article.title}"`);
-    await sendOneSignal(article, isDryRun);
+    const sent = await sendOneSignal(article, isDryRun);
+    const key = normalizeDispatchKey(article.slug || article.url);
+    if (!isDryRun && sent && key && !dispatchedSet.has(key)) {
+      dispatched.push(key);
+      dispatchedSet.add(key);
+    }
   }
 
   // 2. Telegram Broadcast: STRICTLY Deals, Offers, Discounts & Monetized Affiliate Posts
@@ -269,9 +297,11 @@ export async function main() {
       console.log(`Found ${telegramDeals.length} fresh monetized deals to broadcast to Telegram.`);
       for (const deal of telegramDeals) {
         console.log(`-> Telegram Deal Post: "${deal.title}"`);
-        await sendTelegram(deal, isDryRun);
-        if (!isDryRun) {
-          dispatched.push(deal.slug || deal.url);
+        const sent = await sendTelegram(deal, isDryRun);
+        const key = normalizeDispatchKey(deal.slug || deal.url);
+        if (!isDryRun && sent && key && !dispatchedSet.has(key)) {
+          dispatched.push(key);
+          dispatchedSet.add(key);
         }
       }
     } else {

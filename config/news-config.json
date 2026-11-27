@@ -41,28 +41,12 @@
   },
   "providers": [
     {
-      "name": "vercel-ling-flash-fin",
+      "name": "vercel-nemotron-free",
       "baseUrl": "https://ai-gateway.vercel.sh/v1",
-      "model": "inclusionai/ling-3.0-flash-fin",
+      "model": "nvidia/nemotron-3.5-lightning-free",
       "envKey": "VERCEL_AI_GATEWAY_KEY",
       "tier": "tier1-unlimited-free",
-      "rpm": 4
-    },
-    {
-      "name": "vercel-ling-fin-free",
-      "baseUrl": "https://ai-gateway.vercel.sh/v1",
-      "model": "inclusionai/ling-3.0-flash-fin-free",
-      "envKey": "VERCEL_AI_GATEWAY_KEY",
-      "tier": "tier1-unlimited-free",
-      "rpm": 4
-    },
-    {
-      "name": "vercel-laguna-free",
-      "baseUrl": "https://ai-gateway.vercel.sh/v1",
-      "model": "poolside/laguna-s-2.1-free",
-      "envKey": "VERCEL_AI_GATEWAY_KEY",
-      "tier": "tier1-unlimited-free",
-      "rpm": 4
+      "rpm": 12
     },
     {
       "name": "gemini",
@@ -81,9 +65,25 @@
       "rpm": 14
     },
     {
+      "name": "groq-qwen",
+      "baseUrl": "https://api.groq.com/openai/v1",
+      "model": "qwen/qwen3.8-27b",
+      "envKey": "GROQ_API_KEY",
+      "tier": "tier2-daily-free",
+      "rpm": 2
+    },
+    {
       "name": "groq",
       "baseUrl": "https://api.groq.com/openai/v1",
-      "model": "llama-3.3-70b-versatile",
+      "model": "openai/gpt-oss-120b",
+      "envKey": "GROQ_API_KEY",
+      "tier": "tier2-daily-free",
+      "rpm": 2
+    },
+    {
+      "name": "groq-fast",
+      "baseUrl": "https://api.groq.com/openai/v1",
+      "model": "openai/gpt-oss-20b",
       "envKey": "GROQ_API_KEY",
       "tier": "tier2-daily-free",
       "rpm": 2
