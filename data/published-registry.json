@@ -1,1136 +1,4 @@
 {
- "7cd357edd3c6d49e": {
-  "t": "Magnitude 6 Earthquake Strikes Off Panama, Triggers Aftershocks and Tsunami Alert",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news"
- },
- "4a07b86457840cb3": {
-  "t": "NYT Strands #954 Unlocked: Tuesday’s Solutions, Spangram Wins, and Solver Takeaways",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news"
- },
- "21638ffbd013e0ce": {
-  "t": "Indian National Dies After Riyadh Airport Attack, Embassy Confirms",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "3e23b8a02083f8dd": {
-  "t": "House GOP pushes to block Trump’s Russian diesel deal",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "5a9acec4eef59297": {
-  "t": "SC Flags 14 Defects, Rs 220 Fee Gap in Rahul Plea vs CEC",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "967fde3b0ba13991": {
-  "t": "Hyderabad Guard Murdered 5-Year-Old, Demanded ₹20 Lakh Ransom",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "79c8f6ccacd3ca77": {
-  "t": "ASI Shot Dead in Tarn Taran; 5th Punjab Cop Killed in Border Districts This Year",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "5dbc103bee5e13cd": {
-  "t": "Delhi Police de-notifies Jantar Mantar protest site; activists react",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "08ea6b350abce589": {
-  "t": "Delhi Metro Shuts 6 Stations Till 4pm After SC Order: What Commuters Need Now",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "c432735256001d2c": {
-  "t": "Trump Urges Zelenskyy-Putin Talks to End Ukraine War",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "5227acaa7b15e3be": {
-  "t": "Pakistan Emergency in Khyber Pakhtunkhwa: What It Means for Imran Khan's Stronghold",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "300cb74d87ad3507": {
-  "t": "Delhi Police de-notifies Jantar Mantar protest site; 3 new venues",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "e6967fa1cf9cd411": {
-  "t": "Imran Khan's OCI Status Scrutinized After CJP Protest Participation",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "3b2c5156270167d7": {
-  "t": "Delhi Police Detain 18 CJP Leaders at IGI Airport in Major Crackdown",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "ea09ffb632f6349a": {
-  "t": "CJI Surya Kant Warns Against Politicising SC as Lawyers Protest",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "3b837686e7e155dd": {
-  "t": "Tamil Startups Pitch Innovation to PM Modi During Chennai Metro Ride",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "06b63eb022bef602": {
-  "t": "Delhi-NCR Heavy Rain: IMD Red Alert, Flights Normal",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "5034a66e350c40ab": {
-  "t": "India’s Democracy Under Fire: Voter Roll Purges, Mass Arrests Spark Protests",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "eec1187139457d23": {
-  "t": "President Murmu Appoints New Governors: Arlekar to TN, Sudha Yadav to KA",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "ab9b978dc249a0d5": {
-  "t": "Maharashtra MPSC Protest Ends: Key Panel Formed for Reform",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "aaca35f14933d60b": {
-  "t": "Saudi Crown Prince shifts residence amid Houthi attack reports: What it means",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "2521c3e9f54bb848": {
-  "t": "Elon Musk Donates $276M to GOP in Biggest Midterm Push",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "326ee3dc5575500b": {
-  "t": "Iran Escalates Threats Against Global Digital Infrastructure Amid US Friction",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "9adaf2513b943e5b": {
-  "t": "Zelenskyy warns after Russia targets Ukraine energy sites despite ceasefire",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "34b515a7758bb8a8": {
-  "t": "2026 Nobel Economics: Hall and Woodford Honored for Stabilization Insights",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "693dd1f1058cd1f8": {
-  "t": "Russia Diesel Exports May Exceed Trump-Announced Volumes",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "horoscopes-2026-10-13": {
-  "t": "daily horoscopes",
-  "d": "2026-10-13",
-  "c": "Astrology",
-  "k": "special"
- },
- "analysis-ee0217ae0da93060": {
-  "t": "Rahul Gandhi & INDIA Bloc Leaders File Writ Petition In Supreme Court Against ECI Over SIR Process",
-  "d": "2026-10-13",
-  "c": "Analysis",
-  "k": "analysis"
- },
- "analysis-86569f4ab6cc67e8": {
-  "t": "How BJP, Modi government step up to counter Delhi protests",
-  "d": "2026-10-13",
-  "c": "Analysis",
-  "k": "analysis"
- },
- "c2db1edc2487fd49": {
-  "t": "Ollie Pope Withdraws From Afghanistan T20 Draft Over Taliban Concerns",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news"
- },
- "86095dcdd2525efa": {
-  "t": "Opposition moves Supreme Court to pause voter list changes in SIR row",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news"
- },
- "49f18b9db9fa0d1f": {
-  "t": "Thrombosis Awareness: Blood Clot Risks Explained",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news"
- },
- "012dba30237ba43f": {
-  "t": "Gout Cases Rising Globally: Men Face Higher Risk, Doctor Warns",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news"
- },
- "aa83a9db6d5c875c": {
-  "t": "Indian Umrah Pilgrim Killed in Riyadh Airport Attack: Key Details",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "dd90f14ec95de1a1": {
-  "t": "SC Clarifies: No Ruling Yet on ECI's Modified Form 6",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "83b65728a35d0577": {
-  "t": "Omar Home Raid, Diesel Policy Pushback, Prediction Markets Surge",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "79d1db80bbca0c75": {
-  "t": "Rupee Rallies as RBI Moves, Bond Markets Watch Inflation",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "dfa95790bcc790fe": {
-  "t": "OnePlus 16 Review: SD 8 Elite Extreme Gen 6 Performance",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "f4b3e5675e8d29d5": {
-  "t": "Nifty Trade Setup Oct 13: Key Support at 22,180, Resistance at 22,200",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "ff061c37dcb31ed9": {
-  "t": "Vijay Deverakonda, Rashmika Meet Tamil Nadu CM Ahead of 'Ranabaali'",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "4e011e4c21a21e9b": {
-  "t": "Google Fitbit Edge Review: Premium Tracker With Smartwatch Features",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "f123acd5c06943cb": {
-  "t": "CJI Surya Kant: Judicial Intervention Mandated for Constitutional Rights",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "7a7746b558c3cf40": {
-  "t": "Karnataka HC Strikes Down SC/ST Quota Hike Over 50% Cap Breach",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "306d5b1fc4ba8fe4": {
-  "t": "“Tell us in 24 hours…” CJP ultimatum over Jantar Mantar protest",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "f52d80cc18fda4f0": {
-  "t": "INDIA Bloc Marches in Delhi, Challenges SIR Voter Deletions at Supreme Court",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "8e6055975971c5e0": {
-  "t": "Delhi Police Use of Force Against 20+ Journalists Sparks National Outrage",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "dc04bf9d5fe507c5": {
-  "t": "MPSC Paper Leak: Bhima Koregaon Case Officer on Leave, Mundhe Leads Inquiry",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "c5578d586de49b85": {
-  "t": "Delhi protest detainees allege assaults in police vans, phones taken",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "8600ad4685527b92": {
-  "t": "Kerala Mini Cooper Crash: 3 Dead, 220 kmph Video Sparks Licensing Debate",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "80df49eb92bff76c": {
-  "t": "Delhi Protest Day 3: Rahul Gandhi Leads Opposition MPs to Supreme Court in Symbolic Bus March",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "9f02e8b604f563d0": {
-  "t": "Supreme Court Orders Probe Into Assault on Lawyers Protesting BCI Chairperson",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "ef0cde37605e40dd": {
-  "t": "Why the Houthis are striking Saudi airports: what’s behind it",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "757d91d9bd55915e": {
-  "t": "U.S. Senators Challenge Legality of Trump's Russian Oil Import Decision",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "9ad8a1aef64f30ae": {
-  "t": "Nepal Flash Floods: Himalayan Warning for India",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "ce3cab48bb17ab2d": {
-  "t": "“We are not happy”: Trump weighs firing Greece ambassador Guilfoyle",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "2b8747bfd7ddb192": {
-  "t": "Nifty Set to Open Flat Amid Global Cues: Key Stocks to Watch",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news"
- },
- "231ab7cc8bcbb541": {
-  "t": "Musk Spends $276 Million to Aid Republicans in Midterms",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news"
- },
- "d1dc06000b531dd8": {
-  "t": "Jantar Mantar de-notified: Delhi Police designates 3 new protest venues",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "7470b0eee6d5761b": {
-  "t": "Imran Khan's OCI Status at Risk Over CJP Protest Participation?",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "1ea3c198467b6b08": {
-  "t": "IMD Warns of Extended Wet Spell as Heavy Rain Hits Delhi, Rajasthan",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "b57785edec08bc23": {
-  "t": "Food, fuel & gold spur India’s retail inflation to 5.5% (23-month high)",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "1a6dae00c1862664": {
-  "t": "Google Fitbit Edge Tracker: Price, Specs, ECG Features",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "7d8e45e455c2d3a2": {
-  "t": "Rupee Rebounds: Analyzing RBI's New Currency Defense Measures",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "0ec58cb5d479a3f9": {
-  "t": "Selma Blair Arrested After Alleged Bite on Flight Crew: What Happened",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "006049f56e81bb7f": {
-  "t": "PVR-INOX, Cinepolis Boycott Jailer 2 Hindi Version: What It Means for Moviegoers",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "383ea82c1df2fcde": {
-  "t": "GTA 6 Leaks: CyberLeek Releases New Lucia Footage, Teases Full Build",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "64aa3c9134d7408d": {
-  "t": "Delhi Metro station closure challenged: Supreme Court to hear pleas",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "3e59593a6b65202c": {
-  "t": "Australia Poised for Durban Test Win as SA Face 319-Run Chase",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "ee8f9311ff1be5e7": {
-  "t": "CJP Protests Hit After Jantar Mantar De-Notification",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "2213f527c087f351": {
-  "t": "Zubeen Garg Death: HC Grants Bail to Amritprava, Family Protests",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "0cd9645d17ed71d1": {
-  "t": "Why Modi's Protesters Stay Protesters, Not Politicians",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "778786b7ebda61fb": {
-  "t": "Ken-Betwa River Link: The $87B Gamble on Water vs. Displacement",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "97dad5121e2280f3": {
-  "t": "SCBA, SCAORA condemn calls for CJI Surya Kant’s resignation",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "42ad3577ce11ce44": {
-  "t": "Delhi Red Alert: IMD Warns of Waterlogging as Heavy Rain Lashes NCR",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "78e18bcc6c8f4c91": {
-  "t": "Iran rejects US response on 7 conditions to reopen Strait of Hormuz",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "1ab8e5289d583732": {
-  "t": "Poonch Blast: Security Tightened After Deadly Explosion Near LoC",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "fc8333bd4ddde3d5": {
-  "t": "US Archbishop Bars Catholics from Firing Squad Duty",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "13a7eae840b2b540": {
-  "t": "Trump Defends Russia Diesel Deal Amid U.S. Political Firestorm",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "f77275109d5c5f3b": {
-  "t": "EU Imposes Record 1,600 Sanctions on Russia's War Machine",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "38441c842b5c5ea4": {
-  "t": "Trump Urges Ukraine Leadership Change: Who Could Replace Zelenskyy?",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "fa50b459cca5ebea": {
-  "t": "Trump targets Yemen’s Houthis after Saudi attacks—what it means",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "539ac49133e281f6": {
-  "t": "MBS Palace Shifts: Bunkers, Guards Amid Houthi Threats",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news"
- },
- "86569f4ab6cc67e8": {
-  "t": "BJP, Modi Government Escalate Response to Delhi Protests",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news"
- },
- "ee0217ae0da93060": {
-  "t": "Rahul Gandhi, INDIA Bloc Move SC Against ECI Over SIR Voter Deletions",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "e4154abffe5e3a11": {
-  "t": "Apple COO checks Foxconn Zhengzhou as iPhone Duo pre-orders near",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "8adfad4e63ef8424": {
-  "t": "Nushrratt Bharuccha Shares Recovery Video Post Spine Surgery",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "af249e9527d1ae84": {
-  "t": "Steven Smith concussion check after helmet blow: what it means",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "7aea35d1706a754b": {
-  "t": "Jailer 2 Hindi Release Confirmed: Rajinikanth Film Hits 5 Languages Oct 15",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "b8413d9892f8aa86": {
-  "t": "Northern Lights Visible: 10 States to Watch Monday",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "7b386a4941e5299b": {
-  "t": "Hidden Dopamine Trap in Smartphone Scrolling Revealed by Scientists",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "38e84c1696f79e21": {
-  "t": "Nagaland Hosts HPV Vaccination Workshop in Kiphire to Target 2,370 Girls",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news"
- },
- "e27b60c9c423be28": {
-  "t": "Chennai Metro’s Poonamallee–Vadapalani line crosses 25,000 rides on day 1",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "36b0686af2ed3e32": {
-  "t": "Dhruv Rathee's Post-Press Conference Critique Sparks Online Debate",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "84c714dfa259fe74": {
-  "t": "Hyderabad Guard Arrested in 5-Year-Old's Murder, ₹20L Ransom Demand",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "5821abc3290b671d": {
-  "t": "Delhi Metro Seat Dispute Turns Fatal: Ex-IAS Officer, Son Arrested",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "42de32cbc1392e1f": {
-  "t": "Delhi HC Questions Police Over Alleged Illegal Detention of Activist Nadeem Khan",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "864a1397983d5380": {
-  "t": "Delhi HC Refuses To Restrain AJL From Seeking Release Of National Herald Attached Properties",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "4e65939ba02225d8": {
-  "t": "Neha Bora: The Protester Behind Delhi's EC-SIR Stir",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "fcfb4ac432359a92": {
-  "t": "AP Local Body Polls: Seat-Sharing Tensions Threaten Coalition Unity",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "40d82e6a79b4a81a": {
-  "t": "India Rejects UN Criticism Over Delhi Protest Crackdown",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news"
- },
- "095c3e79c9e8287e": {
-  "t": "“Stop oligarchy”: Bernie Sanders targets Musk and a $366m Trump push",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "9637c082bb2341de": {
-  "t": "US Restores UK Access to Pre-Release AI Safety Testing",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "b5dfa51dbccae27d": {
-  "t": "Trump Defends Russia Oil Imports Amid US Political Firestorm",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "1fbae26263d3cbca": {
-  "t": "Federal Agents Raid Home of US Congresswoman Ilhan Omar",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "1a1a5040c85bf51e": {
-  "t": "El Niño pushes Pacific sea temps to fresh record, EU monitor flags risks",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "590d41ba3eb9634c": {
-  "t": "Djibouti Migrant Boat Tragedy: 139 Dead, Including 15 Children",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "4ac9e66616502175": {
-  "t": "Mecca Pact Limits: Pakistan, Turkey's Role in Saudi-Houthi War",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news"
- },
- "7d6965dea65e170d": {
-  "t": "Kerala Teen's Bar Hopping Preceded Fatal Mini Cooper Crash: Reports",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-laguna-free"
- },
- "a25f761001df98d6": {
-  "t": "UAE Detains 2 Maldivian Co-Pilots in Flydubai Attack Probe",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-laguna-free"
- },
- "a108a5e32aff87fa": {
-  "t": "Sensex Surges 1,100 Points: Investors Gain Rs 4 Trillion",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-laguna-free"
- },
- "67a09f543c62f2bc": {
-  "t": "Free AI-Powered Office Clones Challenge Microsoft's Dominance",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-laguna-free"
- },
- "97997f057ca1c63d": {
-  "t": "GLP-1 Drugs Could Lower Stroke and Alzheimer’s Risk—What Buyers Need",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "3a80f73082a441eb": {
-  "t": "Supreme Court Postes Delhi Protest Hearing: Order vs. Rights",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "55a6de0dd4c1100a": {
-  "t": "OnePlus 16 vs Galaxy S26 Ultra: Which flagship is truly better?",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "9c3783b4f19118e7": {
-  "t": "SC stays Rahul Gandhi’s criminal defamation trial over Modi remarks",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "993ef7aefbbcb415": {
-  "t": "Markram's resistance fails as Australia seals 214-run Durban Test win",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-laguna-free"
- },
- "9e541985c215e55c": {
-  "t": "Rahul Gandhi plea not listed Oct 13: clerical hurdles in SC",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "0b0cc675fc80906b": {
-  "t": "Elon Musk's $276M Midterm Surge: A Shift in Political Finance",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "ceea6bfd079b6f3f": {
-  "t": "PM Modi: India “mother of democracy”, debates on issues democratically",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "c5bf488ac71208b3": {
-  "t": "Supreme Court vs. Protest Bans: The Jantar Mantar Legal Legacy",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "84944b186b6fa438": {
-  "t": "Punjab train derailment: 6 dead, several injured—what buyers & officials need to know",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "96823d8d772a5a8a": {
-  "t": "Anti-Drug Activist Parvinder Jhota Shot Dead in Punjab After Confronting Chemist",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-frugal-free"
- },
- "58839bed2093fdc0": {
-  "t": "MDR on UPI: Kerala hotels association to cap UPI payments at ₹2,000",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "c925d7ea6e2334f6": {
-  "t": "Hyderabad Tragedy: Safety and Mental Health in High-Rise Hubs",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "ed43c5fbe0b83699": {
-  "t": "Kerala HC Reserves Verdict on FIR Challenge in CMRL-Exalogic Case",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "66c17844fc9e5522": {
-  "t": "Sitharaman Open to LTCG Tax Review: What it Means for Indian Investors",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "24ef4c52f38fa464": {
-  "t": "Nandan Nilekani: AI won’t be winner-take-all—jobs ‘doom’ is marketing",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "b776fcdd093ce987": {
-  "t": "Modi calls India ‘mother of democracy’ amid rising ‘Cockroach’ vote-fraud protests",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "cde00edcaf4da048": {
-  "t": "IAS officer booked after Bengaluru pub raid abuse caught on camera",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "34563de4749dbc4d": {
-  "t": "Russia proposes 1-day ceasefire tied to Ukraine elections, rejects truce",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "52bfd92014b6f5f7": {
-  "t": "Nepal Flood Response: Rescuers Reach Villages; At Least 5 Missing",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "2c694fd670471c43": {
-  "t": "PTI braces for federal takeover of Khyber Pakhtunkhwa amid crackdown",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "3a3cf6b1dcdf60e6": {
-  "t": "Kim showcases US-reach missile as Trump signals possible meeting",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "458e10897ba4a6b6": {
-  "t": "India’s Decisive Legal Stand: Why China’s Denial Fails on Ladakh",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-qwen-free"
- },
- "7cc76911e2a6a1c6": {
-  "t": "INDIA Bloc Mobilizes: Rahul Gandhi Leads Anti-CEC Protest",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "4284d0ca6a74cdec": {
-  "t": "Flydubai Case Escalates: UAE Detains Two More Pilots, Probe Widens",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "e57f4070260a9800": {
-  "t": "Jio IPO Draws $20 Billion Bids: The ₹11 Lakh Crore Listing Decoded",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-glm-free"
- },
- "201a14fcd30de758": {
-  "t": "Nothing CEO Slams Apple's Foldable iPhone Duo as a 'Waste of Money'",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-glm-free"
- },
- "c78cd4827dd2dcdc": {
-  "t": "Repair Himachal before repairing democracy: Sona Mohapatra’s call",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "31dc8e92b7e4fd26": {
-  "t": "NASA Perseverance Rover Breaks Mars Driving Record at 45.2 km",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-qwen-free"
- },
- "87d5e4cea857d225": {
-  "t": "Archer and Bethell return as England name ODI squad for Australia tour",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "4138027f2bf9557d": {
-  "t": "Kerala Mini Cooper Crash: Legal Fallout and the Regulatory Shift",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "3bb13feef831327d": {
-  "t": "GTA 6 Leak Hype Meets Crypto Chaos as “Cyberleek” Token Crashes",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "8b34c6d304d47fe5": {
-  "t": "Sex-for-marks row: Congress MP alleges ‘khap panchayat’ witch hunt",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "38ba4cff35dc4676": {
-  "t": "Bose Returns to Wired Audio: The $99 Privacy-First Earbud",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "cf11cdad13b59b28": {
-  "t": "KP emergency move raises alarm as Asim Munir likened to Radcliffe",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "b0a6db19fbe1929b": {
-  "t": "RBI widens forex risk reserve and tightens NDF rules—what it means",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "ed3c361f8039c73a": {
-  "t": "Drishyam 3 Day 11 Box Office: Ajay Devgn Nears ₹500cr Club",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "3ac14acc68d485f0": {
-  "t": "Sitharaman's LTCG Remarks Trigger 1,100-Point Sensex Rally",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "2fca8ad827f686d1": {
-  "t": "Rahul Gandhi’s SC march in Delhi protest: plea against CEC filed",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "1e4b948e2adc5ac5": {
-  "t": "IMD Red Alert Hits Delhi-NCR as Heavy Rain, Thunderstorms Continue",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "47e8555f32c3f693": {
-  "t": "Pregnant Journalist’s Claim Against Rahul Gandhi: What the Video Shows",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "0df0690569ad9710": {
-  "t": "Zelenskyy Claims Russia Dismissing Trump's Energy Ceasefire Proposal",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "453ae5a22dff0dd3": {
-  "t": "New governors assigned to 7 states: Kerala, Tamil Nadu, Karnataka & more",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "d42255a0b6a5d0d0": {
-  "t": "IMF tells developing nations: cut spending despite Iran war shock",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "98c2f46a4c78dea7": {
-  "t": "Ilhan Omar Home Raided: What To Know About The Immigration Probe",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-qwen-free"
- },
- "6635d9804f2e46c1": {
-  "t": "Iran fortifies nuclear sites and mobilizes loyalists amid US attack risk",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "aa29fbdaeadcac4a": {
-  "t": "Nepal Flood: 100+ Foreign Trekkers Stranded Near Manaslu After Flash Flood",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-glm-free"
- },
- "717e17367711f058": {
-  "t": "Nidal Hasan Execution: Legal, Ethical & Tech Debates Explained",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-qwen-free"
- },
- "1f9c60f954c58858": {
-  "t": "Anti-CEC Protests: Rahul Gandhi Vows Justice for 'Vote Chori'",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-glm-free"
- },
- "32d207d781462fd5": {
-  "t": "Sensex surges 1,100+ points; rupee firms—key drivers behind today’s rally",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "53150501160a2636": {
-  "t": "UPI MDR Postponed: What the Post-Diwali Shift Means",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "0ffeba5ab9f3e4b6": {
-  "t": "Hema Malini at 77: A Masterclass in Classical Dance and Endurance",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "82a1448b8ec7ffc3": {
-  "t": "Yuvraj Singh appointed Delhi Capitals assistant & batting coach for IPL 2027",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "1b1e531dd7af93e1": {
-  "t": "Ayush Mhatre Grade 4 hamstring tear: Mumbai face a month-long setback",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "2f69d33b177aeebf": {
-  "t": "Riyadh Under Fire: Houthi Missile Strikes Disrupt Regional Aviation",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "e8dcbf052173c21e": {
-  "t": "NASA Artemis II Moon images: Why the lunar surface isn’t just grey",
-  "d": "2026-10-13",
-  "c": "Breaking News",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "dbe4826e45edb495": {
-  "t": "Rupee Surge: Surpasses Asian Peers as RBI Intervenes in FX Market",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "58f6f97ae2c362c0": {
-  "t": "Kerala Mini Cooper crash: Viral reels, birthday gift and outrage",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "72e8dde205b064d7": {
-  "t": "Amit Shah hails BIMSTEC as key to regional integration and security",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "439e8a7426f22de8": {
-  "t": "Salman Khan Graces Grand Finale of Koffee With Karan Season 9",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "8028bf20ad281126": {
-  "t": "Tata boardroom feud: governance pressure tests a trusted business empire",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "29a391c89efca8d4": {
-  "t": "RJ Mitte, ‘Breaking Bad’ actor and disability rights champion, dies at 34",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "f26b8558f56300bb": {
-  "t": "Antarctic sea ice posts third-lowest winter maximum on record",
-  "d": "2026-10-13",
-  "c": "Top Stories",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
- "94b368bded526d8a": {
-  "t": "Centre Prepares Clampdown on Detention: Balancing Civil Liberties and Public Order",
-  "d": "2026-10-13",
-  "c": "India",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "cb08e96495d0dcee": {
-  "t": "Iran's Threat to Gulf Data Centers: Assessing Regional Cyber-Risk",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-diffusiongema-26B-free-free"
- },
- "c09b510a83f7775b": {
-  "t": "Azerbaijan’s school hijab ban: motives, impact, and what comes next",
-  "d": "2026-10-13",
-  "c": "World",
-  "k": "news",
-  "p": "pollinations-jev-test-triage-free"
- },
  "1fc609f49362f1b2": {
   "t": "India’s Government Fails to Crush Gen Z Protests: A Constitutional Crisis in Progress",
   "d": "2026-10-14",
@@ -13163,5 +12031,206 @@
   "d": "2026-11-27",
   "c": "Features",
   "k": "feature"
+ },
+ "c9ebab8044302cfb": {
+  "t": "Today’s NYT Wordle Hints, Answer and Help for Saturday, Nov. 28, #1988",
+  "d": "2026-11-28",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "vercel-nemotron-free"
+ },
+ "9be2a9afb1839fd9": {
+  "t": "Kallakurichi MLA Arul Vignesh Arrested for Harassing IAS Officer",
+  "d": "2026-11-28",
+  "c": "Breaking News",
+  "k": "news",
+  "p": "gemini-flash-lite"
+ },
+ "dec713de3df51738": {
+  "t": "Naidu Defends 50% Seat Hike, Urges Opposition Unity On Southern Representation",
+  "d": "2026-11-28",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "groq-qwen"
+ },
+ "9aba34457be25f88": {
+  "t": "Trump Backs Iraqi PM's Oil Smuggling Crackdown",
+  "d": "2026-11-28",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "gemini-flash-lite"
+ },
+ "fa82bee05cb1b019": {
+  "t": "Zelenskyy Presses US on Putin, Critiques Trump's 'Friend' Comment",
+  "d": "2026-11-28",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "gemini-flash-lite"
+ },
+ "4d95ffb0a36f68b5": {
+  "t": "High Court Blocks Tata Trusts Bid, Lets Board Meeting Go",
+  "d": "2026-11-28",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "groq-fast"
+ },
+ "9af018b80a615a62": {
+  "t": "Ukraine’s Benghazi Strike Jeopardizes Libya’s Fragile Peace Deal",
+  "d": "2026-11-28",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "groq"
+ },
+ "f3b1ec416732e004": {
+  "t": "NCP-SP announces support to delimitation, Congress calls it ‘unfortunate’",
+  "d": "2026-11-28",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "vercel-nemotron-free"
+ },
+ "611b1d684f0dfc8e": {
+  "t": "OPEC Faces Growing Pressure As Iraq Pushes for Higher Quota",
+  "d": "2026-11-28",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "vercel-nemotron-free"
+ },
+ "914a77dd97a3bb0d": {
+  "t": "RBI Deputy Governor Calls for Faster MSME Loans and Cash‑Flow Credit Expansion",
+  "d": "2026-11-28",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "groq"
+ },
+ "4f66ea282e066a82": {
+  "t": "Market Watch: AI Chip Curbs, Musk Giveaway & Oil Risks in 2026",
+  "d": "2026-11-28",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "groq-qwen"
+ },
+ "21be926eeb4ef339": {
+  "t": "India's Forex Reserves Slip to $700.9 bn, Gold Holdings Drop – What It Means for the Rupee",
+  "d": "2026-11-28",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "groq"
+ },
+ "2d765a00ff678c46": {
+  "t": "2026 Black Friday: Premium Hi‑Fi Bundle Delivers 25% Off Top‑Tier Stereo System",
+  "d": "2026-11-28",
+  "c": "Top Stories",
+  "k": "news",
+  "p": "groq-fast"
+ },
+ "db73fa66d2bb3b63": {
+  "t": "Delimitation Bill Pushes Modi Govt Near 2/3 Lok Sabha Majority, Three Parties Hold the Balance",
+  "d": "2026-11-28",
+  "c": "India",
+  "k": "news",
+  "p": "groq"
+ },
+ "a880defec7e2dd80": {
+  "t": "DMK Conditions for Supporting BJP’s Delimitation Bill: Tamil Nadu Representation Key",
+  "d": "2026-11-28",
+  "c": "India",
+  "k": "news",
+  "p": "groq-fast"
+ },
+ "249852a5382b0843": {
+  "t": "Supreme Court orders Karthigai Deepam to be lit at ‘deepathoon’ on November 28; issues contempt notice",
+  "d": "2026-11-28",
+  "c": "India",
+  "k": "news",
+  "p": "vercel-nemotron-free"
+ },
+ "9d8f61d3f68e74b3": {
+  "t": "India-US trade deal close to culmination: Piyush Goyal",
+  "d": "2026-11-28",
+  "c": "India",
+  "k": "news",
+  "p": "vercel-nemotron-free"
+ },
+ "e029b9f5642a8ed4": {
+  "t": "Former Rapper PM Balen Shah Seeks Indian Funding: What It Means for Nepal‑India Ties",
+  "d": "2026-11-28",
+  "c": "India",
+  "k": "news",
+  "p": "groq"
+ },
+ "8dfe97a738734aed": {
+  "t": "MLA Anant Singh Kicks Driver While Greeting Guests From Sunroof, Video Goes Viral",
+  "d": "2026-11-28",
+  "c": "India",
+  "k": "news",
+  "p": "vercel-nemotron-free"
+ },
+ "2a8e787772c3998c": {
+  "t": "Kashmir Schools Announce Winter Break: Primary Classes Shut on Nov 30",
+  "d": "2026-11-28",
+  "c": "India",
+  "k": "news",
+  "p": "groq-fast"
+ },
+ "d544f0028dbd5a7c": {
+  "t": "Rajasthan CET 12th Admit Card 2026 Released: Download Now",
+  "d": "2026-11-28",
+  "c": "India",
+  "k": "news",
+  "p": "gemini-flash-lite"
+ },
+ "224c29a5a4c33fa0": {
+  "t": "President Murmu Demands Accountability for Naxal Recruitment",
+  "d": "2026-11-28",
+  "c": "India",
+  "k": "news",
+  "p": "gemini-flash-lite"
+ },
+ "b2ec09b676b44a53": {
+  "t": "SC Rejects Plea to Remove Italian PM’s Election Comments",
+  "d": "2026-11-28",
+  "c": "India",
+  "k": "news",
+  "p": "groq-qwen"
+ },
+ "ba12d02cbbde5c56": {
+  "t": "US Tariff Claims vs. Indian Export Data: A TIVRA Analysis",
+  "d": "2026-11-28",
+  "c": "World",
+  "k": "news",
+  "p": "gemini-flash-lite"
+ },
+ "8a5192157f634b4d": {
+  "t": "Kuwait Attack: Italians Dead, Iran Denies Drone Strike Claims",
+  "d": "2026-11-28",
+  "c": "World",
+  "k": "news",
+  "p": "gemini-flash-lite"
+ },
+ "65b4c4a39225c4eb": {
+  "t": "‘Here I am’: Lookout circular issued, CJP’s Abhijit Dipke rallies in Nagpur anyway",
+  "d": "2026-11-28",
+  "c": "India",
+  "k": "news",
+  "p": "vercel-nemotron-free"
+ },
+ "horoscopes-2026-11-28": {
+  "t": "daily horoscopes",
+  "d": "2026-11-28",
+  "c": "Astrology",
+  "k": "special",
+  "p": "gemini-flash-lite"
+ },
+ "analysis-f3b1ec416732e004": {
+  "t": "NCP-SP announces support to delimitation, Congress calls it ‘unfortunate’",
+  "d": "2026-11-28",
+  "c": "Analysis",
+  "k": "analysis"
+ },
+ "analysis-9be2a9afb1839fd9": {
+  "t": "Kallakurichi TVK MLA Arul Vignesh arrested on charges of harassing IAS officer",
+  "d": "2026-11-28",
+  "c": "Analysis",
+  "k": "analysis"
  }
 }
